@@ -1,0 +1,3 @@
+# food, cost
+hamburger, 5
+waffle, 6
