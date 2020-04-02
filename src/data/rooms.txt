@@ -1,0 +1,3 @@
+# roomType, no_of_rooms, cost
+deluxe, 12, 100
+

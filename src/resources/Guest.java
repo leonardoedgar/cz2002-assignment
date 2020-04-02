@@ -1,4 +1,5 @@
-package project;
+package resources;
+import java.util.Date;
 
 public class Guest {
 	String name;
@@ -9,8 +10,11 @@ public class Guest {
 	String nationality;
 	int contact;
 	String identity;
-	double total_cost;
-	
+	Payment payment;
+	RoomService roomService;
+	Date start_date_of_stay;
+	Date end_date_of_stay;
+
 	public Guest(String name, String cardDetails, String address, String country, String gender, String nationality, int contact, String identity) {
 		this.name = name;
 		this.cardDetails = cardDetails;
@@ -29,6 +33,7 @@ public class Guest {
 	public String getCardDetails() {
 		return cardDetails;
 	}
-	
-	
+	public void makeOrder(Menu menu) {
+		//
+	}
 }
