@@ -4,13 +4,11 @@ import resources.Hotel;
 import exception.GuestDetailUpdateFailureException;
 import exception.GuestNotFoundException;
 import exception.AppFailureException;
-import resources.Guest;
 
 public class HotelApp {
 	
 	public static void main(String[] args) {
 		Scanner sc = new Scanner(System.in);
-//		Guest guest = new Guest("Leonardo", "1", "1", "1", "1", "1", 12345, "1");
 		boolean exitApp = false;
 		try {
 			Hotel hotel = new Hotel("src/data/roomConfig.txt");
