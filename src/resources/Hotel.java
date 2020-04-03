@@ -1,4 +1,5 @@
 package resources;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
 import resources.ReservationSystem;
@@ -133,7 +134,18 @@ public class Hotel {
 		Guest guest = this.getGuestByName(name);
 		guest.printDetails();
 	}
-
+	
+	public ReservationSystem getReservationSystem() {
+		return this.reservationSystem;
+	}
+	
+	public ArrayList<String> getAvailableRoomTypes() {
+		ArrayList<String> roomTypes = new ArrayList<String>();
+		for(String roomType: this.roomTable.keySet()) {
+			roomTypes.add(roomType);
+		}
+		return roomTypes;
+	}
 //	public void printStatusReport() {
 //	for (String roomType: this.roomTable.keySet()) {
 //		for(String roomNo: this.roomTable.get(roomType).keySet()) {

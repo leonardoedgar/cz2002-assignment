@@ -1,9 +1,17 @@
 package main;
 import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.Date;
 import resources.Hotel;
+import resources.ReservationSystem;
+import resources.Reservation;
+import resources.Guest;
 import exception.GuestDetailUpdateFailureException;
 import exception.GuestNotFoundException;
+import exception.ReservationNotFoundException;
+import exception.InvalidReservationDetailException;
 import exception.AppFailureException;
+import exception.DuplicateReservationFoundException;
 
 public class HotelApp {
 	
@@ -12,14 +20,14 @@ public class HotelApp {
 		boolean exitApp = false;
 		try {
 			Hotel hotel = new Hotel("src/data/roomConfig.txt");
-			HotelApp.printHotelAppMenu();
 			while (!exitApp) {
+				HotelApp.printHotelAppMenu();
 				System.out.print("Enter user input: ");
 				switch(sc.next()) {
 					case "a":
-					case "A": HotelApp.showMenuA(hotel);break;
+					case "A": HotelApp.showMenuA(hotel); break;
 					case "b":
-					case "B": System.out.println("B"); break;
+					case "B": HotelApp.showMenuB(hotel); break;
 					case "q":
 					case "Q": exitApp = true; break;
 					default: System.out.println("Invalid input. Retry\n");
@@ -64,7 +72,7 @@ public class HotelApp {
 	 */
 	public static void showMenuA(Hotel hotel) throws GuestNotFoundException {
 		Scanner sc = new Scanner(System.in);
-		System.out.println(""
+		System.out.print(""
 				+ "|==================================|\n"
 				+ "|(A) Update guest's detail by name |\n"
 				+ "|(B) Search guest's detail by name |\n"
@@ -76,9 +84,10 @@ public class HotelApp {
 				System.out.println("Enter guest name, detail to update, new detail (respectively): ");
 				try {
 					hotel.updateGuestDetailsByName(sc.next(), sc.next(), sc.next());
+					System.out.println("Guest's details updated successfully!\n");
 				}
 				catch (GuestNotFoundException | GuestDetailUpdateFailureException e) {
-					System.out.println(e.getMessage());
+					System.out.println(e.getMessage() + "\n");
 				}
 				break;
 			}
@@ -88,9 +97,100 @@ public class HotelApp {
 				hotel.printGuestDetailsByName(sc.next());
 				break;
 			}
-			default: System.out.println("Invalid input. Retry\n");
+			default: System.out.println("Invalid input. Retry\n"); 
 		}
-		sc.close();
+	}
+	
+	public static void showMenuB(Hotel hotel) {
+		Scanner sc = new Scanner(System.in);
+		System.out.print(""
+				+ "|==================================|\n"
+				+ "|(A) Create a reservation          |\n"
+				+ "|(B) Update a reservation          |\n"
+				+ "|(C) Remove a reservation          |\n"
+				+ "|(D) Print all reservations        |\n"
+				+ "|==================================|\n"
+				+ "\nEnter user input: ");
+		switch(sc.next()) {
+			case "a":
+			case "A": {
+				try {
+					hotel.getReservationSystem().addReservation(
+							HotelApp.createNewReservation(hotel.getAvailableRoomTypes()));
+					System.out.println("Reservation added successfully!\n");
+				} catch (InvalidReservationDetailException | DuplicateReservationFoundException e) {
+					System.out.println(e.getMessage() + "\n");
+				}
+				break;
+			}
+			case "b":
+			case "B": {
+				try {
+					hotel.getReservationSystem().updateReservation(
+						HotelApp.createNewReservation(hotel.getAvailableRoomTypes()));
+					System.out.println("Reservation updated successfully!\n");
+				} catch (InvalidReservationDetailException | ReservationNotFoundException e) {
+					System.out.println(e.getMessage()+ "\n");
+				} 
+				break;
+			}
+			case "c":
+			case "C": {
+				System.out.print("Enter reservation Id to remove: ");
+				try {
+					hotel.getReservationSystem().removeReservation(sc.next());
+					System.out.println("Reservation removed successfully!\n");
+				} catch (ReservationNotFoundException e) {
+					System.out.println(e.getMessage() + "\n");
+				}
+				break;
+			}
+			case "d":
+			case "D": hotel.getReservationSystem().printReservation(); break;
+			default: System.out.println("Invalid input. Retry\n"); 
+		}
+	}
+	public static Reservation createNewReservation(ArrayList<String> roomTypes) throws InvalidReservationDetailException {
+		Scanner sc = new Scanner(System.in);
+		System.out.print("Enter reservation ID                 : ");
+		String reservationId = sc.nextLine().trim();
+		Guest guest = HotelApp.createNewGuest();
+		System.out.print("Enter date of check in (MM/DD/YYYY)  : ");
+		Date checkInDate = new Date(sc.nextLine().trim());
+		System.out.print("Enter date of check out (MM/DD/YYYY) : ");
+		Date checkOutDate = new Date(sc.nextLine().trim());
+		System.out.print("Enter number of people               : ");
+		int numOfPeople = Integer.parseInt(sc.nextLine().trim());
+		System.out.print("Enter payment type                   : ");
+		String paymentType = sc.nextLine().trim();
+		System.out.print("Enter room type                      : ");
+		String roomType = sc.nextLine().trim();
+		if (checkInDate.compareTo(checkOutDate) >=0 || !roomTypes.contains(roomType)) {
+			throw new InvalidReservationDetailException();
+		}
+		return new Reservation(reservationId, guest, checkInDate, checkOutDate, 
+			numOfPeople, paymentType, roomType);
+	}
+	public static Guest createNewGuest() {
+		Scanner sc = new Scanner(System.in);
+		System.out.print("Enter guest name                     : ");
+		String guestName = sc.nextLine().trim();
+		System.out.print("Enter card details                   : ");
+		String cardDetails = sc.nextLine().trim();
+		System.out.print("Enter address                        : ");
+		String address = sc.nextLine().trim();
+		System.out.print("Enter country                        : ");
+		String country = sc.nextLine().trim();
+		System.out.print("Enter gender                         : ");
+		String gender = sc.nextLine().trim();
+		System.out.print("Enter nationality                    : ");
+		String nationality = sc.nextLine().trim();
+		System.out.print("Enter contact                        : ");
+		String contact = sc.nextLine().trim();
+		System.out.print("Enter identity                       : ");
+		String identity = sc.nextLine().trim();
+		return new Guest(guestName, cardDetails, address, country, 
+				gender, nationality, Integer.parseInt(contact), identity);
 	}
 }
 

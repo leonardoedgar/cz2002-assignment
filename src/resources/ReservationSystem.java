@@ -64,18 +64,26 @@ public class ReservationSystem {
 	}
 	public void printReservation() {
 		ArrayList<String> sortedDateReservationArr = this.getSortedDateOfReservation();
-		for(int i=0; i<sortedDateReservationArr.size(); i++) {
-			String date = sortedDateReservationArr.get(i);
-			System.out.println("==============================================");
-			System.out.println("DD/MM/YYYY: " + date);
-			for (String roomType: this.reservationTable.get(date).keySet()) {
-				for (Reservation reservation: this.reservationTable.get(date).get(roomType)) {
-					System.out.println("----------------------------------------------");
-					reservation.printDetails();
-					System.out.println("----------------------------------------------");
+		if (sortedDateReservationArr.size() == 0) {
+			System.out.println(""
+					+ "|=========================|\n"
+					+ "|      NO RESERVATIONS    |\n"
+					+ "|=========================|\n");
+		}
+		else {
+			for(int i=0; i<sortedDateReservationArr.size(); i++) {
+				String date = sortedDateReservationArr.get(i);
+				System.out.println("==============================================");
+				System.out.println("DD/MM/YYYY: " + date);
+				for (String roomType: this.reservationTable.get(date).keySet()) {
+					for (Reservation reservation: this.reservationTable.get(date).get(roomType)) {
+						System.out.println("----------------------------------------------");
+						reservation.printDetails();
+						System.out.println("----------------------------------------------");
+					}
 				}
+				System.out.println("==============================================");
 			}
-			System.out.println("==============================================");
 		}
 	}
 	
