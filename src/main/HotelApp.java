@@ -2,6 +2,7 @@ package main;
 import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.Date;
+import java.lang.NumberFormatException;
 import resources.Hotel;
 import resources.ReservationSystem;
 import resources.Reservation;
@@ -12,6 +13,7 @@ import exception.ReservationNotFoundException;
 import exception.InvalidReservationDetailException;
 import exception.AppFailureException;
 import exception.DuplicateReservationFoundException;
+import exception.InvalidGuestDetailException;
 
 public class HotelApp {
 	
@@ -78,12 +80,17 @@ public class HotelApp {
 				+ "|(B) Search guest's detail by name |\n"
 				+ "|==================================|\n"
 				+ "\nEnter user input: ");
-		switch(sc.next()) {
+		switch(sc.nextLine().trim()) {
 			case "a":
 			case "A": {
-				System.out.println("Enter guest name, detail to update, new detail (respectively): ");
+				System.out.print("Enter guest name      : ");
+				String guestName = sc.nextLine().trim();
+				System.out.print("Enter detail to update: ");
+				String detailToUpdate = sc.nextLine().trim();
+				System.out.print("Enter new detail      : ");
+				String newDetail = sc.nextLine().trim();
 				try {
-					hotel.updateGuestDetailsByName(sc.next(), sc.next(), sc.next());
+					hotel.updateGuestDetailsByName(guestName, detailToUpdate, newDetail);
 					System.out.println("Guest's details updated successfully!\n");
 				}
 				catch (GuestNotFoundException | GuestDetailUpdateFailureException e) {
@@ -94,7 +101,7 @@ public class HotelApp {
 			case "b":
 			case "B": {
 				System.out.println("Enter guest name to display his/her details: ");
-				hotel.printGuestDetailsByName(sc.next());
+				hotel.printGuestDetailsByName(sc.nextLine().trim());
 				break;
 			}
 			default: System.out.println("Invalid input. Retry\n"); 
@@ -111,14 +118,15 @@ public class HotelApp {
 				+ "|(D) Print all reservations        |\n"
 				+ "|==================================|\n"
 				+ "\nEnter user input: ");
-		switch(sc.next()) {
+		switch(sc.nextLine().trim()) {
 			case "a":
 			case "A": {
 				try {
 					hotel.getReservationSystem().addReservation(
 							HotelApp.createNewReservation(hotel.getAvailableRoomTypes()));
 					System.out.println("Reservation added successfully!\n");
-				} catch (InvalidReservationDetailException | DuplicateReservationFoundException e) {
+				} catch (InvalidGuestDetailException | InvalidReservationDetailException | 
+						DuplicateReservationFoundException e) {
 					System.out.println(e.getMessage() + "\n");
 				}
 				break;
@@ -129,16 +137,17 @@ public class HotelApp {
 					hotel.getReservationSystem().updateReservation(
 						HotelApp.createNewReservation(hotel.getAvailableRoomTypes()));
 					System.out.println("Reservation updated successfully!\n");
-				} catch (InvalidReservationDetailException | ReservationNotFoundException e) {
+				} catch ( InvalidGuestDetailException | InvalidReservationDetailException | 
+						ReservationNotFoundException e) {
 					System.out.println(e.getMessage()+ "\n");
 				} 
 				break;
 			}
 			case "c":
 			case "C": {
-				System.out.print("Enter reservation Id to remove: ");
+				System.out.print("Enter reservation ID to remove: ");
 				try {
-					hotel.getReservationSystem().removeReservation(sc.next());
+					hotel.getReservationSystem().removeReservation(sc.nextLine().trim());
 					System.out.println("Reservation removed successfully!\n");
 				} catch (ReservationNotFoundException e) {
 					System.out.println(e.getMessage() + "\n");
@@ -150,7 +159,7 @@ public class HotelApp {
 			default: System.out.println("Invalid input. Retry\n"); 
 		}
 	}
-	public static Reservation createNewReservation(ArrayList<String> roomTypes) throws InvalidReservationDetailException {
+	public static Reservation createNewReservation(ArrayList<String> roomTypes) throws InvalidReservationDetailException, InvalidGuestDetailException {
 		Scanner sc = new Scanner(System.in);
 		System.out.print("Enter reservation ID                 : ");
 		String reservationId = sc.nextLine().trim();
@@ -171,7 +180,7 @@ public class HotelApp {
 		return new Reservation(reservationId, guest, checkInDate, checkOutDate, 
 			numOfPeople, paymentType, roomType);
 	}
-	public static Guest createNewGuest() {
+	public static Guest createNewGuest() throws InvalidGuestDetailException {
 		Scanner sc = new Scanner(System.in);
 		System.out.print("Enter guest name                     : ");
 		String guestName = sc.nextLine().trim();
@@ -189,8 +198,14 @@ public class HotelApp {
 		String contact = sc.nextLine().trim();
 		System.out.print("Enter identity                       : ");
 		String identity = sc.nextLine().trim();
-		return new Guest(guestName, cardDetails, address, country, 
-				gender, nationality, Integer.parseInt(contact), identity);
+		try {
+			return new Guest(guestName, cardDetails, address, country, 
+					gender, nationality, Integer.parseInt(contact), identity);
+		}
+		catch (NumberFormatException e) {
+			throw new InvalidGuestDetailException();
+		}
+		
 	}
 }
 

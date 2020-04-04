@@ -1,9 +1,7 @@
 package resources;
 import java.util.Date;
-import java.util.Hashtable;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.ArrayList;
-import java.util.Map.Entry;
-import resources.Guest;
 import java.util.Collections;
 import java.util.Comparator;
 import resources.Reservation;
@@ -13,8 +11,8 @@ import exception.DuplicateReservationFoundException;
 public class ReservationSystem {
 	//{"DD MM YYYY": {"roomType": Reservation}}
 	
-	private Hashtable<String, Hashtable<String, ArrayList<Reservation>>> reservationTable = 
-			new Hashtable<String, Hashtable<String, ArrayList<Reservation>>>();
+	private ConcurrentHashMap<String, ConcurrentHashMap<String, ArrayList<Reservation>>> reservationTable = 
+			new ConcurrentHashMap<String, ConcurrentHashMap<String, ArrayList<Reservation>>>();
 	public void addReservation(Reservation reservation) throws DuplicateReservationFoundException {
 		if(!this.doesDuplicateReservationIdExist(reservation.getReservationId())) {
 			this.addNewReservation(reservation);
@@ -38,7 +36,7 @@ public class ReservationSystem {
 				for (String roomType: this.reservationTable.get(date).keySet()) {
 					ArrayList<Reservation> reservationList = this.reservationTable.get(date).get(roomType);
 					for (int i=0; i<reservationList.size(); i++) {
-						if(reservationList.get(i).getReservationId() == reservationId) {
+						if(reservationList.get(i).getReservationId().equals(reservationId)) {
 							this.removeReservationFromArrayByIndex(reservationList, i, date, roomType);
 						}
 					}
@@ -111,7 +109,7 @@ public class ReservationSystem {
 						this.getReservationsOnSameDateAndRoomType(reserveDate, reservation.getRoomType());
 				boolean reservationUpdated = false;
 				for (int i=0; i<reservationList.size(); i++) {
-					if(reservationList.get(i).getReservationId() == reservation.getReservationId()) {
+					if(reservationList.get(i).getReservationId().equals(reservation.getReservationId())) {
 						reservationUpdated = true;
 					}
 				}
@@ -133,7 +131,7 @@ public class ReservationSystem {
 				catch (ReservationNotFoundException e2) {
 					this.reservationTable.put(
 							ReservationSystem.getFormattedDate(reserveDate), 
-							new Hashtable<String, ArrayList<Reservation>>() {{
+							new ConcurrentHashMap<String, ArrayList<Reservation>>() {{
 								put(
 										reservation.getRoomType(), 
 										new ArrayList<Reservation>() {{add(reservation);}}
@@ -149,19 +147,17 @@ public class ReservationSystem {
 				ArrayList<Reservation> reservationList = 
 						this.reservationTable.get(date).get(roomType);
 				for (int i=0; i<reservationList.size();i++) {
-					if (reservationList.get(i).getReservationId() == 
-							reservation.getReservationId()) {
-						if(reservationList.get(i).getDateOfCheckIn() != 
-								reservation.getDateOfCheckIn() || 
-								reservationList.get(i).getDateOfCheckOut() != 
-								reservation.getDateOfCheckOut()) {
+					if (reservationList.get(i).getReservationId().equals( 
+							reservation.getReservationId())) {
+						if(!reservationList.get(i).getDateOfCheckIn().equals(reservation.getDateOfCheckIn()) || 
+								!reservationList.get(i).getDateOfCheckOut().equals(reservation.getDateOfCheckOut())) {
 							Date reservationStartDate = reservation.getDateOfCheckIn();
 							Date reservationEndDate = new Date(
 									reservation.getDateOfCheckOut().getTime() - 24*60*60*1000);
 							Date currentDate = new Date(date);
 							if (reservationStartDate.compareTo(currentDate)*
 									currentDate.compareTo(reservationEndDate) >= 0) {
-								if(reservation.getRoomType() == reservationList.get(i).getRoomType()) {
+								if(reservation.getRoomType().equals(reservationList.get(i).getRoomType())) {
 									Reservation newReservation = Reservation.copy(reservation);
 									newReservation.updateStatus(reservationList.get(i).getStatus());
 									reservationList.set(i, newReservation);
@@ -176,7 +172,7 @@ public class ReservationSystem {
 									date, roomType);
 							}
 						}
-						else if (reservationList.get(i).getRoomType() != reservation.getRoomType()) {
+						else if (reservationList.get(i).getRoomType().equals(reservation.getRoomType())) {
 							this.removeReservationFromArrayByIndex(reservationList, i, 
 								date, roomType);
 						}
@@ -193,7 +189,7 @@ public class ReservationSystem {
 		return this.reservationTable.containsKey(ReservationSystem.getFormattedDate(date));
 	}
 	
-	private Hashtable<String, ArrayList<Reservation>> getReservationOnSameDate(Date date) throws ReservationNotFoundException {
+	private ConcurrentHashMap<String, ArrayList<Reservation>> getReservationOnSameDate(Date date) throws ReservationNotFoundException {
 		if (this.doesReservationOnSameDateExist(date)) {
 			return this.reservationTable.get(ReservationSystem.getFormattedDate(date));
 		}
@@ -222,7 +218,7 @@ public class ReservationSystem {
 		for(String date: this.reservationTable.keySet()) {
 			for (String roomType: this.reservationTable.get(date).keySet()) {
 				for (Reservation reservation: this.reservationTable.get(date).get(roomType)) {
-					if (reservation.getReservationId() == reservationId) {
+					if (reservation.getReservationId().equals(reservationId)) {
 						return true;
 					}
 				}
