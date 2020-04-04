@@ -1,8 +1,11 @@
 package main;
 import java.util.Scanner;
 import resources.Hotel;
+import resources.Room;
 import exception.GuestDetailUpdateFailureException;
 import exception.GuestNotFoundException;
+import exception.RoomDetailUpdateFailureException;
+import exception.RoomNotFoundException;
 import exception.AppFailureException;
 import resources.Guest;
 
@@ -14,14 +17,16 @@ public class HotelApp {
 		boolean exitApp = false;
 		try {
 			Hotel hotel = new Hotel("src/data/roomConfig.txt");
-			HotelApp.printHotelAppMenu();
 			while (!exitApp) {
+				HotelApp.printHotelAppMenu();
 				System.out.print("Enter user input: ");
-				switch(sc.next()) {
+				switch(sc.nextLine()) {
 					case "a":
 					case "A": HotelApp.showMenuA(hotel);break;
 					case "b":
 					case "B": System.out.println("B"); break;
+					case "c":
+					case "C": HotelApp.showMenuC(hotel);break;
 					case "q":
 					case "Q": exitApp = true; break;
 					default: System.out.println("Invalid input. Retry\n");
@@ -72,7 +77,7 @@ public class HotelApp {
 				+ "|(B) Search guest's detail by name |\n"
 				+ "|==================================|\n"
 				+ "\nEnter user input: ");
-		switch(sc.next()) {
+		switch(sc.nextLine()) {
 			case "a":
 			case "A": {
 				System.out.println("Enter guest name, detail to update, new detail (respectively): ");
@@ -93,6 +98,38 @@ public class HotelApp {
 			default: System.out.println("Invalid input. Retry\n");
 		}
 		sc.close();
+	}
+	
+	public static void showMenuC(Hotel hotel) throws RoomNotFoundException {
+		Scanner sc = new Scanner(System.in);
+		System.out.println("Enter your room number: ");
+		String room_num = sc.nextLine();
+		Room room = hotel.getRoomByNo(room_num);
+		room.printRoom();
+		System.out.print(""
+				+ "Details to be created/updated: \n"
+				+ "|=====================|\n"
+				+ "|(A) Room status	|\n"
+				+ "|(B) Room cost	|\n"
+				+ "|(C) Bed type	|\n"
+				+ "|(D) Wifi Availability|\n"
+				+ "|(E) View of the Room |\n"
+				+ "|(F) Smoking Allowance|\n"
+				+ "|=====================|\n"
+				+ "\nEnter user input: ");
+		String choice = sc.nextLine();
+		System.out.println("choice = "+choice);
+		System.out.println("Enter the updated information: ");
+		String new_data = sc.nextLine();
+		try {
+			hotel.updateRoomDetails(room_num, choice.charAt(0), new_data);
+			System.out.println("Room Information Updated!");
+			room.printRoom();
+		}
+		catch (RoomNotFoundException e) {
+			System.out.println(e.getMessage());
+		}
+		
 	}
 }
 
