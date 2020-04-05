@@ -1,3 +1,7 @@
-# food, cost
-hamburger, 5
-waffle, 6
+hamburger,5
+waffle,6
+Japanese curry,10
+Quesadilla,8
+Taco,12
+Nachos,7
+Nasi lemak,5

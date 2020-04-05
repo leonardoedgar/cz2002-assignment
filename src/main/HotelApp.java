@@ -1,6 +1,7 @@
 package main;
 import java.util.Scanner;
 import resources.Hotel;
+import resources.Menu;
 import exception.GuestDetailUpdateFailureException;
 import exception.GuestNotFoundException;
 import exception.AppFailureException;
@@ -14,14 +15,17 @@ public class HotelApp {
 		boolean exitApp = false;
 		try {
 			Hotel hotel = new Hotel("src/data/roomConfig.txt");
+			Menu menu = new Menu("src/data/menu.txt");
 			HotelApp.printHotelAppMenu();
 			while (!exitApp) {
 				System.out.print("Enter user input: ");
-				switch(sc.next()) {
+				switch(sc.nextLine()) {
 					case "a":
 					case "A": HotelApp.showMenuA(hotel);break;
 					case "b":
 					case "B": System.out.println("B"); break;
+					case "e":
+					case "E": HotelApp.showMenuE(menu); break;
 					case "q":
 					case "Q": exitApp = true; break;
 					default: System.out.println("Invalid input. Retry\n");
@@ -93,6 +97,64 @@ public class HotelApp {
 			default: System.out.println("Invalid input. Retry\n");
 		}
 		sc.close();
+	}
+	
+	public static void showMenuE(Menu menu) {
+		String foodname;
+		double price;
+		boolean dummy = false;
+		Scanner scn = new Scanner(System.in);
+		System.out.println("Would you like to:\n"
+				+ "(A) Add Items in the Menu\n"
+				+ "(B) Remove Items from the Menu\n"
+				+ "(C) Update Items from the Menu\n"
+				+ "Your choice: ");
+		switch(scn.nextLine()) {
+		case "a":
+		case "A":{
+			System.out.println("Enter the food name:");
+			foodname = scn.nextLine();
+			System.out.println("Enter the price of the food:");
+			price = scn.nextDouble();
+			menu.addItems(foodname, price);
+			break;}
+		case "b":
+		case "B":{
+			System.out.println("Enter the food name:");
+			foodname = scn.nextLine();
+			for (String food: menu.Menu_list.keySet()) {
+				if (food.equals(foodname)){
+					menu.removeItems(foodname);
+					dummy = true;
+					break;
+				}
+			}
+			if (dummy == false) {
+			System.out.println("Item is not in the list");}
+			dummy= false;
+			break;}
+		
+		case "c":
+		case "C":{
+			System.out.println("Enter the food name:");
+			foodname = scn.nextLine();
+			System.out.println("Enter the price:");
+			price = scn.nextDouble();
+			for (String food: menu.Menu_list.keySet()) {
+				if (food.equals(foodname)){
+					menu.updateItems(foodname, price);
+					dummy = true;
+					break;
+				}
+			}
+			if (dummy == false) {
+			System.out.println("Item is not in the list, but we will add it in.");
+			menu.addItems(foodname, price);
+			}
+			dummy = false;
+			break;}
+			
+		}
 	}
 }
 
