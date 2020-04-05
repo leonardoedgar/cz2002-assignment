@@ -110,7 +110,7 @@ public class HotelApp {
 				+ "Details to be created/updated: \n"
 				+ "|=====================|\n"
 				+ "|(A) Room status	|\n"
-				+ "|(B) Room cost	|\n"
+				+ "|(B) Room price	|\n"
 				+ "|(C) Bed type	|\n"
 				+ "|(D) Wifi Availability|\n"
 				+ "|(E) View of the Room |\n"
