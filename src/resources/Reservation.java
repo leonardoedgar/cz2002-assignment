@@ -1,6 +1,9 @@
 package resources;
 import java.util.Date;
 
+/**
+ * A class to represent a reservation in a hotel.
+ */
 public class Reservation {
 	private String reservationId;
 	private Guest guestDetails;
@@ -10,15 +13,16 @@ public class Reservation {
 	private String paymentType;
 	private String status;
 	private String roomType;
+	
 	/**
-	 * Creates an instance of Reservation
-	 * @param reservationId
-	 * @param guestDetails
-	 * @param dateOfCheckIn
-	 * @param dateOfCheckOut
-	 * @param noOfPeople
-	 * @param paymentType
-	 * @param status
+	 * A class constructor for reservation object.
+	 * @param reservationId {String} the reservation id
+	 * @param guestDetails {Guest} the guest object
+	 * @param dateOfCheckIn {Date} date of check in
+	 * @param dateOfCheckOut {Date} date of check out
+	 * @param noOfPeople {int} number of people in 1 room
+	 * @param paymentType {String} the payment type
+	 * @param roomType {String} the room type
 	 */
 	public Reservation(String reservationId,Guest guestDetails, Date dateOfCheckIn, Date dateOfCheckOut,
 			int noOfPeople,String paymentType,String roomType){
@@ -32,34 +36,64 @@ public class Reservation {
 		this.roomType=roomType;
 	}
 	
+	/**
+	 * A function to get the reservation id.
+	 * @return {String} the reservation id
+	 */
 	public String getReservationId() {
 		return this.reservationId;
 	}
 	
+	/**
+	 * A function to get the guest detail.
+	 * @return {Guest} the guest object
+	 */
 	public Guest getGuest() {
 		return this.guestDetails;
 	}
 	
+	/**
+	 * A function to get the payment type.
+	 * @return {String} the payment type
+	 */
 	public String getPaymentType() {
 		return this.paymentType;
 	}
 	
+	/**
+	 * A function to get the number of people in 1 room.
+	 * @return {int} the number of people in 1 room
+	 */
 	public int getNoOfPeople() {
 		return this.noOfPeople;
 	}
 	
+	/**
+	 * A function to get the reservation status.
+	 * @return {String} the status of the reservation
+	 */
 	public String getStatus() {
 		return this.status;
 	}
 	
+	/**
+	 * A function to expire a reservation.
+	 */
 	public void expire() {
-		this.status="Expired";
+		this.updateStatus("expired");
 	}
 	
+	/**
+	 * A function to update the status of a reservation.
+	 * @param reservationStatus {String} the status to update to
+	 */
 	public void updateStatus(String reservationStatus) {
 		this.status=reservationStatus;
 	}
 	
+	/**
+	 * A function to print the reservation receipt.
+	 */
 	public void printReceipt() {
 		int lengthOfSymbol = this.dateOfCheckIn.toString().length()+ 18;
 		String header = "RECEIPT";
@@ -84,16 +118,33 @@ public class Reservation {
 		System.out.println();
 	}
 	
+	/**
+	 * A function to get the date of check in.
+	 * @return {Date} the check in date
+	 */
 	public Date getDateOfCheckIn() {
 		return this.dateOfCheckIn;
 	}
 	
+	/**
+	 * A function to get the date of check out.
+	 * @return {Date} the check out date
+	 */
 	public Date getDateOfCheckOut() {
 		return this.dateOfCheckOut;
 	}
+	
+	/**
+	 * A function to get the room type.
+	 * @return {String} the room type
+	 */
 	public String getRoomType() {
 		return this.roomType;
 	}
+	
+	/**
+	 * A function to print the detail of a reservation.
+	 */
 	public void printDetails() {
 		System.out.println("Reservation id  : " + this.reservationId);
 		System.out.println("Guest name      : " + this.guestDetails.getName());
@@ -104,6 +155,12 @@ public class Reservation {
 		System.out.println("Status          : " + this.status);
 		System.out.println("Room type       : " + this.roomType);
 	}
+	
+	/**
+	 * A function to copy a reservation.
+	 * @param reservation {Reservation} the reservation object to copy.
+	 * @return {Reservation} a new copied reservation object
+	 */
 	public static Reservation copy(Reservation reservation) {
 		return new Reservation(
 			reservation.getReservationId(),

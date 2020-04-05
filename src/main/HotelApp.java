@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.lang.NumberFormatException;
 import resources.Hotel;
-import resources.ReservationSystem;
 import resources.Reservation;
 import resources.Guest;
 import exception.GuestDetailUpdateFailureException;
@@ -44,6 +43,7 @@ public class HotelApp {
 			sc.close();
 		}
 	}
+	
 	/**
 	 * A function to print hotelApp Menu.
 	 */
@@ -67,6 +67,7 @@ public class HotelApp {
 				+ "|(Q) Quit the app                                 |\n"
 				+ "|=================================================|\n");
 	}
+	
 	/**
 	 * A function to show menu A.
 	 * @param hotel {Hotel} indicates the hotel object
@@ -108,6 +109,10 @@ public class HotelApp {
 		}
 	}
 	
+	/**
+	 * A function to show menu B.
+	 * @param hotel {Hotel} indicates the hotel object
+	 */
 	public static void showMenuB(Hotel hotel) {
 		Scanner sc = new Scanner(System.in);
 		System.out.print(""
@@ -159,6 +164,15 @@ public class HotelApp {
 			default: System.out.println("Invalid input. Retry\n"); 
 		}
 	}
+	
+	/**
+	 * A function to create a new reservation. 
+	 * @param roomTypes {ArrayList<String>} indicates the available room types in the hotel
+	 * @return {Reservation} the reservation object.
+	 * @throws {InvalidReservationDetailException} exception when reservation detail input is not valid
+	 * @throws {InvalidGuestDetailException} exception when guest detail input is not valid 
+	 */
+	@SuppressWarnings("deprecation")
 	public static Reservation createNewReservation(ArrayList<String> roomTypes) throws InvalidReservationDetailException, InvalidGuestDetailException {
 		Scanner sc = new Scanner(System.in);
 		System.out.print("Enter reservation ID                 : ");
@@ -168,18 +182,24 @@ public class HotelApp {
 		Date checkInDate = new Date(sc.nextLine().trim());
 		System.out.print("Enter date of check out (MM/DD/YYYY) : ");
 		Date checkOutDate = new Date(sc.nextLine().trim());
+		System.out.print("Enter room type                      : ");
+		String roomType = sc.nextLine().trim();
 		System.out.print("Enter number of people               : ");
 		int numOfPeople = Integer.parseInt(sc.nextLine().trim());
 		System.out.print("Enter payment type                   : ");
 		String paymentType = sc.nextLine().trim();
-		System.out.print("Enter room type                      : ");
-		String roomType = sc.nextLine().trim();
 		if (checkInDate.compareTo(checkOutDate) >=0 || !roomTypes.contains(roomType)) {
 			throw new InvalidReservationDetailException();
 		}
 		return new Reservation(reservationId, guest, checkInDate, checkOutDate, 
 			numOfPeople, paymentType, roomType);
 	}
+	
+	/**
+	 * A function to create a new Guest.
+	 * @return {Guest} the guest object
+	 * @throws {InvalidGuestDetailException} exception when guest detail input is not valid 
+	 */
 	public static Guest createNewGuest() throws InvalidGuestDetailException {
 		Scanner sc = new Scanner(System.in);
 		System.out.print("Enter guest name                     : ");
@@ -190,10 +210,10 @@ public class HotelApp {
 		String address = sc.nextLine().trim();
 		System.out.print("Enter country                        : ");
 		String country = sc.nextLine().trim();
-		System.out.print("Enter gender                         : ");
-		String gender = sc.nextLine().trim();
 		System.out.print("Enter nationality                    : ");
 		String nationality = sc.nextLine().trim();
+		System.out.print("Enter gender                         : ");
+		String gender = sc.nextLine().trim();
 		System.out.print("Enter contact                        : ");
 		String contact = sc.nextLine().trim();
 		System.out.print("Enter identity                       : ");
@@ -208,4 +228,3 @@ public class HotelApp {
 		
 	}
 }
-

@@ -8,11 +8,24 @@ import resources.Reservation;
 import exception.ReservationNotFoundException;
 import exception.DuplicateReservationFoundException;
 
+/**
+ * A class to represent a reservation system.
+ */
 public class ReservationSystem {
 	//{"DD MM YYYY": {"roomType": Reservation}}
 	
-	private ConcurrentHashMap<String, ConcurrentHashMap<String, ArrayList<Reservation>>> reservationTable = 
-			new ConcurrentHashMap<String, ConcurrentHashMap<String, ArrayList<Reservation>>>();
+	private ConcurrentHashMap<String, ConcurrentHashMap<String, ArrayList<Reservation>>> reservationTable;
+	
+	ReservationSystem() {
+		this.reservationTable = 
+				new ConcurrentHashMap<String, ConcurrentHashMap<String, ArrayList<Reservation>>>();
+	}
+	
+	/**
+	 * A function to add a reservation.
+	 * @param reservation { Reservation} the reservation to add
+	 * @throws {DuplicateReservationFoundException} exception when duplicate reservation is found
+	 */
 	public void addReservation(Reservation reservation) throws DuplicateReservationFoundException {
 		if(!this.doesDuplicateReservationIdExist(reservation.getReservationId())) {
 			this.addNewReservation(reservation);
@@ -21,6 +34,12 @@ public class ReservationSystem {
 			throw new DuplicateReservationFoundException();
 		}
 	}
+	
+	/**
+	 * A function to update a reservation.
+	 * @param reservation {Reservation} the reservation to update to
+	 * @throws {ReservationNotFoundException} exception when the old reservation is not found
+	 */
 	public void updateReservation(Reservation reservation) throws ReservationNotFoundException {
 		if (this.doesDuplicateReservationIdExist(reservation.getReservationId())) {
 			this.updatePastReservation(reservation);
@@ -30,6 +49,12 @@ public class ReservationSystem {
 			throw new ReservationNotFoundException();
 		}
 	}
+	
+	/**
+	 * A function to remove a reservation
+	 * @param reservationId {String} the reservation id to remove
+	 * @throws {ReservationNotFoundException} exception when reservation to remove is not found
+	 */
 	public void removeReservation(String reservationId) throws ReservationNotFoundException {
 		if (this.doesDuplicateReservationIdExist(reservationId)) {
 			for(String date: this.reservationTable.keySet()) {
@@ -47,6 +72,14 @@ public class ReservationSystem {
 			throw new ReservationNotFoundException();
 		}
 	}
+	
+	/**
+	 * A function to remove a reservation by index from an array.
+	 * @param reservationList {ArrayList<Reservation>} the reservation array
+	 * @param index {int} the index to remove
+	 * @param date {Date} the date of the reservation to remove
+	 * @param roomType {String} the room type
+	 */
 	private void removeReservationFromArrayByIndex(ArrayList<Reservation> reservationList, 
 			int index, String date, String roomType) {
 		if (reservationList.size() > 12) {
@@ -60,6 +93,10 @@ public class ReservationSystem {
 			}
 		}
 	}
+	
+	/**
+	 * A function to print a reservation.
+	 */
 	public void printReservation() {
 		ArrayList<String> sortedDateReservationArr = this.getSortedDateOfReservation();
 		if (sortedDateReservationArr.size() == 0) {
@@ -85,18 +122,29 @@ public class ReservationSystem {
 		}
 	}
 	
+	/**
+	 * A function to get a sorted reservation by date.
+	 * @return {ArrayList<String>} an array of sorted reservation
+	 */
 	private ArrayList<String> getSortedDateOfReservation() {
 		ArrayList<String> dateArr = new ArrayList<String>();
 		for (String date: this.reservationTable.keySet()) {
 			dateArr.add(date);
 		}
 		Collections.sort(dateArr, new Comparator<String>() {
-			  public int compare(String date1, String date2) {
+			  @SuppressWarnings("deprecation")
+			public int compare(String date1, String date2) {
 			    return new Date(date1).compareTo(new Date(date2));
 			  }
 		});
 		return dateArr;
 	}
+	
+	/**
+	 * A function to add a new reservation.
+	 * @param reservation {Reservation} the new reservation to add
+	 */
+	@SuppressWarnings("serial")
 	private void addNewReservation(Reservation reservation) {
 		reservation.updateStatus("confirmed");
 		for(
@@ -141,6 +189,11 @@ public class ReservationSystem {
 			}
 		}
 	}
+	
+	/**
+	 * A function to update the past reservation with a new one.
+	 * @param reservation {Reservation} the new reservation to update to
+	 */
 	private void updatePastReservation(Reservation reservation) {
 		for(String date: this.reservationTable.keySet()) {
 			for (String roomType: this.reservationTable.get(date).keySet()) {
@@ -154,6 +207,7 @@ public class ReservationSystem {
 							Date reservationStartDate = reservation.getDateOfCheckIn();
 							Date reservationEndDate = new Date(
 									reservation.getDateOfCheckOut().getTime() - 24*60*60*1000);
+							@SuppressWarnings("deprecation")
 							Date currentDate = new Date(date);
 							if (reservationStartDate.compareTo(currentDate)*
 									currentDate.compareTo(reservationEndDate) >= 0) {
@@ -185,10 +239,22 @@ public class ReservationSystem {
 			}
 		}
 	}
+	
+	/**
+	 * A function to know whether reservation on a particular date exists.
+	 * @param date {Date} the date to check with.
+	 * @return {boolean} the existence of the reservation on the same date
+	 */
 	private boolean doesReservationOnSameDateExist(Date date) {
 		return this.reservationTable.containsKey(ReservationSystem.getFormattedDate(date));
 	}
 	
+	/**
+	 * A function to get reservations on the same date.
+	 * @param date {Date} the date of the reservation
+	 * @return {ArrayList<Reservation>} all reservations on the same date
+	 * @throws {ReservationNotFoundException} exception when no reservation found on the same date
+	 */
 	private ConcurrentHashMap<String, ArrayList<Reservation>> getReservationOnSameDate(Date date) throws ReservationNotFoundException {
 		if (this.doesReservationOnSameDateExist(date)) {
 			return this.reservationTable.get(ReservationSystem.getFormattedDate(date));
@@ -196,6 +262,13 @@ public class ReservationSystem {
 		throw new ReservationNotFoundException(); 
 	}
 	
+	/**
+	 * A function to know whether there is any reservations on a particular date and room type.
+	 * @param date {Date} the date of the reservation
+	 * @param roomType {String} the room type
+	 * @return {boolean} the existence of any reservations on a particular date and room type
+	 * @throws {ReservationNotFoundException} exception when no reservation found
+	 */
 	private boolean doesReservationOnSameDateAndRoomTypeExist(Date date, String roomType) throws ReservationNotFoundException {
 		if (this.doesReservationOnSameDateExist(date)) {
 			return this.getReservationOnSameDate(date).containsKey(roomType);
@@ -203,6 +276,13 @@ public class ReservationSystem {
 		return false;
 	}
 	
+	/**
+	 * A function to get all reservations on the same date and room type.
+	 * @param date {Date} the date of the reservation
+	 * @param roomType {String} the room type
+	 * @return {ArrayList<reservation>} all reservation on the same date and room type
+	 * @throws {ReservationNotFoundException} exception when no reservation found
+	 */
 	private ArrayList<Reservation> getReservationsOnSameDateAndRoomType(Date date, String roomType) throws ReservationNotFoundException {
 		if (this.doesReservationOnSameDateAndRoomTypeExist(date, roomType)) {
 			return this.getReservationOnSameDate(date).get(roomType);
@@ -210,10 +290,21 @@ public class ReservationSystem {
 		throw new ReservationNotFoundException();
 	}
 	
+	/**
+	 * A function to get a formatted date string.
+	 * @param date {Date} the date to format
+	 * @return {String} the formatted date
+	 */
+	@SuppressWarnings("deprecation")
 	private static String getFormattedDate(Date date) {
 		return date.toLocaleString().split(",")[0];
 	}
 	
+	/**
+	 * A function to know whether duplication reservation id exists.
+	 * @param reservationId {String} the reservation id to check for duplication
+	 * @return {boolean} the existence of duplicate reservation id
+	 */
 	private boolean doesDuplicateReservationIdExist(String reservationId) {
 		for(String date: this.reservationTable.keySet()) {
 			for (String roomType: this.reservationTable.get(date).keySet()) {
