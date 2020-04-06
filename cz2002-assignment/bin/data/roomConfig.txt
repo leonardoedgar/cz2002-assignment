@@ -1,0 +1,5 @@
+| Room Type | Number of rooms | Price | Bed Type |   Wifi  |     View      | Smoking |
+|  single   |       12        |  100  |  single  | enabled |  buildings    |   yes   |
+|  double   |       12        |  200  |  double  | enabled |     city      |   yes   |
+|  deluxe   |       12        |  300  |  master  | enabled | swimming pool |   yes   |
+|   vip     |       12        |  400  |  master  | enabled |  golf course  |   no    |
