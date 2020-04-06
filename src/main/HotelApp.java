@@ -100,9 +100,6 @@ public class HotelApp {
 	}
 	
 	public static void showMenuE(Menu menu) {
-		String foodname;
-		double price;
-		boolean dummy = false;
 		Scanner scn = new Scanner(System.in);
 		System.out.println("Would you like to:\n"
 				+ "(A) Add Items in the Menu\n"
@@ -112,46 +109,16 @@ public class HotelApp {
 		switch(scn.nextLine()) {
 		case "a":
 		case "A":{
-			System.out.println("Enter the food name:");
-			foodname = scn.nextLine();
-			System.out.println("Enter the price of the food:");
-			price = scn.nextDouble();
-			menu.addItems(foodname, price);
+			menu.addItems();
 			break;}
 		case "b":
 		case "B":{
-			System.out.println("Enter the food name:");
-			foodname = scn.nextLine();
-			for (String food: menu.Menu_list.keySet()) {
-				if (food.equals(foodname)){
-					menu.removeItems(foodname);
-					dummy = true;
-					break;
-				}
-			}
-			if (dummy == false) {
-			System.out.println("Item is not in the list");}
-			dummy= false;
+			menu.removeItems();
 			break;}
 		
 		case "c":
 		case "C":{
-			System.out.println("Enter the food name:");
-			foodname = scn.nextLine();
-			System.out.println("Enter the price:");
-			price = scn.nextDouble();
-			for (String food: menu.Menu_list.keySet()) {
-				if (food.equals(foodname)){
-					menu.updateItems(foodname, price);
-					dummy = true;
-					break;
-				}
-			}
-			if (dummy == false) {
-			System.out.println("Item is not in the list, but we will add it in.");
-			menu.addItems(foodname, price);
-			}
-			dummy = false;
+			menu.updateItems();
 			break;}
 			
 		}
