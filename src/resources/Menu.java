@@ -20,14 +20,25 @@ public class Menu {
 		// Append new food and price to the .txt file
 		String foodname;
 		double price;
+		boolean isFoodOnMenu = false;
 		Scanner scn = new Scanner(System.in);
 		System.out.println("Enter the food name:");
 		foodname = scn.nextLine();
 		System.out.println("Enter the price of the food:");
 		price = scn.nextDouble();
-		this.Menu_list.put(foodname, price);
-		System.out.println("Modification success! Here is the current menu.");
-		printItems();
+		for (String food: this.Menu_list.keySet()) {
+			if (food.equals(foodname)){
+				System.out.println("The food is already in the menu. The current menu is as follows.");
+				printItems();
+				isFoodOnMenu = true;
+				break;
+			}
+		}
+		if (isFoodOnMenu == false) {
+			this.Menu_list.put(foodname, price);
+			System.out.println("Modification success! Here is the current menu.");
+			printItems();}
+		isFoodOnMenu= false;
 	}
 	
 	public void updateItems() {
@@ -79,7 +90,8 @@ public class Menu {
 			}
 		}
 		if (isFoodOnMenu == false) {
-		System.out.println("Item is not in the list");}
+		System.out.println("Item is not in the list. The food in the menu is as follows.");
+		printItems();}
 		isFoodOnMenu= false;
 	}
 	
