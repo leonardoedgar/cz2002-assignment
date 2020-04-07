@@ -1,4 +1,6 @@
 package main;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Scanner;
 import resources.Hotel;
 import resources.Menu;
@@ -35,6 +37,12 @@ public class HotelApp {
 		}
 		catch(AppFailureException e) {
 			System.out.println("App has crashed. Err: " + e.getMessage());
+		}
+		catch (FileNotFoundException e) {
+			System.out.println("Err: " + e.getMessage());
+		}
+		catch (IOException e) {
+			System.out.println("Err: " + e.getMessage());
 		}
 		finally {
 			sc.close();

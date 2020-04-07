@@ -10,7 +10,7 @@ import java.util.Scanner;
 
 public class Menu {
 	public Hashtable<String,Double> Menu_list;
-	public Menu(String filepath) {
+	public Menu(String filepath) throws FileNotFoundException, IOException {
 		Hashtable<String,Double> Menu_list = new Hashtable<String, Double>();
 		this.Menu_list = getMenu(filepath);
 	}
@@ -91,25 +91,18 @@ public class Menu {
 		}	
 	}
 	
-	private Hashtable<String,Double> getMenu(String MenuFilePath) {
+	private Hashtable<String,Double> getMenu(String MenuFilePath) throws FileNotFoundException,IOException {
 		// Here we will read the txt file in the format of csv. with the format of "food,price". Then next we will create a hashtable for the menu.
 		String row;
 		String[] data = null;
 		Hashtable<String,Double> Menu = new Hashtable<String, Double>();
-		try {
-			BufferedReader csvReader = new BufferedReader(new FileReader(MenuFilePath));
-			while ((row = csvReader.readLine()) != null) {
-			    data = row.split(",");
-			    Menu.put(data[0],Double.valueOf(data[1]));
-			}
-			csvReader.close();
+		BufferedReader csvReader = new BufferedReader(new FileReader(MenuFilePath));
+		while ((row = csvReader.readLine()) != null) {
+		    data = row.split(",");
+		    Menu.put(data[0],Double.valueOf(data[1]));
 		}
-		catch (FileNotFoundException e) {
-			System.out.println("Err: " + e.getMessage());
-		}
-		catch (IOException e) {
-			System.out.println("Err: " + e.getMessage());
-		}
+		csvReader.close();
+		
 		return Menu;
 	}
 	
