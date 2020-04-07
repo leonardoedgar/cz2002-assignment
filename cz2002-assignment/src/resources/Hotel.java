@@ -190,12 +190,12 @@ public class Hotel {
 		if(newStartDate.compareTo(existingStartDate)==0) {
 			return 1;
 		}
-		//newStartDate after existingStartDate
+		//newStartDate after or existingStartDate
 		if(newStartDate.compareTo(existingStartDate)>0) {
 			
 			
-			//if newStartDate after existingStartDate, no clash
-			if(newStartDate.compareTo(existingEndDate)>0) {
+			//if newStartDate after or on existingEndDate (Prev guest checked out), no clash
+			if(newStartDate.compareTo(existingEndDate)>=0) {
 				return 0;
 			}
 			//otherwise clash
@@ -205,8 +205,8 @@ public class Hotel {
 		//newStartDate before existingStartDate
 		if(newStartDate.compareTo(existingStartDate)<0){
 			
-			//newEndDate before existingStartDate, no clash
-			if(newEndDate.compareTo(existingStartDate)<0) {
+			//newEndDate before or on existingStartDate (new guest leaves before existing guest comes), no clash
+			if(newEndDate.compareTo(existingStartDate)<=0) {
 				return 0;
 			}
 			//otherwise clash
@@ -226,6 +226,11 @@ public class Hotel {
 	 */
 	public boolean checkRoomAvailability(java.util.Date startDate, java.util.Date endDate, String roomType) {
 		//assume all rooms are available at the start
+		if(roomTable.get(roomType)==null) {
+			System.out.println("Room type does not exist.");
+			return false;
+		}
+		
 		int roomsLeftForDate=12;
 
 		//check all guests in guestList
@@ -297,7 +302,7 @@ public class Hotel {
 		//mapping of roomtype was different for some reason: double =1 single =4, vip=3, deluxe=2
 		Room tempRoom = tempRoomList.get(roomNo);
 		if(tempRoom==null) {
-			System.out.println("Room number does not exist for room type "+roomType);
+			System.out.println("Room number does not exist for room type "+roomType+".");
 			return false;
 		}
 		//use the method below to check for mapping of hashtable

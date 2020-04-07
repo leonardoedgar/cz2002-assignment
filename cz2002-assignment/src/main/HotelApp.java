@@ -21,18 +21,21 @@ public class HotelApp {
 		Scanner sc = new Scanner(System.in);
 		
 		// added date time for creating test objects
-		DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+		DateFormat df = new SimpleDateFormat("dd-MM-yyyy");
 		Date sdate= new Date();
 		Date edate= new Date();
+		
 		try {
-			 sdate=df.parse("2000-10-05");
-			 edate=df.parse("2000-10-07");
+			 sdate=df.parse("05-10-2000");
+			 edate=df.parse("07-10-2000");
 		}catch(Exception e) {
 			System.out.println("Unable to parse");
 		}
 		
 		Guest guest = new Guest("Leonardo", "1", "1", "1", "1", "1", 12345, "1",sdate,edate);
-		
+
+		System.out.println(edate);
+		System.out.println(sdate);
 		
 		boolean exitApp = false;
 		try {
@@ -141,33 +144,33 @@ public class HotelApp {
 		System.out.println("|(F) Check room availability	|\n"
 						 + "|(G) Room check-in (for walk-in or reservation)	|\n");
 		
-		switch(sc.next()) {
+		switch(sc.next().trim()) {
 			case "f":
 			case "F":{
 			
-				DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+				DateFormat df = new SimpleDateFormat("dd-MM-yyyy");
 				
-				System.out.println("Enter start date in the following format: yyyy-MM-dd");
+				System.out.println("Enter start date in the following format: dd-MM-yyyy");
 				Date startDate = new Date();
 				try {
 			
-					startDate= df.parse(sc.next());
+					startDate= df.parse(sc.next().trim());
 				}catch(ParseException e) {
 					e.printStackTrace();
 				}
 				
-				System.out.println("Enter end date in the following format: yyyy-MM-dd");
+				System.out.println("Enter end date in the following format: dd-MM-yyyy");
 				int checker=1;
 
 				Date endDate = new Date();
 				while(checker==1) {
 				try {
 			
-					endDate= df.parse(sc.next());
+					endDate= df.parse(sc.next().trim());
 				}catch(ParseException e) {
 					e.printStackTrace();
 				}
-				if(endDate.compareTo(startDate)>=0) {
+				if(endDate.compareTo(startDate)>0) {
 					checker=0;
 				}
 				else {
@@ -176,7 +179,7 @@ public class HotelApp {
 				}
 				
 				System.out.println("Enter roomType:");
-				String roomType=sc.next();
+				String roomType=sc.next().trim();
 				
 				if(hotel.checkRoomAvailability(startDate, endDate, roomType)==true) {
 					System.out.println("Room type is available.");
@@ -191,18 +194,23 @@ public class HotelApp {
 				System.out.println("Enter guest identity");
 				Guest guest = null;
 				try {
-					guest = hotel.getGuestByIdentity(sc.next());
+					guest = hotel.getGuestByIdentity(sc.next().trim());
 				}catch(GuestNotFoundException e) {
 					System.out.println(e.getMessage());
 					break;
 				}
 				System.out.println("Guest's selected room type is "+hotel.getGuestRoomType(guest)+" room.");
 				
-				System.out.println("Enter the room number you want to assign guest to:");
-				String roomNo=sc.next();
-				
-				
-				hotel.checkIn(guest,roomNo);
+				//allows multiple tries for entering room number
+				boolean validEntry=false;
+				while(validEntry==false) {
+					
+					System.out.println("Enter the room number you want to assign guest to:");
+					String roomNo=sc.next().trim();
+					
+					
+					validEntry=hotel.checkIn(guest,roomNo);
+				}
 			}
 			break;
 			
