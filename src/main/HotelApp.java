@@ -1,9 +1,12 @@
 package main;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.Date;
 import java.lang.NumberFormatException;
 import resources.Hotel;
+import resources.Menu;
 import resources.Room;
 import exception.GuestDetailUpdateFailureException;
 import exception.GuestNotFoundException;
@@ -24,6 +27,8 @@ public class HotelApp {
 		boolean exitApp = false;
 		try {
 			Hotel hotel = new Hotel("src/data/roomConfig.txt");
+			Menu menu = new Menu("src/data/menu.txt");
+			HotelApp.printHotelAppMenu();
 			while (!exitApp) {
 				HotelApp.printHotelAppMenu();
 				System.out.print("Enter user input: ");
@@ -34,6 +39,8 @@ public class HotelApp {
 					case "B": System.out.println("B"); break;
 					case "c":
 					case "C": HotelApp.showMenuC(hotel);break;
+					case "e":
+					case "E": HotelApp.showMenuE(menu); break;
 					case "q":
 					case "Q": exitApp = true; break;
 					default: System.out.println("Invalid input. Retry\n");
@@ -43,6 +50,12 @@ public class HotelApp {
 		}
 		catch(AppFailureException e) {
 			System.out.println("App has crashed. Err: " + e.getMessage());
+		}
+		catch (FileNotFoundException e) {
+			System.out.println("Err: " + e.getMessage());
+		}
+		catch (IOException e) {
+			System.out.println("Err: " + e.getMessage());
 		}
 		finally {
 			sc.close();
@@ -267,5 +280,52 @@ public class HotelApp {
 		}
 		
 		
+	}
+	
+	public static void showMenuE(Menu menu) {
+		String foodname;
+		double price;
+		System.out.println("Here is the current menu.");
+		menu.printItems();
+		Scanner scn = new Scanner(System.in);
+		System.out.println("Would you like to:\n"
+				+ "|=================================|\n"
+				+ "|(A) Add Items in the Menu        |\n"
+				+ "|(B) Remove Items from the Menu   |\n"
+				+ "|(C) Update Items from the Menu   |\n"
+				+ "|(D) Print the Menu               |\n"
+				+ "|=================================|"
+				+ "\nYour choice: ");
+		switch(scn.nextLine()) {
+		case "a":
+		case "A":{
+			System.out.println("Enter the food name:");
+			foodname = scn.nextLine();
+			System.out.println("Enter the price of the food:");
+			price = scn.nextDouble();
+			menu.addItems(foodname,price);
+			break;}
+		case "b":
+		case "B":{
+			System.out.println("Enter the food name:");
+			foodname = scn.nextLine();
+			menu.removeItems(foodname);
+			break;}
+		
+		case "c":
+		case "C":{
+			System.out.println("Enter the food name:");
+			foodname = scn.nextLine();
+			System.out.println("Enter the price of the food:");
+			price = scn.nextDouble();
+			menu.updateItems(foodname,price);
+			break;}
+		
+		case "d":
+		case "D":{
+			menu.printItems();
+			break;}
+			
+		}
 	}
 }
