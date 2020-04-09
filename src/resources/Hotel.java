@@ -21,7 +21,11 @@ public class Hotel {
 	// {"roomType": {"roomNo": Room()}}
 	Hashtable<String, Hashtable<String, Room>> roomTable = new Hashtable<String, Hashtable<String, Room>>();
 	private ReservationSystem reservationSystem;
-	
+//	temporary, hard code to 12
+	public int noOfAvailable_single=12;
+	public int noOfAvailable_double =12;
+	public int noOfAvailable_deluxe =12;
+	public int noOfAvailable_vip =12;
 	/**
 	 * A class constructor to create a hotel. 
 	 * @param roomConfigFilePath {String} the path to room configuration file
@@ -394,7 +398,60 @@ public class Hotel {
 		}
 		
 	}
-
+	
+	public ArrayList[] getStatusRoom() {
+		ArrayList<String> vacant = new ArrayList<String>();
+		ArrayList<String> occupied = new ArrayList<String>();
+		ArrayList<String> renov = new ArrayList<String>();
+		ArrayList<String> others = new ArrayList<String>();
+		for (String roomType: this.roomTable.keySet()) {
+			for(String roomNo: this.roomTable.get(roomType).keySet()) {
+				Room roomDetail = this.roomTable.get(roomType).get(roomNo);
+				if (roomDetail.getStatus().equals("vacant")) {
+					vacant.add(roomNo);
+				}
+				else if (roomDetail.getStatus().equals("occupied")) {
+					occupied.add(roomNo);
+				}
+				else if (roomDetail.getStatus().equals("under maintainance")) {
+					renov.add(roomNo);
+				}
+				else {others.add(roomNo);}
+			}
+		}
+		ArrayList[] result = {vacant,occupied,renov,others};
+		return result;
+				
+	}
+	
+	public ArrayList[] getOccupancyRate() {
+		ArrayList<String> single = new ArrayList<String>();
+		ArrayList<String> doublee = new ArrayList<String>();
+		ArrayList<String> deluxe = new ArrayList<String>();
+		ArrayList<String> vip = new ArrayList<String>();
+		for (String roomType: this.roomTable.keySet()) {
+			for(String roomNo: this.roomTable.get(roomType).keySet()) {
+				Room roomDetail = this.roomTable.get(roomType).get(roomNo);
+				if (roomDetail.getStatus().equals("vacant") && roomType.equals("single")) {
+					single.add(roomNo);
+				}
+				else if (roomDetail.getStatus().equals("vacant") && roomType.equals("double")) {
+					doublee.add(roomNo);
+				}
+				else if (roomDetail.getStatus().equals("vacant") && roomType.equals("deluxe")) {
+					deluxe.add(roomNo);
+				}
+				else if (roomDetail.getStatus().equals("vacant") && roomType.equals("vip")) {
+					vip.add(roomNo);
+				}
+			}
+		}
+		ArrayList[] result = {single,doublee,deluxe,vip};
+		return result;
+				
+	}
+	
+	
 //	public void printStatusReport() {
 //	for (String roomType: this.roomTable.keySet()) {
 //		for(String roomNo: this.roomTable.get(roomType).keySet()) {

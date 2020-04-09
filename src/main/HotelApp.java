@@ -8,6 +8,8 @@ import java.lang.NumberFormatException;
 //added import
 import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.ParseException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 import resources.Hotel;
@@ -46,6 +48,8 @@ public class HotelApp {
 					case "E": HotelApp.showMenuE(menu); break;
 					case "f":
 					case "F": HotelApp.showMenuFG(hotel);break;
+					case "i":
+					case "I": HotelApp.showMenuI(hotel); break;
 					case "q":
 					case "Q": exitApp = true; break;
 					default: System.out.println("Invalid input. Retry\n");
@@ -418,5 +422,52 @@ public class HotelApp {
 				break;
 			}
 }
+	/**
+	 * Show the functional i
+	 * @param hotel
+	 */
+	public static void showMenuI(Hotel hotel) {
+		Scanner sc = new Scanner(System.in);
+		System.out.println("Print room statistics by:\n"+
+						   "|============================|\n"+
+						   "|(A) Room type occupancy rate|\n"+
+						   "|(B) Room status             |\n"+
+						   "|============================|\n"+
+						   "Enter your choice:");
+		switch(sc.nextLine()) {
+		case "a":
+		case "A":{
+			System.out.println("Single:");
+			System.out.println("\tNumber:" + hotel.getOccupancyRate()[0].size() +" out of " + hotel.noOfAvailable_single);
+			System.out.println("\tRooms:" + hotel.getOccupancyRate()[0]);
+			
+			System.out.println("Double");
+			System.out.println("\tNumber:" + hotel.getOccupancyRate()[1].size() +" out of " + hotel.noOfAvailable_double);
+			System.out.println("\tRooms:" + hotel.getOccupancyRate()[1]);
+			
+			System.out.println("Deluxe");
+			System.out.println("\tNumber:" + hotel.getOccupancyRate()[2].size() +" out of " + hotel.noOfAvailable_deluxe);
+			System.out.println("\tRooms:" + hotel.getOccupancyRate()[2]);
+			
+			System.out.println("VIP suite");
+			System.out.println("\tNumber:" + hotel.getOccupancyRate()[3].size() +" out of " + hotel.noOfAvailable_vip);
+			System.out.println("\tRooms:" + hotel.getOccupancyRate()[3]);
+			break;
+		}
+		case "b":
+		case "B":{
+			System.out.println("Vacant :");
+			System.out.println(hotel.getStatusRoom()[0]);
+			System.out.println("Occupied: ");
+			System.out.println(hotel.getStatusRoom()[1]);
+			System.out.println("Under maintainance: ");
+			System.out.println(hotel.getStatusRoom()[2]);
+			System.out.println("Others: ");
+			System.out.println(hotel.getStatusRoom()[3]);
+			break;
+			
+		}
+		}
+	}
 
 }
