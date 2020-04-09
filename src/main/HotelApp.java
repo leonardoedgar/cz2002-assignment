@@ -104,14 +104,15 @@ public class HotelApp {
 		Scanner sc = new Scanner(System.in);
 		System.out.println("Enter your room number: ");
 		String room_num = sc.nextLine();
+		try {
 		Room room = hotel.getRoomByNo(room_num);
 		room.printRoom();
 		System.out.print(""
 				+ "Details to be created/updated: \n"
 				+ "|=====================|\n"
-				+ "|(A) Room status	|\n"
-				+ "|(B) Room price	|\n"
-				+ "|(C) Bed type	|\n"
+				+ "|(A) Room status      |\n"
+				+ "|(B) Room price       |\n"
+				+ "|(C) Bed type         |\n"
 				+ "|(D) Wifi Availability|\n"
 				+ "|(E) View of the Room |\n"
 				+ "|(F) Smoking Allowance|\n"
@@ -121,14 +122,13 @@ public class HotelApp {
 		System.out.println("choice = "+choice);
 		System.out.println("Enter the updated information: ");
 		String new_data = sc.nextLine();
-		try {
-			hotel.updateRoomDetails(room_num, choice.charAt(0), new_data);
-			System.out.println("Room Information Updated!");
-			room.printRoom();
-		}
+		hotel.updateRoomDetails(room_num, choice.charAt(0), new_data);
+		System.out.println("Room Information Updated!");
+		room.printRoom();}
 		catch (RoomNotFoundException e) {
 			System.out.println(e.getMessage());
 		}
+		
 		
 	}
 }
