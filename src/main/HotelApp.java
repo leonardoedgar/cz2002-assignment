@@ -5,12 +5,16 @@ import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.Date;
 import java.lang.NumberFormatException;
+//added import
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
 import resources.Hotel;
 import resources.Menu;
 import resources.Room;
 import exception.GuestDetailUpdateFailureException;
 import exception.GuestNotFoundException;
-import exception.RoomDetailUpdateFailureException;
 import exception.RoomNotFoundException;
 import resources.Reservation;
 import resources.Guest;
@@ -28,7 +32,6 @@ public class HotelApp {
 		try {
 			Hotel hotel = new Hotel("src/data/roomConfig.txt");
 			Menu menu = new Menu("src/data/menu.txt");
-			HotelApp.printHotelAppMenu();
 			while (!exitApp) {
 				HotelApp.printHotelAppMenu();
 				System.out.print("Enter user input: ");
@@ -36,11 +39,13 @@ public class HotelApp {
 					case "a":
 					case "A": HotelApp.showMenuA(hotel); break;
 					case "b":
-					case "B": System.out.println("B"); break;
+					case "B": HotelApp.showMenuB(hotel);; break;
 					case "c":
 					case "C": HotelApp.showMenuC(hotel);break;
 					case "e":
 					case "E": HotelApp.showMenuE(menu); break;
+					case "f":
+					case "F": HotelApp.showMenuFG(hotel);break;
 					case "q":
 					case "Q": exitApp = true; break;
 					default: System.out.println("Invalid input. Retry\n");
@@ -328,4 +333,90 @@ public class HotelApp {
 			
 		}
 	}
+	/**
+	 * A function to show functional requirements f and g
+	 * @param hotel
+	 */
+	public static void showMenuFG(Hotel hotel) {
+
+		Scanner sc = new Scanner(System.in);
+		//remove the print once you combine with the rest
+		System.out.println("|(F) Check room availability	|\n"
+						 + "|(G) Room check-in (for walk-in or reservation)	|\n");
+		
+		switch(sc.next().trim()) {
+			case "f":
+			case "F":{
+			
+				DateFormat df = new SimpleDateFormat("dd-MM-yyyy");
+				
+				System.out.println("Enter start date in the following format: dd-MM-yyyy");
+				Date startDate = new Date();
+				try {
+			
+					startDate= df.parse(sc.next().trim());
+				}catch(ParseException e) {
+					e.printStackTrace();
+				}
+				
+				System.out.println("Enter end date in the following format: dd-MM-yyyy");
+				int checker=1;
+
+				Date endDate = new Date();
+				while(checker==1) {
+				try {
+			
+					endDate= df.parse(sc.next().trim());
+				}catch(ParseException e) {
+					e.printStackTrace();
+				}
+				if(endDate.compareTo(startDate)>0) {
+					checker=0;
+				}
+				else {
+					System.out.println("End date must be after startDate, enter another end date:");
+				}
+				}
+				
+				System.out.println("Enter roomType:");
+				String roomType=sc.next().trim();
+				
+				if(hotel.checkRoomAvailability(startDate, endDate, roomType)==true) {
+					System.out.println("Room type is available.");
+				}
+				else {
+					System.out.println("Room type is not available.");
+				}
+				break;
+			}
+			case "g":
+			case "G":{
+				System.out.println("Enter guest identity");
+				Guest guest = null;
+				try {
+					guest = hotel.getGuestByIdentity(sc.next().trim());
+				}catch(GuestNotFoundException e) {
+					System.out.println(e.getMessage());
+					break;
+				}
+				System.out.println("Guest's selected room type is "+hotel.getGuestRoomType(guest)+" room.");
+				
+				//allows multiple tries for entering room number
+				boolean validEntry=false;
+				while(validEntry==false) {
+					
+					System.out.println("Enter the room number you want to assign guest to:");
+					String roomNo=sc.next().trim();
+					
+					
+					validEntry=hotel.checkIn(guest,roomNo);
+				}
+			}
+			break;
+			
+			default:
+				break;
+			}
+}
+
 }
