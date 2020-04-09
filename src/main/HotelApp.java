@@ -283,25 +283,47 @@ public class HotelApp {
 	}
 	
 	public static void showMenuE(Menu menu) {
+		String foodname;
+		double price;
+		System.out.println("Here is the current menu.");
+		menu.printItems();
 		Scanner scn = new Scanner(System.in);
 		System.out.println("Would you like to:\n"
-				+ "(A) Add Items in the Menu\n"
-				+ "(B) Remove Items from the Menu\n"
-				+ "(C) Update Items from the Menu\n"
-				+ "Your choice: ");
+				+ "|=================================|\n"
+				+ "|(A) Add Items in the Menu        |\n"
+				+ "|(B) Remove Items from the Menu   |\n"
+				+ "|(C) Update Items from the Menu   |\n"
+				+ "|(D) Print the Menu               |\n"
+				+ "|=================================|"
+				+ "\nYour choice: ");
 		switch(scn.nextLine()) {
 		case "a":
 		case "A":{
-			menu.addItems();
+			System.out.println("Enter the food name:");
+			foodname = scn.nextLine();
+			System.out.println("Enter the price of the food:");
+			price = scn.nextDouble();
+			menu.addItems(foodname,price);
 			break;}
 		case "b":
 		case "B":{
-			menu.removeItems();
+			System.out.println("Enter the food name:");
+			foodname = scn.nextLine();
+			menu.removeItems(foodname);
 			break;}
 		
 		case "c":
 		case "C":{
-			menu.updateItems();
+			System.out.println("Enter the food name:");
+			foodname = scn.nextLine();
+			System.out.println("Enter the price of the food:");
+			price = scn.nextDouble();
+			menu.updateItems(foodname,price);
+			break;}
+		
+		case "d":
+		case "D":{
+			menu.printItems();
 			break;}
 			
 		}

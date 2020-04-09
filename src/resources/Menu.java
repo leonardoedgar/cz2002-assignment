@@ -15,87 +15,75 @@ public class Menu {
 		this.Menu_list = getMenu(filepath);
 	}
 	
-
-	public void addItems() {
+/**
+ * add the items in the list (will also check if the food is already in the menu)
+ * @param foodname
+ * @param price
+ */
+	public void addItems(String foodname, double price) {
 		// Append new food and price to the .txt file
-		String foodname;
-		double price;
 		boolean isFoodOnMenu = false;
-		Scanner scn = new Scanner(System.in);
-		System.out.println("Enter the food name:");
-		foodname = scn.nextLine();
-		System.out.println("Enter the price of the food:");
-		price = scn.nextDouble();
 		for (String food: this.Menu_list.keySet()) {
 			if (food.equals(foodname)){
-				System.out.println("The food is already in the menu. The current menu is as follows.");
-				printItems();
+				System.out.println("The food is already in the menu.");
 				isFoodOnMenu = true;
 				break;
 			}
 		}
 		if (isFoodOnMenu == false) {
 			this.Menu_list.put(foodname, price);
-			System.out.println("Modification success! Here is the current menu.");
-			printItems();}
+			System.out.println("Modification success!");}
 		isFoodOnMenu= false;
 	}
 	
-	public void updateItems() {
+/**
+ * update the menu, will not update if the food is not yet in the menu.
+ * @param foodname
+ * @param price
+ */
+	public void updateItems(String foodname, double price) {
 		// Check if foodName is inside the .txt file, if so modify the price
 		// If not, raise error
-		String foodname;
-		double price;
 		boolean isFoodOnMenu = false;
-		Scanner scn = new Scanner(System.in);
-		System.out.println("Enter the food name:");
-		foodname = scn.nextLine();
-		System.out.println("Enter the price:");
-		price = scn.nextDouble();
 		for (String food: this.Menu_list.keySet()) {
 			if (food.equals(foodname)){
 				this.Menu_list.remove(foodname);
 				this.Menu_list.put(foodname, price);
-				System.out.println("Modification success! Here is the current menu.");
-				printItems();
+				System.out.println("Modification success!");
 				isFoodOnMenu = true;
 				break;
 			}
 		}
 		if (isFoodOnMenu == false) {
-		System.out.println("Item is not in the list, but we will add it in.");
-		this.Menu_list.remove(foodname);
-		this.Menu_list.put(foodname, price);
-		System.out.println("Modification success! Here is the current menu.");
-		printItems();
+		System.out.println("Item is not in the list.");
 		}
 		isFoodOnMenu = false;	
 	}
 	
-	public void removeItems() {
+/**
+ * remove items from the menu. Will also check if the food is on the menu.	
+ * @param foodname
+ */
+	public void removeItems(String foodname) {
 		// Check if foodName is inside the .txt file, if so remove the food name
 		// If not, raise error
-		String foodname;
 		boolean isFoodOnMenu = false;
-		Scanner scn = new Scanner(System.in);
-		System.out.println("Enter the food name:");
-		foodname = scn.nextLine();
 		for (String food: this.Menu_list.keySet()) {
 			if (food.equals(foodname)){
 				this.Menu_list.remove(foodname);
-				System.out.println("Modification success! Here is the current menu.");
-				printItems();
+				System.out.println("Modification success!");
 				isFoodOnMenu = true;
 				break;
 			}
 		}
 		if (isFoodOnMenu == false) {
-		System.out.println("Item is not in the list. The food in the menu is as follows.");
-		printItems();}
+		System.out.println("Item is not in the list.");}
 		isFoodOnMenu= false;
 	}
 	
-	
+/**
+ * print the current menu.
+ */
 	public void printItems() {
 		System.out.println("Food \t\t\t\tPrice");
 		for (String food: this.Menu_list.keySet()) {
