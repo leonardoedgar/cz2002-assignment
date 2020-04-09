@@ -1,5 +1,5 @@
 package resources;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Hashtable;
 import resources.ReservationSystem;
 import resources.Room;
@@ -9,16 +9,23 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import exception.HotelSetupFailureException;
+import exception.RoomNotFoundException;
 import exception.GuestDetailUpdateFailureException;
 import exception.GuestNotFoundException;
 
 /**
- * A Class to represent a hotel
+ * A class to represent a hotel.
  */
 public class Hotel {
 	// {"roomType": {"roomNo": Room()}}
 	Hashtable<String, Hashtable<String, Room>> roomTable = new Hashtable<String, Hashtable<String, Room>>();
 	private ReservationSystem reservationSystem;
+	
+	/**
+	 * A class constructor to create a hotel. 
+	 * @param roomConfigFilePath {String} the path to room configuration file
+	 * @throws {HotelSetupFailureException} exception when hotel failed to set up
+	 */
 	public Hotel(String roomConfigFilePath) throws HotelSetupFailureException {
 		this.setupRooms(this.getRoomConfig(roomConfigFilePath));
 		this.reservationSystem = new ReservationSystem();
@@ -55,12 +62,14 @@ public class Hotel {
 			floorNo += 1;
 		}
 	}
+	
 	/**
 	 * A function to get the room configuration.
 	 * @param roomConfigFilePath {String} the path to the room configuration file
 	 * @return {Hashtable<String, Hashtable<String. String>>} the room configuration 
 	 * @throws {HotelSetupException} failure in setting up the hotel (configuration file not found)
 	 */
+	@SuppressWarnings("serial")
 	private Hashtable<String, Hashtable<String, String>> getRoomConfig(String roomConfigFilePath) throws HotelSetupFailureException {
 		try {
 			FileReader frStream = new FileReader(roomConfigFilePath);
@@ -132,6 +141,96 @@ public class Hotel {
 	public void printGuestDetailsByName(String name) throws GuestNotFoundException {
 		Guest guest = this.getGuestByName(name);
 		guest.printDetails();
+	}
+
+/**
+ * this method will try to find if the room exist in the hotel system by comparing the room number. If no such roome exist, we will throw roomnotfound error.
+ * @param Room_num
+ * @return
+ * @throws RoomNotFoundException
+ */
+	public Room getRoomByNo(String Room_num) throws RoomNotFoundException{
+		for (String roomType: this.roomTable.keySet()) {
+			for (String roomNo: this.roomTable.get(roomType).keySet()) {
+				if ((roomNo).equals(Room_num)) {
+					return this.roomTable.get(roomType).get(roomNo);
+				}
+			}
+		}
+		throw new RoomNotFoundException();
+	}
+//	public Room getRoomByNo(String Room_num){
+//		for (String roomType: this.roomTable.keySet()) {
+//			for (String roomNo: this.roomTable.get(roomType).keySet()) {
+//				if ((roomType+"-"+roomNo).equals(Room_num)) {
+//					return this.roomTable.get(roomType).get(roomNo);
+//				}
+//			}
+//		}
+//	}
+
+	/**
+	 * details refer to the choice of information to be updated by the user of this app.
+	 * @param roomNo
+	 * @param details
+	 * @param newData
+	 * @throws RoomNotFoundException
+	 */
+	public void updateRoomDetails(String roomNo, char details, String newData) throws RoomNotFoundException{
+		Room room = this.getRoomByNo(roomNo);
+		switch(details) {
+		case 'a':
+		case 'A':{
+			room.updateStatus(newData);
+			break;
+		}
+		case 'b':
+		case 'B':{
+			room.updateCost(newData);
+			break;
+		}
+		case 'c':
+		case 'C':{
+			room.updateBedType(newData);
+			break;
+		}
+		case 'd':
+		case 'D':{
+			room.updateWifi(newData);
+			break;
+		}
+		case 'e':
+		case 'E':{
+			room.updateView(newData);
+			break;
+		}
+		case 'f':
+		case 'F':{
+			room.updateSmoking(newData);
+			break;
+		}
+		default: System.out.println("Invalid input. Retry\n");
+		}
+	}
+
+	/**
+	 * A function to get the reservation system in a hotel.
+	 * @return {ReservationSystem} the reservation system
+	 */
+	public ReservationSystem getReservationSystem() {
+		return this.reservationSystem;
+	}
+	
+	/**
+	 * A function to get available room types in a hotel.
+	 * @return {ArrayList<String>} that contains available room types
+	 */
+	public ArrayList<String> getAvailableRoomTypes() {
+		ArrayList<String> roomTypes = new ArrayList<String>();
+		for(String roomType: this.roomTable.keySet()) {
+			roomTypes.add(roomType);
+		}
+		return roomTypes;
 	}
 
 //	public void printStatusReport() {
