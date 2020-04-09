@@ -78,4 +78,20 @@ public class Room {
 	Guest getGuest() {
 		return this.guest;
 	}
+	
+	/**
+	 * A function to assign a guest to the room
+	 * @param guest {Guest} the guest object assigned to this room
+	 */
+	public void assignGuestToRoom(Guest guest) {
+		this.guest=guest;
+	}
+
+	/**
+	 * A function to check the status of the room
+	 * @return {String} String of status of the room
+	 */
+	public String getStatus() {
+		return status;
+	}
 }

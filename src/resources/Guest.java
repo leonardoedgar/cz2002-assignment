@@ -120,8 +120,26 @@ public class Guest {
         return fields;
 	}
 
-//	public void makeOrder(Menu menu) {
-//		
-//	}
-
+	/**
+	 * A function to get date when guest will check in
+	 * @return {Date} the Date object
+	 */
+	public Date getstartDate() {
+		return startDateOfStay;
+	}
+	
+	/**
+	 * A function to get date when guest will check out
+	 * @return {Date} the Date object
+	 */
+	public Date getendDate() {
+		return endDateOfStay;
+	}
+	/**
+	 * A function to get identity number of the guest
+	 * @return {String} String of identity
+	 */
+	public String getIdentity() {
+		return identity;
+	}
 }
