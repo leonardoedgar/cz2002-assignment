@@ -74,6 +74,23 @@ public class ReservationSystem {
 	}
 	
 	/**
+	 * will loop through each reservation date and shift the ppl that is reserved to the left by delta index
+	 * @param delta
+	 */
+	public void shiftReservation(int num_room, int delta,String roomtype) {
+		int counter = 1;
+		for(String date: this.reservationTable.keySet()) {
+			for (Reservation reserve: this.reservationTable.get(date).get(roomtype)) {
+				counter ++;
+//				only set to waitlist if the person is between the current number of room and the prev number of room 
+				if (counter > num_room && counter <=num_room+delta) {
+					reserve.updateStatus("waitlist");
+				}
+			}
+		}
+	}
+	
+	/**
 	 * A function to remove a reservation by index from an array.
 	 * @param reservationList {ArrayList<Reservation>} the reservation array
 	 * @param index {int} the index to remove

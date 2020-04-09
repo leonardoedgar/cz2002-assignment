@@ -27,11 +27,20 @@ import exception.InvalidGuestDetailException;
 public class HotelApp {
 	
 	public static void main(String[] args) {
+//		Guest g1 = new Guest("g1","1","1","1","1","1",1,"1");
+//		Guest g2 = new Guest("g2","1","1","1","1","1",1,"1");
+//		Guest g3 = new Guest("g3","1","1","1","1","1",1,"1");
+//		Guest g4 = new Guest("g4","1","1","1","1","1",1,"1");
 		Scanner sc = new Scanner(System.in);
 		boolean exitApp = false;
 		try {
 			Hotel hotel = new Hotel("src/data/roomConfig.txt");
 			Menu menu = new Menu("src/data/menu.txt");
+//			
+//			hotel.addToGuestList(g1, "single");
+//			hotel.addToGuestList(g2, "single");
+//			hotel.addToGuestList(g3, "single");
+//			hotel.addToGuestList(g4, "single");
 			while (!exitApp) {
 				HotelApp.printHotelAppMenu();
 				System.out.print("Enter user input: ");
@@ -278,6 +287,24 @@ public class HotelApp {
 		System.out.println("Enter the updated information: ");
 		String new_data = sc.nextLine();
 		hotel.updateRoomDetails(room_num, choice.charAt(0), new_data);
+		if (new_data.equals("under maintainance") | new_data.equals("renovation")) {
+			if (room_num.split("-")[0].equals("01")) {
+				hotel.noOfAvailable_single--;
+				hotel.getReservationSystem().shiftReservation(hotel.noOfAvailable_single, 1, "single");
+			}
+			else if (room_num.split("-")[0].equals("02")) {
+				hotel.noOfAvailable_double--;
+				hotel.getReservationSystem().shiftReservation(hotel.noOfAvailable_double, 1, "double");
+			}
+			else if (room_num.split("-")[0].equals("03")) {
+				hotel.noOfAvailable_deluxe--;
+				hotel.getReservationSystem().shiftReservation(hotel.noOfAvailable_deluxe, 1, "deluxe");
+			}
+			else {
+				hotel.noOfAvailable_vip--;
+				hotel.getReservationSystem().shiftReservation(hotel.noOfAvailable_vip, 1, "vip");
+			}
+		}
 		System.out.println("Room Information Updated!");
 		room.printRoom();}
 		catch (RoomNotFoundException e) {

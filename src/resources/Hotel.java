@@ -24,7 +24,7 @@ public class Hotel {
 	
 	/**
 	 * A class constructor to create a hotel. 
-	 * @param roomConfigFilePath {String} the path to room configuration file
+	 * @param roomConfigFilePath {String} the path to room configuration fileƒ
 	 * @throws {HotelSetupFailureException} exception when hotel failed to set up
 	 */
 	public Hotel(String roomConfigFilePath) throws HotelSetupFailureException {
@@ -35,6 +35,10 @@ public class Hotel {
 	//added hashtable {"roomType":guestId:Guest()}
 	//during checkin, guess is assigned a roomNo
 	Hashtable<Guest,String> guestList = new Hashtable<Guest,String>();
+	public int noOfAvailable_single=3;
+	public int noOfAvailable_double =12;
+	public int noOfAvailable_deluxe =12;
+	public int noOfAvailable_vip =12;
 	
 	//in main app, everytime a guest is create, add them to the GuestList
 	/**
