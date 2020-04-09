@@ -1,5 +1,5 @@
 package resources;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Hashtable;
 import resources.ReservationSystem;
 import resources.Room;
@@ -13,12 +13,18 @@ import exception.GuestDetailUpdateFailureException;
 import exception.GuestNotFoundException;
 
 /**
- * A Class to represent a hotel
+ * A class to represent a hotel.
  */
 public class Hotel {
 	// {"roomType": {"roomNo": Room()}}
 	Hashtable<String, Hashtable<String, Room>> roomTable = new Hashtable<String, Hashtable<String, Room>>();
 	private ReservationSystem reservationSystem;
+	
+	/**
+	 * A class constructor to create a hotel. 
+	 * @param roomConfigFilePath {String} the path to room configuration file
+	 * @throws {HotelSetupFailureException} exception when hotel failed to set up
+	 */
 	public Hotel(String roomConfigFilePath) throws HotelSetupFailureException {
 		this.setupRooms(this.getRoomConfig(roomConfigFilePath));
 		this.reservationSystem = new ReservationSystem();
@@ -55,12 +61,14 @@ public class Hotel {
 			floorNo += 1;
 		}
 	}
+	
 	/**
 	 * A function to get the room configuration.
 	 * @param roomConfigFilePath {String} the path to the room configuration file
 	 * @return {Hashtable<String, Hashtable<String. String>>} the room configuration 
 	 * @throws {HotelSetupException} failure in setting up the hotel (configuration file not found)
 	 */
+	@SuppressWarnings("serial")
 	private Hashtable<String, Hashtable<String, String>> getRoomConfig(String roomConfigFilePath) throws HotelSetupFailureException {
 		try {
 			FileReader frStream = new FileReader(roomConfigFilePath);
@@ -132,6 +140,26 @@ public class Hotel {
 	public void printGuestDetailsByName(String name) throws GuestNotFoundException {
 		Guest guest = this.getGuestByName(name);
 		guest.printDetails();
+	}
+	
+	/**
+	 * A function to get the reservation system in a hotel.
+	 * @return {ReservationSystem} the reservation system
+	 */
+	public ReservationSystem getReservationSystem() {
+		return this.reservationSystem;
+	}
+	
+	/**
+	 * A function to get available room types in a hotel.
+	 * @return {ArrayList<String>} that contains available room types
+	 */
+	public ArrayList<String> getAvailableRoomTypes() {
+		ArrayList<String> roomTypes = new ArrayList<String>();
+		for(String roomType: this.roomTable.keySet()) {
+			roomTypes.add(roomType);
+		}
+		return roomTypes;
 	}
 
 //	public void printStatusReport() {
