@@ -136,6 +136,13 @@ public class Hotel {
 	}
 	
 // Task c
+	
+/**
+ * this method will try to find if the room exist in the hotel system by comparing the room number. If no such roome exist, we will throw roomnotfound error.
+ * @param Room_num
+ * @return
+ * @throws RoomNotFoundException
+ */
 	public Room getRoomByNo(String Room_num) throws RoomNotFoundException{
 		for (String roomType: this.roomTable.keySet()) {
 			for (String roomNo: this.roomTable.get(roomType).keySet()) {
@@ -156,7 +163,13 @@ public class Hotel {
 //		}
 //	}
 
-	
+	/**
+	 * details refer to the choice of information to be updated by the user of this app.
+	 * @param roomNo
+	 * @param details
+	 * @param newData
+	 * @throws RoomNotFoundException
+	 */
 	public void updateRoomDetails(String roomNo, char details, String newData) throws RoomNotFoundException{
 		Room room = this.getRoomByNo(roomNo);
 		switch(details) {

@@ -99,7 +99,11 @@ public class HotelApp {
 		}
 		sc.close();
 	}
-	
+	/**
+	 * Functional Requirement C.
+	 * @param hotel
+	 * @throws RoomNotFoundException
+	 */
 	public static void showMenuC(Hotel hotel) throws RoomNotFoundException {
 		Scanner sc = new Scanner(System.in);
 		System.out.println("Enter your room number: ");
