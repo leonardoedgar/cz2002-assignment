@@ -4,10 +4,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.lang.NumberFormatException;
 import resources.Hotel;
-import resources.Reservation;
-import resources.Guest;
+import resources.Room;
 import exception.GuestDetailUpdateFailureException;
 import exception.GuestNotFoundException;
+import exception.RoomDetailUpdateFailureException;
+import exception.RoomNotFoundException;
+import resources.Reservation;
+import resources.Guest;
 import exception.ReservationNotFoundException;
 import exception.InvalidReservationDetailException;
 import exception.AppFailureException;
@@ -24,11 +27,13 @@ public class HotelApp {
 			while (!exitApp) {
 				HotelApp.printHotelAppMenu();
 				System.out.print("Enter user input: ");
-				switch(sc.next()) {
+				switch(sc.nextLine()) {
 					case "a":
 					case "A": HotelApp.showMenuA(hotel); break;
 					case "b":
-					case "B": HotelApp.showMenuB(hotel); break;
+					case "B": System.out.println("B"); break;
+					case "c":
+					case "C": HotelApp.showMenuC(hotel);break;
 					case "q":
 					case "Q": exitApp = true; break;
 					default: System.out.println("Invalid input. Retry\n");
@@ -225,6 +230,42 @@ public class HotelApp {
 		catch (NumberFormatException e) {
 			throw new InvalidGuestDetailException();
 		}
+		
+	}
+	/**
+	 * Functional Requirement C.
+	 * @param hotel
+	 * @throws RoomNotFoundException
+	 */
+	public static void showMenuC(Hotel hotel) throws RoomNotFoundException {
+		Scanner sc = new Scanner(System.in);
+		System.out.println("Enter your room number: ");
+		String room_num = sc.nextLine();
+		try {
+		Room room = hotel.getRoomByNo(room_num);
+		room.printRoom();
+		System.out.print(""
+				+ "Details to be created/updated: \n"
+				+ "|=====================|\n"
+				+ "|(A) Room status      |\n"
+				+ "|(B) Room price       |\n"
+				+ "|(C) Bed type         |\n"
+				+ "|(D) Wifi Availability|\n"
+				+ "|(E) View of the Room |\n"
+				+ "|(F) Smoking Allowance|\n"
+				+ "|=====================|\n"
+				+ "\nEnter user input: ");
+		String choice = sc.nextLine();
+		System.out.println("choice = "+choice);
+		System.out.println("Enter the updated information: ");
+		String new_data = sc.nextLine();
+		hotel.updateRoomDetails(room_num, choice.charAt(0), new_data);
+		System.out.println("Room Information Updated!");
+		room.printRoom();}
+		catch (RoomNotFoundException e) {
+			System.out.println(e.getMessage());
+		}
+		
 		
 	}
 }

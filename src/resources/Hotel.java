@@ -9,6 +9,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import exception.HotelSetupFailureException;
+import exception.RoomNotFoundException;
 import exception.GuestDetailUpdateFailureException;
 import exception.GuestNotFoundException;
 
@@ -141,7 +142,77 @@ public class Hotel {
 		Guest guest = this.getGuestByName(name);
 		guest.printDetails();
 	}
-	
+
+/**
+ * this method will try to find if the room exist in the hotel system by comparing the room number. If no such roome exist, we will throw roomnotfound error.
+ * @param Room_num
+ * @return
+ * @throws RoomNotFoundException
+ */
+	public Room getRoomByNo(String Room_num) throws RoomNotFoundException{
+		for (String roomType: this.roomTable.keySet()) {
+			for (String roomNo: this.roomTable.get(roomType).keySet()) {
+				if ((roomNo).equals(Room_num)) {
+					return this.roomTable.get(roomType).get(roomNo);
+				}
+			}
+		}
+		throw new RoomNotFoundException();
+	}
+//	public Room getRoomByNo(String Room_num){
+//		for (String roomType: this.roomTable.keySet()) {
+//			for (String roomNo: this.roomTable.get(roomType).keySet()) {
+//				if ((roomType+"-"+roomNo).equals(Room_num)) {
+//					return this.roomTable.get(roomType).get(roomNo);
+//				}
+//			}
+//		}
+//	}
+
+	/**
+	 * details refer to the choice of information to be updated by the user of this app.
+	 * @param roomNo
+	 * @param details
+	 * @param newData
+	 * @throws RoomNotFoundException
+	 */
+	public void updateRoomDetails(String roomNo, char details, String newData) throws RoomNotFoundException{
+		Room room = this.getRoomByNo(roomNo);
+		switch(details) {
+		case 'a':
+		case 'A':{
+			room.updateStatus(newData);
+			break;
+		}
+		case 'b':
+		case 'B':{
+			room.updateCost(newData);
+			break;
+		}
+		case 'c':
+		case 'C':{
+			room.updateBedType(newData);
+			break;
+		}
+		case 'd':
+		case 'D':{
+			room.updateWifi(newData);
+			break;
+		}
+		case 'e':
+		case 'E':{
+			room.updateView(newData);
+			break;
+		}
+		case 'f':
+		case 'F':{
+			room.updateSmoking(newData);
+			break;
+		}
+		default: System.out.println("Invalid input. Retry\n");
+		}
+	}
+
 	/**
 	 * A function to get the reservation system in a hotel.
 	 * @return {ReservationSystem} the reservation system
