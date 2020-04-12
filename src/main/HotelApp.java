@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Hashtable;
+import java.util.InputMismatchException;
 import java.lang.NumberFormatException;
 //added import
 import java.text.DateFormat;
@@ -22,6 +24,7 @@ import exception.ReservationNotFoundException;
 import exception.InvalidReservationDetailException;
 import exception.AppFailureException;
 import exception.DuplicateReservationFoundException;
+import exception.FoodNotOnMenuException;
 import exception.InvalidGuestDetailException;
 
 public class HotelApp {
@@ -42,10 +45,14 @@ public class HotelApp {
 					case "B": HotelApp.showMenuB(hotel);; break;
 					case "c":
 					case "C": HotelApp.showMenuC(hotel);break;
+					case "D": 
+					case "d": HotelApp.showMenuD(hotel, menu);break;
 					case "e":
 					case "E": HotelApp.showMenuE(menu); break;
 					case "f":
 					case "F": HotelApp.showMenuFG(hotel);break;
+					case "H":
+					case "h": HotelApp.showMenuH(hotel);break;
 					case "q":
 					case "Q": exitApp = true; break;
 					default: System.out.println("Invalid input. Retry\n");
@@ -286,7 +293,54 @@ public class HotelApp {
 		
 		
 	}
-	
+	/**
+	 * A function show hotel app menu D.
+	 * @param hotel {Hotel} the hotel object
+	 * @param menu {Menu} the menu object
+	 * @throws RoomNotFoundException 
+	 * @throws FoodNotOnMenuException 
+	 */
+	public static void showMenuD(Hotel hotel, Menu menu) {
+			Hashtable<String, String> orderMap = new Hashtable<String, String>();
+			Scanner sc = new Scanner(System.in);
+			boolean orderMore = true, orderSuccess = true;
+			menu.printItems();
+			System.out.print("Enter room number: ");
+			String roomNo = sc.nextLine().trim();
+			while (orderMore) {
+				System.out.print("Enter food name: ");
+				String foodName = sc.nextLine().trim();
+				System.out.print("Enter quantity to order: ");
+				try {
+					String quantity = Integer.toString(sc.nextInt());
+					sc.nextLine();
+					if (orderMap.containsKey(foodName)) {
+						String newQuantity = Integer.toString(
+								Integer.parseInt(orderMap.get(foodName)) + Integer.parseInt(quantity));
+						orderMap.replace(foodName, newQuantity);
+					}
+					else {
+						orderMap.put(foodName, quantity);
+					}
+					System.out.println("current order: " + orderMap.toString());
+					System.out.print("Order more (yes/no): ");
+					orderMore = sc.nextLine().trim().equalsIgnoreCase("yes");
+				}
+				catch(InputMismatchException e) {
+					System.out.println("Invalid input. Retry");
+					orderSuccess = false;
+					break;
+				}
+			}
+			if (orderSuccess) {
+				try {
+					hotel.makeRoomServiceOrder(roomNo, menu, orderMap);
+					System.out.println("Order successful!");
+				} catch (FoodNotOnMenuException | RoomNotFoundException | GuestNotFoundException e ) {
+					System.out.println(e.getMessage());
+				} 
+			}
+	}
 	public static void showMenuE(Menu menu) {
 		String foodname;
 		double price;
@@ -417,6 +471,21 @@ public class HotelApp {
 			default:
 				break;
 			}
-}
+		}
+	public static void showMenuH(Hotel hotel) {
+		Scanner sc = new Scanner(System.in);
+		System.out.println("Enter room number to check out: ");
+		String roomNo = sc.nextLine().trim();
+		System.out.println("Enter guest full name for verification: ");
+		String guestName = sc.nextLine().trim();
+		try {
+			boolean success = hotel.checkOut(roomNo, guestName);
+			if (!success) {
+				System.out.println("Check out failed. Identity is not verified.");
+			}
+		} catch (RoomNotFoundException | GuestNotFoundException e) {
+			System.out.println(e.getMessage());
+		} 
+	}
 
 }
