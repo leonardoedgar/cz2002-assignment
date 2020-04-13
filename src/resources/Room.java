@@ -40,26 +40,49 @@ public class Room {
 		this.status = status;
 	}
 	
+	/**
+	 * A function to update the cost of the room
+	 * @param cost {String} the new cost of the room
+	 */
 	void updateCost(String cost) {
 		this.roomCost = Double.parseDouble(cost);
 	}
 	
+	/**
+	 * A function to update the bedType of the room
+	 * @param bed_type {String} the new bedType of the room
+	 */
 	void updateBedType(String bed_type) {
 		this.bedType = bed_type;
 	}
 	
+	/**
+	 * A function to update the wifi status of the room
+	 * @param wifi {String} the new wifi of the room
+	 */
 	void updateWifi(String wifi) {
 		this.wifi = wifi;
 	}
 	
+	/**
+	 * A function to update the smoking status of the room
+	 * @param smoking {String} the new smoking of the room
+	 */
 	void updateSmoking(String smoking) {
 		this.smoking = smoking == "yes";
 	}
 	
+	/**
+	 * A function to update the view of the room
+	 * @param view {String} the new view of the room
+	 */
 	void updateView(String view) {
 		this.view = view;
 	}
 	
+	/**
+	 * A function to print the room details
+	 */
 	public void printRoom() {
 		System.out.println(""
 				+"Room Number: "+this.roomNo+"\n"

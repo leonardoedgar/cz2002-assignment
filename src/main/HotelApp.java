@@ -364,7 +364,7 @@ public class HotelApp {
 		}
 	}
 	/**
-	 * A function to show functional requirements f and g
+	 * A function to show the functional requirements f
 	 * @param hotel
 	 */
 	public static void showMenuF(Hotel hotel) {
@@ -414,6 +414,10 @@ public class HotelApp {
 			
 }
 	
+	/**
+	 * A function to show the functional requirements of G
+	 * @param hotel
+	 */
 	public static void showMenuG(Hotel hotel){
 		Scanner sc = new Scanner(System.in);
 		//does guest have a reservation
