@@ -339,4 +339,56 @@ public class ReservationSystem {
 		}
 		return false;
 	}
+	
+	// get all reservations for a particular roomType
+	// for each day
+	/**
+	 * Get all reservations for a particular roomType.
+	 * @param roomType {String} roomType of reservation
+	 * @return {ArrayList<Reservation>} An ArrayList of all reservations for a particular roomType
+	 */
+	public ArrayList<Reservation> getRoomTypeReservation(String roomType){
+		ArrayList<Reservation> reservationList = new ArrayList<Reservation>();
+		ConcurrentHashMap<String, ArrayList<Reservation>> tempMap = new ConcurrentHashMap<String, ArrayList<Reservation>>();
+		
+		
+		//checks through the hashmap for reservations with a particular roomType
+		for(String date:this.reservationTable.keySet()) {
+			tempMap = this.reservationTable.get(date);
+			
+			for(String roomt:tempMap.keySet()) {
+				
+				if(roomt.equals(roomType)) {
+						reservationList.addAll(tempMap.get(roomt));
+				}
+				
+			}
+				
+				
+			
+		}
+
+		return reservationList;
+	}
+	
+	/**
+	 * A function to get the reservation object using the reservationId
+	 * @param reservationId The reservationId of the reservation object
+	 * @return {Reservation} The reservation object with the specified reservationId
+	 */
+	public Reservation getReservation(String reservationId) {
+		
+		for(String date: this.reservationTable.keySet()) {
+			for (String roomType: this.reservationTable.get(date).keySet()) {
+				for (Reservation reservation: this.reservationTable.get(date).get(roomType)) {
+					if (reservation.getReservationId().equals(reservationId)) {
+						return reservation;
+					}
+				}
+			}
+		}
+		
+		return null;
+	}
+	
 }
