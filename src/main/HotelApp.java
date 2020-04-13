@@ -6,16 +6,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.lang.NumberFormatException;
 //added import
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-
 import resources.Hotel;
 import resources.Menu;
 import resources.Room;
 import exception.GuestDetailUpdateFailureException;
 import exception.GuestNotFoundException;
 import exception.RoomNotFoundException;
+import exception.RoomTypeNotFoundException;
 import resources.Reservation;
 import resources.Guest;
 import exception.ReservationNotFoundException;
@@ -156,11 +153,12 @@ public class HotelApp {
 			case "a":
 			case "A": {
 				try {
-					hotel.getReservationSystem().addReservation(
-							HotelApp.createNewReservation(hotel.getAvailableRoomTypes()));
+					Reservation reservation = HotelApp.createNewReservation(hotel.getAvailableRoomTypes());
+					hotel.getReservationSystem().addReservation(reservation, hotel.getRooms(reservation.getRoomType()));
+					
 					System.out.println("Reservation added successfully!\n");
 				} catch (InvalidGuestDetailException | InvalidReservationDetailException | 
-						DuplicateReservationFoundException e) {
+						DuplicateReservationFoundException | RoomTypeNotFoundException e) {
 					System.out.println(e.getMessage() + "\n");
 				}
 				break;
@@ -168,11 +166,12 @@ public class HotelApp {
 			case "b":
 			case "B": {
 				try {
+					Reservation reservation = HotelApp.createNewReservation(hotel.getAvailableRoomTypes());
 					hotel.getReservationSystem().updateReservation(
-						HotelApp.createNewReservation(hotel.getAvailableRoomTypes()));
+						reservation, hotel.getRooms(reservation.getRoomType()) );
 					System.out.println("Reservation updated successfully!\n");
 				} catch ( InvalidGuestDetailException | InvalidReservationDetailException | 
-						ReservationNotFoundException e) {
+						ReservationNotFoundException | RoomTypeNotFoundException e) {
 					System.out.println(e.getMessage()+ "\n");
 				} 
 				break;
@@ -181,9 +180,11 @@ public class HotelApp {
 			case "C": {
 				System.out.print("Enter reservation ID to remove: ");
 				try {
-					hotel.getReservationSystem().removeReservation(sc.nextLine().trim());
+					String reservationId = sc.nextLine().trim();
+					Reservation reservation = hotel.getReservationSystem().getReservation(reservationId);
+					hotel.getReservationSystem().removeReservation(reservationId, hotel.getRooms(reservation.getRoomType()));
 					System.out.println("Reservation removed successfully!\n");
-				} catch (ReservationNotFoundException e) {
+				} catch (ReservationNotFoundException | RoomTypeNotFoundException e) {
 					System.out.println(e.getMessage() + "\n");
 				}
 				break;
@@ -284,23 +285,61 @@ public class HotelApp {
 		room.printRoom();
 		System.out.print(""
 				+ "Details to be created/updated: \n"
-				+ "|=====================|\n"
-				+ "|(A) Room status      |\n"
-				+ "|(B) Room price       |\n"
-				+ "|(C) Bed type         |\n"
-				+ "|(D) Wifi Availability|\n"
-				+ "|(E) View of the Room |\n"
-				+ "|(F) Smoking Allowance|\n"
-				+ "|=====================|\n"
+				+ "|===============================|\n"
+				+ "|(A) Room status                |\n"
+				+ "|(B) Room price                 |\n"
+				+ "|(C) Bed type                   |\n"
+				+ "|(D) Wifi Availability          |\n"
+				+ "|(E) View of the Room           |\n"
+				+ "|(F) Smoking Allowance (yes/no) |\n"
+				+ "|===============================|\n"
 				+ "\nEnter user input: ");
 		String choice = sc.nextLine();
-		System.out.println("choice = "+choice);
-		System.out.println("Enter the updated information: ");
-		String new_data = sc.nextLine();
-		hotel.updateRoomDetails(room_num, choice.charAt(0), new_data);
-		System.out.println("Room Information Updated!");
-		room.printRoom();}
-		catch (RoomNotFoundException e) {
+		switch(choice) {
+		case "a":
+		case "A": choice = "status";break;
+		case "b":
+		case "B": choice = "price";break;
+		case "c":
+		case "C": choice = "bed type";break;
+		case "d":
+		case "D": choice = "wifi";break;
+		case "e":
+		case "E": choice = "view";break;
+		case "f":
+		case "F": choice = "smoking";break;
+		default: System.out.println("Invalid choice! Please try again.");
+		}
+
+		if (choice.equals("status")) {
+			System.out.print(""
+					+ "New room status: \n"
+					+ "|======================|\n"
+					+ "|(A) Vacant            |\n"
+					+ "|(B) Under Maintainance|\n"
+					+ "|======================|\n"
+					+ "\nEnter user input: ");
+			String status = sc.next();
+			if (status.equals("a")|status.equals("A")) {
+				hotel.updateRoomDetails(room_num, choice, "vacant");
+				System.out.println("Room Information Updated!");
+			}
+			else if (status.equals("b")|status.equals("B")) {
+				hotel.updateRoomDetails(room_num, choice, "under maintainance");
+				System.out.println("Room Information Updated!");
+			}
+			else {
+				System.out.println("Invalid choice, please try again");
+			}
+		}
+		else{
+			System.out.println("Enter the updated information: ");
+			String new_data = sc.nextLine();
+			hotel.updateRoomDetails(room_num, choice, new_data);
+			System.out.println("Room Information Updated!");
+		}
+		}
+		catch (RoomNotFoundException | RoomTypeNotFoundException e) {
 			System.out.println(e.getMessage());
 		}
 		
@@ -361,7 +400,6 @@ public class HotelApp {
 
 		Scanner sc = new Scanner(System.in);
 			
-				DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
 				Date startDate = new Date();
 				Date endDate = new Date();
 				
@@ -404,7 +442,7 @@ public class HotelApp {
 				else {
 					System.out.println("Room type is not available.");
 				}		
-		}catch(ParseException e) {
+		}catch(RoomTypeNotFoundException e) {
 			System.out.println(e.getMessage());
 		}
 			
@@ -474,8 +512,7 @@ public class HotelApp {
 			//create new guest object and assign to room
 			try {
 				System.out.println("Enter new guest details:");
-				Guest newGuest = createNewGuest();
-				
+				Guest newGuest = createNewGuest();				
 				System.out.println("Enter guest's preferred roomType:");
 				String roomType = sc.next().trim();
 				boolean roomTypeChecker = false;
@@ -511,7 +548,7 @@ public class HotelApp {
 					newGuest=null;
 				}
 				
-			}catch(InvalidGuestDetailException e) {
+			}catch(InvalidGuestDetailException |RoomTypeNotFoundException e) {
 				System.out.println(e.getMessage());
 			}
 

@@ -25,7 +25,7 @@ public class Hotel {
 	
 	/**
 	 * A class constructor to create a hotel. 
-	 * @param roomConfigFilePath {String} the path to room configuration file
+	 * @param roomConfigFilePath {String} the path to room configuration fileƒ
 	 * @throws {HotelSetupFailureException} exception when hotel failed to set up
 	 */
 	public Hotel(String roomConfigFilePath) throws HotelSetupFailureException {
@@ -33,7 +33,14 @@ public class Hotel {
 		this.reservationSystem = new ReservationSystem();
 	}
 	
-	//removed guestList
+	//added hashtable {"roomType":guestId:Guest()}
+	//during checkin, guess is assigned a roomNo
+	Hashtable<Guest,String> guestList = new Hashtable<Guest,String>();
+	private int noOfAvailable_single;
+	private int noOfAvailable_double;
+	private int noOfAvailable_deluxe;
+	private int noOfAvailable_vip;
+
 	
 	/**
 	 * A function to setup rooms in a hotel.
@@ -44,6 +51,21 @@ public class Hotel {
 		for (String roomType: roomConfig.keySet()) {
 			Hashtable<String, String> roomDetail = roomConfig.get(roomType);
 			Hashtable<String, Room> roomDataPerLevel = new Hashtable<String, Room>();
+			switch(roomType) {
+				case "single":
+					noOfAvailable_single = Integer.parseInt(roomDetail.get("numberOfRooms"));
+					break;
+				case "double":
+					noOfAvailable_double = Integer.parseInt(roomDetail.get("numberOfRooms"));
+					break;
+				case "deluxe":
+					noOfAvailable_deluxe = Integer.parseInt(roomDetail.get("numberOfRooms"));
+					break;
+				case "vip":
+					noOfAvailable_vip = Integer.parseInt(roomDetail.get("numberOfRooms"));
+					break;
+			
+			}
 			for(int i=1; i<= Integer.parseInt(roomDetail.get("numberOfRooms")); i++) {
 				String roomNo = "0" + roomDetail.get("level") + "-";
 				if (i > 9) {
@@ -191,36 +213,56 @@ public class Hotel {
 	 * @param newData
 	 * @throws RoomNotFoundException
 	 */
-	public void updateRoomDetails(String roomNo, char details, String newData) throws RoomNotFoundException{
+	public void updateRoomDetails(String roomNo, String details, String newData) throws RoomNotFoundException, RoomTypeNotFoundException{
 		Room room = this.getRoomByNo(roomNo);
+		int delta=0;
 		switch(details) {
-		case 'a':
-		case 'A':{
-			room.updateStatus(newData);
+		case "status":{
+			if (newData.equals("under maintainance") | newData.equals("renovation")){
+				delta = -1;
+			}
+			else if (newData.equals("vacant")) {
+				delta=1;
+			}
+			if (!newData.equals(room.getStatus())) {
+				if (newData.split("-")[0].equals("01")) {
+					updateRoomAvailability("single",delta);
+					updateReservation("single",newData,delta);
+				}
+				else if (roomNo.split("-")[0].equals("02")) {
+					updateRoomAvailability("double",delta);
+					updateReservation("double",newData,delta);
+				}
+				else if (roomNo.split("-")[0].equals("03")) {
+					updateRoomAvailability("deluxe",delta);
+					updateReservation("deluxe",newData,delta);
+				}
+				else {
+					updateRoomAvailability("vip",delta);
+					updateReservation("vip",newData,delta);
+				}
+				room.updateStatus(newData);
+			}
+			
 			break;
 		}
-		case 'b':
-		case 'B':{
+		case "price":{
 			room.updateCost(newData);
 			break;
 		}
-		case 'c':
-		case 'C':{
+		case "bed type":{
 			room.updateBedType(newData);
 			break;
 		}
-		case 'd':
-		case 'D':{
+		case "wifi":{
 			room.updateWifi(newData);
 			break;
 		}
-		case 'e':
-		case 'E':{
+		case "view":{
 			room.updateView(newData);
 			break;
 		}
-		case 'f':
-		case 'F':{
+		case "smoking":{
 			room.updateSmoking(newData);
 			break;
 		}
@@ -354,21 +396,13 @@ public class Hotel {
 	 * @return {boolean}, true if available, false if not available
 	 * @throws RoomTypeNotFoundException
 	 */
-	public boolean checkRoomAvailability(java.util.Date startDate, java.util.Date endDate, String roomType){
+	public boolean checkRoomAvailability(java.util.Date startDate, java.util.Date endDate, String roomType) throws RoomTypeNotFoundException{
 		//assume all rooms are available at the start
 		if(roomTable.get(roomType)==null) {
 			return false;
 		}
 		
-		//change this to refer to roomType for
-		//switch(roomType){
-		//case "single": roomsLeftForDate=singleRoomsAvailable; break; //<--rooms left attribute in hotel to be implemented
-		//case "double":roomsLeftForDate=doubleRoomsAvailable; break;
-		//case "deluxe":roomsLeftForDate=deluxeRoomsAvailable; break;
-		//case "vip":roomsLeftForDate=vipRoomsAvailable; break;
-		// default:return false;
-		
-		int roomsLeftForDate=12; //currently hardcoded to 12 until code is combined
+		int roomsLeftForDate=this.getRooms(roomType); //currently hardcoded to 12 until code is combined
 
 		//checkHotel method
 		roomsLeftForDate=roomsLeftForDate-checkHotelClash(startDate,endDate,roomType)-checkReservationClash(startDate,endDate,roomType);
@@ -451,6 +485,43 @@ public class Hotel {
 		
 	}
 	
+
+ /**
+	 * A function to update the number of available room in a certain room type
+	 * @param room_type {String} this is the room type that we will refer to
+   * @param num_room {int} this is the number of available room of the corresponding room type
+	 * @return {void} 
+ * @throws RoomTypeNotFoundException 
+	 */
+	public void updateRoomAvailability(String room_type, int num_room) throws RoomTypeNotFoundException {
+		switch(room_type){
+			case "single": noOfAvailable_single = noOfAvailable_single +num_room;break;
+			case "double": noOfAvailable_double = noOfAvailable_double +num_room;break;
+			case "deluxe": noOfAvailable_deluxe = noOfAvailable_deluxe +num_room;break;
+			case "vip": noOfAvailable_vip = noOfAvailable_vip +num_room;break;
+			default: throw new RoomTypeNotFoundException();
+		}
+	}
+  
+	 /**
+	 * A function to update the number of available room in a certain room type
+	 * @param room_type {String} this is the room type that we will refer to
+   * @param num_room {int} this is the number of available room of the corresponding room type
+   * @param delta {int} the number of rooms that the status should be change (1 if you are changing waitlist to confirmed, -1 otherwise)
+	 * @return {void} 
+	 * @throws RoomTypeNotFoundException 
+	 */
+	public void updateReservation(String room_type, String new_status,int delta) throws RoomTypeNotFoundException {
+		switch(room_type) {
+		case "single": getReservationSystem().shiftReservation(noOfAvailable_single, "single",delta);break;
+		case "double": getReservationSystem().shiftReservation(noOfAvailable_double, "double",delta);break;
+		case "deluxe": getReservationSystem().shiftReservation(noOfAvailable_deluxe, "deluxe",delta);break;
+		case "vip": getReservationSystem().shiftReservation(noOfAvailable_vip, "vip",delta);break;
+		default: throw new RoomTypeNotFoundException();
+	
+		}
+	}
+
 	/**
 	 * A function to check if roomType exists in the hotel
 	 * @param roomType {String} the roomType you want to check
@@ -463,6 +534,17 @@ public class Hotel {
 			}
 		}
 		return false;
+
+	}
+	
+	public int getRooms(String roomType) throws RoomTypeNotFoundException {
+		switch(roomType) {
+		case "single":return this.noOfAvailable_single;
+		case "double":return this.noOfAvailable_double;
+		case "deluxe":return this.noOfAvailable_deluxe;
+		case "vip":return this.noOfAvailable_vip;
+		default: throw new RoomTypeNotFoundException();
+		}
 	}
 	
 //	public void printStatusReport() {
