@@ -516,7 +516,7 @@ public class Hotel {
 	private String getRoomTypeFromRoomNo(String roomNo) throws RoomNotFoundException {
 		String theRoomType = null;
 		for (String roomType: this.roomTable.keySet()) {
-			if (this.roomTable.get(roomType).equals(roomNo)) {
+			if (this.roomTable.get(roomType).containsKey(roomNo)) {
 				theRoomType = roomType;
 				break;
 			}
@@ -555,6 +555,7 @@ public class Hotel {
 		
 	}
 
+	/**
 	 * To print the report based on status (feature I (b))
 	 * @return
 	 */

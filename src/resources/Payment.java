@@ -48,22 +48,26 @@ public class Payment {
 		double totalCost = this.roomCost;
 		System.out.println("           HOTEL CHECKOUT");
 		System.out.println("===================================");
-		System.out.println("Room type: " + this.roomType);
-		System.out.println("Room cost: SGD" + this.roomCost);
+		System.out.println("Room type\t: " + this.roomType);
+		System.out.println("Room cost\t: SGD" + String.format("%.2f", this.roomCost));
 		System.out.println("Room order history: ");
 		for (RoomService roomService: roomServiceList) {
 			roomService.printOrderHistory();
 			totalCost += roomService.getTotalCost();
 		}
 		System.out.println("===================================");
-		System.out.println("Total cost before tax                        : SGD" + totalCost);
+		System.out.println("Total cost before tax\t: SGD" + 
+			String.format("%.2f", totalCost));
 		double discountAmount = this.discountRate*totalCost;
 		totalCost -= discountAmount;
-		System.out.println("Discount rate(" + this.discountRate*100 + "%): SGD" + discountAmount);
+		System.out.println("Discount rate(" + String.format("%.2f", this.discountRate*100) + "%)\t: SGD" + 
+			String.format("%.2f", discountAmount));
 		double taxAmount = this.taxRate*totalCost;
 		totalCost += taxAmount;
-		System.out.println("Tax rate("      + this.taxRate*100      + "%): SGD" + taxAmount);
-		System.out.println("Total cost after tax                         : SGD" + totalCost);
+		System.out.println("Tax rate("      + String.format("%.2f", this.taxRate*100) + "%)\t\t: SGD" + 
+			String.format("%.2f", taxAmount));
+		System.out.println("Total cost after tax\t: SGD" + 
+			String.format("%.2f", totalCost));
 		System.out.println("===================================");
 		System.out.println("  THANK YOU FOR STAYING WITH US!");
 		System.out.println("           SEE YOU AGAIN!");

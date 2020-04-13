@@ -260,7 +260,7 @@ public class HotelApp {
 		Date endDate= new Date();
 		//DateFormat df = new SimpleDateFormat("MM/DD/YYYY");
 		try {
-			System.out.print("Enter date of check-in (MM/DD/YYYY) : ");
+			System.out.print("Enter date of check-in (MM/DD/YYYY)  : ");
 			startDate=new Date(sc.nextLine().trim());
 
 			System.out.print("Enter date of check-out (MM/DD/YYYY) : ");
@@ -625,9 +625,6 @@ public class HotelApp {
 		} 
 	}
 
-}
-
-}
 	/**
 	 * Show the functional i
 	 * @param hotel

@@ -60,7 +60,7 @@ public class RoomService {
 					double costPerFood = 
 							this.menu.getCostOfAFood(foodName)*Integer.parseInt(foodQuantity);
 					System.out.println(foodQuantity + " " + foodName + ": SGD" + 
-						Double.toString(costPerFood));	
+							costPerFood);	
 					System.out.println("-----------------------------------");
 				} catch (FoodNotOnMenuException e) {
 					continue;
