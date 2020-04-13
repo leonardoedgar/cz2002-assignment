@@ -22,7 +22,7 @@ public class Hotel {
 	// {"roomType": {"roomNo": Room()}}
 	Hashtable<String, Hashtable<String, Room>> roomTable = new Hashtable<String, Hashtable<String, Room>>();
 	private ReservationSystem reservationSystem;
-	
+//	temporary, hard code to 12
 	/**
 	 * A class constructor to create a hotel. 
 	 * @param roomConfigFilePath {String} the path to room configuration fileƒ
@@ -470,7 +470,9 @@ public class Hotel {
 		if(tempRoom==null) {
 		throw new RoomNotFoundException();
 		}
-		
+		if (reservation.getStatus().equals("waitlist")) {
+			throw new RoomNotFoundException("Check in failed. The reservation is in waitlist");
+		}
 		if(tempRoom.getStatus().equals("vacant")) {
 			
 			tempRoom.assignGuestToRoom(guest);
@@ -485,6 +487,66 @@ public class Hotel {
 		
 	}
 	
+	/**
+	 * To print the report based on status (feature I (b))
+	 * @return
+	 */
+	public ArrayList[] getStatusRoom() {
+		ArrayList<String> vacant = new ArrayList<String>();
+		ArrayList<String> occupied = new ArrayList<String>();
+		ArrayList<String> renov = new ArrayList<String>();
+		ArrayList<String> others = new ArrayList<String>();
+		for (String roomType: this.roomTable.keySet()) {
+			for(String roomNo: this.roomTable.get(roomType).keySet()) {
+				Room roomDetail = this.roomTable.get(roomType).get(roomNo);
+				if (roomDetail.getStatus().equals("vacant")) {
+					vacant.add(roomNo);
+				}
+				else if (roomDetail.getStatus().equals("occupied")) {
+					occupied.add(roomNo);
+				}
+				else if (roomDetail.getStatus().equals("under maintainance")) {
+					renov.add(roomNo);
+				}
+				else {others.add(roomNo);}
+			}
+		}
+		ArrayList[] result = {vacant,occupied,renov,others};
+		return result;
+				
+	}
+	
+	/**
+	 * To get the report based on Occupancy rate (feature I(a))
+	 * @return
+	 */
+	public ArrayList[] getOccupancyRate() {
+		ArrayList<String> single = new ArrayList<String>();
+		ArrayList<String> doublee = new ArrayList<String>();
+		ArrayList<String> deluxe = new ArrayList<String>();
+		ArrayList<String> vip = new ArrayList<String>();
+		for (String roomType: this.roomTable.keySet()) {
+			for(String roomNo: this.roomTable.get(roomType).keySet()) {
+				Room roomDetail = this.roomTable.get(roomType).get(roomNo);
+				if (roomDetail.getStatus().equals("vacant") && roomType.equals("single")) {
+					single.add(roomNo);
+				}
+				else if (roomDetail.getStatus().equals("vacant") && roomType.equals("double")) {
+					doublee.add(roomNo);
+				}
+				else if (roomDetail.getStatus().equals("vacant") && roomType.equals("deluxe")) {
+					deluxe.add(roomNo);
+				}
+				else if (roomDetail.getStatus().equals("vacant") && roomType.equals("vip")) {
+					vip.add(roomNo);
+				}
+			}
+		}
+		ArrayList[] result = {single,doublee,deluxe,vip};
+		return result;
+				
+	}
+
 
  /**
 	 * A function to update the number of available room in a certain room type
@@ -537,6 +599,12 @@ public class Hotel {
 
 	}
 	
+	/**
+	 * get method for the number of available rooms
+	 * @param roomType
+	 * @return
+	 * @throws RoomTypeNotFoundException
+	 */
 	public int getRooms(String roomType) throws RoomTypeNotFoundException {
 		switch(roomType) {
 		case "single":return this.noOfAvailable_single;
