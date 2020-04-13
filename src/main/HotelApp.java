@@ -207,13 +207,7 @@ public class HotelApp {
 		System.out.print("Enter reservation ID                 : ");
 		String reservationId = sc.nextLine().trim();
 		Guest guest = HotelApp.createNewGuest();
-		//Use the start and end date from guest and assign to reservation
-		//System.out.print("Enter date of check in (MM/DD/YYYY)  : ");
-		//Date checkInDate = new Date(sc.nextLine().trim());
 		Date checkInDate=guest.getstartDate();
-		//same for the checkOutDate
-		//System.out.print("Enter date of check out (MM/DD/YYYY) : ");
-		//Date checkOutDate = new Date(sc.nextLine().trim());
 		Date checkOutDate = guest.getendDate();
 		System.out.print("Enter room type                      : ");
 		String roomType = sc.nextLine().trim();
@@ -255,20 +249,17 @@ public class HotelApp {
 		//added date
 		Date startDate= new Date();
 		Date endDate= new Date();
-		DateFormat df = new SimpleDateFormat("MM/DD/YYYY");
+		//DateFormat df = new SimpleDateFormat("MM/DD/YYYY");
 		try {
 			System.out.print("Enter date of check-in (MM/DD/YYYY) : ");
-			startDate=df.parse(sc.nextLine().trim());
+			startDate=new Date(sc.nextLine().trim());
 
-			
-		}catch(Exception e) {
-			System.out.println("Unable to parse");
-		}
-		try {
 			System.out.print("Enter date of check-out (MM/DD/YYYY) : ");
-			 endDate=df.parse(sc.nextLine().trim());	
+			 endDate=new Date(sc.nextLine().trim());	
+		
 		}catch(Exception e){
-			System.out.println("Unable to parse");
+			System.out.println("Date format is invalid.");
+			throw new InvalidGuestDetailException();
 		}
 		
 		try {
@@ -278,7 +269,6 @@ public class HotelApp {
 		catch (NumberFormatException e) {
 			throw new InvalidGuestDetailException();
 		}
-		
 	}
 	/**
 	 * Functional Requirement C.
@@ -372,37 +362,41 @@ public class HotelApp {
 		Scanner sc = new Scanner(System.in);
 			
 				DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
+				Date startDate = new Date();
+				Date endDate = new Date();
+				
 				
 				System.out.println("Enter start date in the following format: MM/DD/YYYY");
-				Date startDate = new Date();
-				try {
-			
-					startDate= df.parse(sc.next().trim());
-				}catch(ParseException e) {
-					e.printStackTrace();
-				}
 				
+				try {
+				startDate= new Date(sc.nextLine().trim());
+
 				System.out.println("Enter end date in the following format: MM/DD/YYYY");
 				int checker=1;
 
-				Date endDate = new Date();
 				while(checker==1) {
-				try {
-			
-					endDate= df.parse(sc.next().trim());
-				}catch(ParseException e) {
-					e.printStackTrace();
-				}
-				if(endDate.compareTo(startDate)>0) {
-					checker=0;
-				}
-				else {
-					System.out.println("End date must be after startDate, enter another end date:");
-				}
+
+					endDate= new Date(sc.nextLine().trim());
+					
+					if(endDate.compareTo(startDate)>0) {
+						checker=0;
+					}
+					else {
+						System.out.println("End date must be after startDate, enter another end date:");
+					}
 				}
 				
 				System.out.println("Enter roomType:");
 				String roomType=sc.next().trim();
+				
+				boolean roomTypeChecker = false;
+				while(roomTypeChecker == false) {
+					roomTypeChecker=hotel.roomTypeExists(roomType);
+					if(roomTypeChecker==false) {
+						System.out.println("Invalid room type. Try again:");
+						roomType = sc.next().trim();
+					}
+				}
 				
 				if(hotel.checkRoomAvailability(startDate, endDate, roomType)==true) {
 					System.out.println("Room type is available.");
@@ -410,6 +404,9 @@ public class HotelApp {
 				else {
 					System.out.println("Room type is not available.");
 				}		
+		}catch(ParseException e) {
+			System.out.println(e.getMessage());
+		}
 			
 			
 }
@@ -447,11 +444,24 @@ public class HotelApp {
 			if(tempreservation!=null) {
 				String roomType = tempreservation.getRoomType();
 				Guest tempGuest = tempreservation.getGuest();
-				
+
+				boolean checker=false;
 				System.out.println("Enter the room number guest will be assigned to:");
 				String roomNo=sc.next().trim();
-				hotel.checkIn(tempGuest, roomNo, roomType,tempreservation);
 				
+				try{
+					checker=hotel.checkIn(tempGuest, roomNo, roomType,tempreservation);
+				
+				if(checker==true) {
+					System.out.println("Check-in successful!");
+				}
+				else {
+					System.out.println("Room is currently unavailable. Choose another room.");
+				}
+				}catch(RoomNotFoundException e) {
+
+					System.out.println(e.getMessage());
+				}
 			}
 			else {
 				System.out.println("Reservation Id is invalid.");
@@ -465,31 +475,48 @@ public class HotelApp {
 			try {
 				System.out.println("Enter new guest details:");
 				Guest newGuest = createNewGuest();
-				if(newGuest==null) {
-					System.out.println("abc");
-				}
+				
 				System.out.println("Enter guest's preferred roomType:");
 				String roomType = sc.next().trim();
+				boolean roomTypeChecker = false;
+				while(roomTypeChecker == false) {
+					roomTypeChecker=hotel.roomTypeExists(roomType);
+					if(roomTypeChecker==false) {
+						System.out.println("Invalid room type. Try again:");
+						roomType = sc.next().trim();
+					}
+				}
+					
+				
+				boolean roomNoChecker=false;
 				
 				if(hotel.checkRoomAvailability(newGuest.getstartDate(), newGuest.getendDate(), roomType)==true) {
 					System.out.println("Enter the room number guest will be assigned to:");
 					String roomNo=sc.next().trim();
-					hotel.checkIn(newGuest, roomNo, roomType);
-				}
-				else {
+					try{
+						roomNoChecker=hotel.checkIn(newGuest, roomNo, roomType);
+					
+					
+					if(roomNoChecker==true) {
+						System.out.println("Check-in successful!");
+					}
+					else {
+						System.out.println("Room is currently unavailable. Choose another room.");
+					}
+					}catch (RoomNotFoundException e) {
+						System.out.println(e.getMessage());
+					}
+				}else {
 					System.out.println("Room type is currently fully booked. Guest is not assigned to a room and the details will be deleted.");
 					newGuest=null;
 				}
 				
-				
-				
-			} catch (InvalidGuestDetailException e) {
-				e.printStackTrace();
+			}catch(InvalidGuestDetailException e) {
+				System.out.println(e.getMessage());
 			}
-			
-			
-		}
-		
-	}
 
+		
+		}
+	}
+	
 }

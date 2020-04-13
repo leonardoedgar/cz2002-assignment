@@ -1,5 +1,7 @@
 package resources;
 
+import exception.RoomNotFoundException;
+
 /**
  * A class to represent a room in a hotel.
  */
@@ -114,7 +116,7 @@ public class Room {
 	 * A function to check the status of the room
 	 * @return {String} String of status of the room
 	 */
-	public String getStatus() {
+	public String getStatus(){
 		return status;
 	}
 }

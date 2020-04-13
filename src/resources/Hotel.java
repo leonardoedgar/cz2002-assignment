@@ -11,6 +11,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import exception.HotelSetupFailureException;
 import exception.RoomNotFoundException;
+import exception.RoomTypeNotFoundException;
 import exception.GuestDetailUpdateFailureException;
 import exception.GuestNotFoundException;
 
@@ -297,7 +298,7 @@ public class Hotel {
 	 * @param roomType {String} The room type you want to check for
 	 * @return {Integer} The number of rooms that currently have guests
 	 */
-	public int checkHotelClash(java.util.Date startDate, java.util.Date endDate,String roomType) {
+	private int checkHotelClash(java.util.Date startDate, java.util.Date endDate,String roomType) {
 		int roomsClash=0;
 		Hashtable<String, Room> tempTable=roomTable.get(roomType);
 			
@@ -322,7 +323,7 @@ public class Hotel {
 	 * @param roomType {String} The room type you want to check for
 	 * @return {Integer} The number of rooms currently booked by reservation
 	 */
-	public int checkReservationClash(java.util.Date startDate, java.util.Date endDate,String roomType) {
+	private int checkReservationClash(java.util.Date startDate, java.util.Date endDate,String roomType) {
 		int roomsClash=0;
 		
 		ArrayList<Reservation> tempList = new ArrayList<Reservation>();
@@ -351,11 +352,11 @@ public class Hotel {
 	 * @param endDate {Date} End date of new guest
 	 * @param roomType {String} roomType chosen by the new guest
 	 * @return {boolean}, true if available, false if not available
+	 * @throws RoomTypeNotFoundException
 	 */
-	public boolean checkRoomAvailability(java.util.Date startDate, java.util.Date endDate, String roomType) {
+	public boolean checkRoomAvailability(java.util.Date startDate, java.util.Date endDate, String roomType){
 		//assume all rooms are available at the start
 		if(roomTable.get(roomType)==null) {
-			System.out.println("Room type does not exist.");
 			return false;
 		}
 		
@@ -390,42 +391,28 @@ public class Hotel {
 	 * @param guest {Guest} object of the guest who wants to check-in
 	 * @param roomType {String} roomType chosen by the guest 
 	 * @return {boolean} true if successful, false if failure
+	 * @throws RoomNotFoundException
 	 */
-	public boolean checkIn(Guest guest,String roomNo, String roomType) {
+	public boolean checkIn (Guest guest,String roomNo, String roomType) throws RoomNotFoundException {
 		
 		Hashtable<String, Room> tempRoomList = roomTable.get(roomType);
 
-		if(tempRoomList==null) {
-			System.out.println("Room type does not exist.");
-			return false;
-		}
-		
-		//have a method to print available rooms for that roomtype at the current moment
-
-		//mapping fixed
 		Room tempRoom = tempRoomList.get(roomNo);
+		
 		if(tempRoom==null) {
-			System.out.println("Room number does not exist for room type "+roomType+".");
-			return false;
-		}
-		//use the method below to check for mapping of hashtable
-		//System.out.print(roomTable.get(roomType));
+			throw new RoomNotFoundException();
+			}
 		
 		if(tempRoom.getStatus().equals("vacant")) {
-
-			
 			tempRoom.assignGuestToRoom(guest);
-
-			//added status update when checking in
 			tempRoom.updateStatus("occupied");
 			
-			System.out.println("Check-in successful!");
 			return true;
 		}
 		else {
-			System.out.println("Room is currently unavailable. Choose another room.");
 			return false;
 		}
+		
 		
 	}
 	
@@ -438,44 +425,45 @@ public class Hotel {
 	 * @param roomType {String} roomType chosen by the guest 
 	 * @param reservation {Reservation} reservation object belonging to the guest
 	 * @return {boolean} true if successful, false if failure
+	 * @throws RoomNotFoundException
 	 */
-	public boolean checkIn(Guest guest,String roomNo, String roomType,Reservation reservation) {
+	public boolean checkIn(Guest guest,String roomNo, String roomType,Reservation reservation) throws RoomNotFoundException {
 		
 		Hashtable<String, Room> tempRoomList = roomTable.get(roomType);
-
-		if(tempRoomList==null) {
-			System.out.println("Room type does not exist.");
-			return false;
-		}
 		
-		//have a method to print available rooms for that roomtype at the current moment
-
-		//mapping fixed
 		Room tempRoom = tempRoomList.get(roomNo);
+		
 		if(tempRoom==null) {
-			System.out.println("Room number does not exist for room type "+roomType+".");
-			return false;
+		throw new RoomNotFoundException();
 		}
-		//use the method below to check for mapping of hashtable
-		//System.out.print(roomTable.get(roomType));
 		
 		if(tempRoom.getStatus().equals("vacant")) {
 			
 			tempRoom.assignGuestToRoom(guest);
-			//added status update when checking in
 			tempRoom.updateStatus("occupied");
 			reservation.updateStatus("checked-in");
 
-			System.out.println("Check-in successful!");
 			return true;
 		}
 		else {
-			System.out.println("Room is currently unavailable. Choose another room.");
 			return false;
 		}
 		
 	}
 	
+	/**
+	 * A function to check if roomType exists in the hotel
+	 * @param roomType {String} the roomType you want to check
+	 * @return {boolean} true if roomType exists, false if roomType does not exist
+	 */
+	public boolean roomTypeExists(String roomType) {
+		for(int i=0;i<getAvailableRoomTypes().size();i++) {
+			if(roomType.equals(getAvailableRoomTypes().get(i))) {
+				return true;
+			}
+		}
+		return false;
+	}
 	
 //	public void printStatusReport() {
 //	for (String roomType: this.roomTable.keySet()) {
