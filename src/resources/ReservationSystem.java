@@ -74,7 +74,7 @@ public class ReservationSystem {
 	}
 	
 	/**
-	 * this method will shift the reservation list to have more or less "waitlist" depending on delta
+	 * this method will shift the reservation list to have add more "waitlist" (delta =-1) or add more "confirmed" (delta = 1) depending on delta
 	 * @param num_room number of available rooms in certain roomtype
 	 * @param roomtype 
 	 * @param delta delta is the number of rooms to be changed to "vacant" or "under maintainance"
@@ -89,7 +89,7 @@ public class ReservationSystem {
 					reserve.updateStatus("waitlist");
 				}
 				else if (counter > num_room && counter <=num_room+delta && delta == 1) {
-					reserve.updateStatus("vacant");
+					reserve.updateStatus("confirmed");
 				}
 			}
 		}
