@@ -26,9 +26,9 @@ public class ReservationSystem {
 	 * @param reservation { Reservation} the reservation to add
 	 * @throws {DuplicateReservationFoundException} exception when duplicate reservation is found
 	 */
-	public void addReservation(Reservation reservation) throws DuplicateReservationFoundException {
+	public void addReservation(Reservation reservation, int numberOfRooms) throws DuplicateReservationFoundException {
 		if(!this.doesDuplicateReservationIdExist(reservation.getReservationId())) {
-			this.addNewReservation(reservation);
+			this.addNewReservation(reservation, numberOfRooms);
 		}
 		else {
 			throw new DuplicateReservationFoundException();
@@ -40,10 +40,10 @@ public class ReservationSystem {
 	 * @param reservation {Reservation} the reservation to update to
 	 * @throws {ReservationNotFoundException} exception when the old reservation is not found
 	 */
-	public void updateReservation(Reservation reservation) throws ReservationNotFoundException {
+	public void updateReservation(Reservation reservation, int numberOfRooms) throws ReservationNotFoundException {
 		if (this.doesDuplicateReservationIdExist(reservation.getReservationId())) {
-			this.updatePastReservation(reservation);
-			this.addNewReservation(reservation);
+			this.updatePastReservation(reservation,numberOfRooms);
+			this.addNewReservation(reservation,numberOfRooms);
 		}
 		else {
 			throw new ReservationNotFoundException();
@@ -55,14 +55,14 @@ public class ReservationSystem {
 	 * @param reservationId {String} the reservation id to remove
 	 * @throws {ReservationNotFoundException} exception when reservation to remove is not found
 	 */
-	public void removeReservation(String reservationId) throws ReservationNotFoundException {
+	public void removeReservation(String reservationId, int numberOfRooms) throws ReservationNotFoundException {
 		if (this.doesDuplicateReservationIdExist(reservationId)) {
 			for(String date: this.reservationTable.keySet()) {
 				for (String roomType: this.reservationTable.get(date).keySet()) {
 					ArrayList<Reservation> reservationList = this.reservationTable.get(date).get(roomType);
 					for (int i=0; i<reservationList.size(); i++) {
 						if(reservationList.get(i).getReservationId().equals(reservationId)) {
-							this.removeReservationFromArrayByIndex(reservationList, i, date, roomType);
+							this.removeReservationFromArrayByIndex(reservationList, i, date, roomType, numberOfRooms);
 						}
 					}
 				}
@@ -74,6 +74,28 @@ public class ReservationSystem {
 	}
 	
 	/**
+	 * this method will shift the reservation list to have add more "waitlist" (delta =-1) or add more "confirmed" (delta = 1) depending on delta
+	 * @param num_room number of available rooms in certain roomtype (updated information)
+	 * @param roomtype 
+	 * @param delta delta is the number of rooms to be changed to "vacant" or "under maintainance"
+	 */
+	public void shiftReservation(int num_room,String roomtype, int delta) {
+		int counter = 1;
+		for(String date: this.reservationTable.keySet()) {
+			for (Reservation reserve: this.reservationTable.get(date).get(roomtype)) {
+//				only set to waitlist if the person is between the current number of room and the prev number of room 
+				if (counter > num_room && counter <=num_room-delta && delta == -1) {
+					reserve.updateStatus("waitlist");
+				}
+				else if (counter <= num_room && counter > num_room-delta && delta == 1) {
+					reserve.updateStatus("confirmed");
+				}
+				counter ++;
+			}
+		}
+	}
+	
+	/**
 	 * A function to remove a reservation by index from an array.
 	 * @param reservationList {ArrayList<Reservation>} the reservation array
 	 * @param index {int} the index to remove
@@ -81,9 +103,9 @@ public class ReservationSystem {
 	 * @param roomType {String} the room type
 	 */
 	private void removeReservationFromArrayByIndex(ArrayList<Reservation> reservationList, 
-			int index, String date, String roomType) {
-		if (reservationList.size() > 12) {
-			reservationList.get(12).updateStatus("confirmed");
+			int index, String date, String roomType, int numberOfRooms) {
+		if (reservationList.size() > numberOfRooms) {
+			reservationList.get(numberOfRooms).updateStatus("confirmed");
 		}
 		reservationList.remove(index);
 		if(reservationList.size() == 0 ) {
@@ -145,7 +167,7 @@ public class ReservationSystem {
 	 * @param reservation {Reservation} the new reservation to add
 	 */
 	@SuppressWarnings("serial")
-	private void addNewReservation(Reservation reservation) {
+	private void addNewReservation(Reservation reservation, int numberOfRooms) {
 		reservation.updateStatus("confirmed");
 		for(
 				Date reserveDate=reservation.getDateOfCheckIn(); 
@@ -163,7 +185,7 @@ public class ReservationSystem {
 				}
 				if (!reservationUpdated) {
 					Reservation clonedReservation = Reservation.copy(reservation);
-					if(reservationList.size() >= 12) {
+					if(reservationList.size() >= numberOfRooms) {
 						clonedReservation.updateStatus("waitlist");
 					}
 					reservationList.add(clonedReservation);
@@ -194,7 +216,7 @@ public class ReservationSystem {
 	 * A function to update the past reservation with a new one.
 	 * @param reservation {Reservation} the new reservation to update to
 	 */
-	private void updatePastReservation(Reservation reservation) {
+	private void updatePastReservation(Reservation reservation, int numberOfRooms) {
 		for(String date: this.reservationTable.keySet()) {
 			for (String roomType: this.reservationTable.get(date).keySet()) {
 				ArrayList<Reservation> reservationList = 
@@ -218,17 +240,17 @@ public class ReservationSystem {
 								}
 								else {
 									this.removeReservationFromArrayByIndex(reservationList, i, 
-										date, roomType);
+										date, roomType,numberOfRooms);
 								}
 							}
 							else {
 								this.removeReservationFromArrayByIndex(reservationList, i, 
-									date, roomType);
+									date, roomType, numberOfRooms);
 							}
 						}
 						else if (reservationList.get(i).getRoomType().equals(reservation.getRoomType())) {
 							this.removeReservationFromArrayByIndex(reservationList, i, 
-								date, roomType);
+								date, roomType, numberOfRooms);
 						}
 						else {
 							reservation.updateStatus(reservationList.get(i).getStatus());
@@ -317,4 +339,56 @@ public class ReservationSystem {
 		}
 		return false;
 	}
+	
+	// get all reservations for a particular roomType
+	// for each day
+	/**
+	 * Get all reservations for a particular roomType.
+	 * @param roomType {String} roomType of reservation
+	 * @return {ArrayList<Reservation>} An ArrayList of all reservations for a particular roomType
+	 */
+	public ArrayList<Reservation> getRoomTypeReservation(String roomType){
+		ArrayList<Reservation> reservationList = new ArrayList<Reservation>();
+		ConcurrentHashMap<String, ArrayList<Reservation>> tempMap = new ConcurrentHashMap<String, ArrayList<Reservation>>();
+		
+		
+		//checks through the hashmap for reservations with a particular roomType
+		for(String date:this.reservationTable.keySet()) {
+			tempMap = this.reservationTable.get(date);
+			
+			for(String roomt:tempMap.keySet()) {
+				
+				if(roomt.equals(roomType)) {
+						reservationList.addAll(tempMap.get(roomt));
+				}
+				
+			}
+				
+				
+			
+		}
+
+		return reservationList;
+	}
+	
+	/**
+	 * A function to get the reservation object using the reservationId
+	 * @param reservationId The reservationId of the reservation object
+	 * @return {Reservation} The reservation object with the specified reservationId
+	 */
+	public Reservation getReservation(String reservationId) {
+		
+		for(String date: this.reservationTable.keySet()) {
+			for (String roomType: this.reservationTable.get(date).keySet()) {
+				for (Reservation reservation: this.reservationTable.get(date).get(roomType)) {
+					if (reservation.getReservationId().equals(reservationId)) {
+						return reservation;
+					}
+				}
+			}
+		}
+		
+		return null;
+	}
+	
 }
