@@ -45,7 +45,7 @@ public class HotelApp {
 					case "e":
 					case "E": HotelApp.showMenuE(menu); break;
 					case "f":
-          case "F": HotelApp.showMenuF(hotel);break;
+					case "F": HotelApp.showMenuF(hotel);break;
 					case "g":
 					case "G": HotelApp.showMenuG(hotel);break;
 					case "i":
@@ -552,10 +552,6 @@ public class HotelApp {
 			}catch(InvalidGuestDetailException |RoomTypeNotFoundException e) {
 				System.out.println(e.getMessage());
 			}
-			break;
-			
-			default:
-				break;
 			}
 }
 	/**
@@ -570,23 +566,24 @@ public class HotelApp {
 						   "|(B) Room status             |\n"+
 						   "|============================|\n"+
 						   "Enter your choice:");
+		try {
 		switch(sc.nextLine()) {
 		case "a":
 		case "A":{
 			System.out.println("Single:");
-			System.out.println("\tNumber:" + hotel.getOccupancyRate()[0].size() +" out of " + hotel.noOfAvailable_single);
+			System.out.println("\tNumber:" + hotel.getOccupancyRate()[0].size() +" out of " + hotel.getRooms("single"));
 			System.out.println("\tRooms:" + hotel.getOccupancyRate()[0].toString().substring(1, hotel.getOccupancyRate()[0].toString().length()-1));
 			
 			System.out.println("Double");
-			System.out.println("\tNumber:" + hotel.getOccupancyRate()[1].size() +" out of " + hotel.noOfAvailable_double);
+			System.out.println("\tNumber:" + hotel.getOccupancyRate()[1].size() +" out of " + hotel.getRooms("double"));
 			System.out.println("\tRooms:" + hotel.getOccupancyRate()[1].toString().substring(1, hotel.getOccupancyRate()[1].toString().length()-1));
 			
 			System.out.println("Deluxe");
-			System.out.println("\tNumber:" + hotel.getOccupancyRate()[2].size() +" out of " + hotel.noOfAvailable_deluxe);
+			System.out.println("\tNumber:" + hotel.getOccupancyRate()[2].size() +" out of " + hotel.getRooms("deluxe"));
 			System.out.println("\tRooms:" + hotel.getOccupancyRate()[2].toString().substring(1, hotel.getOccupancyRate()[2].toString().length()-1));
 			
 			System.out.println("VIP suite");
-			System.out.println("\tNumber:" + hotel.getOccupancyRate()[3].size() +" out of " + hotel.noOfAvailable_vip);
+			System.out.println("\tNumber:" + hotel.getOccupancyRate()[3].size() +" out of " + hotel.getRooms("vip"));
 			System.out.println("\tRooms:" + hotel.getOccupancyRate()[3].toString().substring(1, hotel.getOccupancyRate()[3].toString().length()-1));
 			break;
 		}
@@ -598,16 +595,13 @@ public class HotelApp {
 			System.out.println(hotel.getStatusRoom()[1].toString().substring(1, hotel.getStatusRoom()[1].toString().length()-1));
 			System.out.println("Under maintainance: ");
 			System.out.println(hotel.getStatusRoom()[2].toString().substring(1, hotel.getStatusRoom()[2].toString().length()-1));
-			System.out.println("Others: ");
-			System.out.println(hotel.getStatusRoom()[3].toString().substring(1, hotel.getStatusRoom()[3].toString().length()-1));
 			break;
 			
 		}
 		}
-	}
-
-		
+		}
+		catch(RoomTypeNotFoundException e){
+			System.out.println(e.getMessage());
 		}
 	}
-	
-}
+	}

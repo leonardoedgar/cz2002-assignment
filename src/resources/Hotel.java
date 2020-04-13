@@ -23,10 +23,6 @@ public class Hotel {
 	Hashtable<String, Hashtable<String, Room>> roomTable = new Hashtable<String, Hashtable<String, Room>>();
 	private ReservationSystem reservationSystem;
 //	temporary, hard code to 12
-	public int noOfAvailable_single=12;
-	public int noOfAvailable_double =12;
-	public int noOfAvailable_deluxe =12;
-	public int noOfAvailable_vip =12;
 	/**
 	 * A class constructor to create a hotel. 
 	 * @param roomConfigFilePath {String} the path to room configuration fileƒ
@@ -474,7 +470,9 @@ public class Hotel {
 		if(tempRoom==null) {
 		throw new RoomNotFoundException();
 		}
-		
+		if (reservation.getStatus().equals("waitlist")) {
+			throw new RoomNotFoundException("Check in failed. The reservation is in waitlist");
+		}
 		if(tempRoom.getStatus().equals("vacant")) {
 			
 			tempRoom.assignGuestToRoom(guest);
@@ -489,6 +487,10 @@ public class Hotel {
 		
 	}
 	
+	/**
+	 * To print the report based on status (feature I (b))
+	 * @return
+	 */
 	public ArrayList[] getStatusRoom() {
 		ArrayList<String> vacant = new ArrayList<String>();
 		ArrayList<String> occupied = new ArrayList<String>();
@@ -514,6 +516,10 @@ public class Hotel {
 				
 	}
 	
+	/**
+	 * To get the report based on Occupancy rate (feature I(a))
+	 * @return
+	 */
 	public ArrayList[] getOccupancyRate() {
 		ArrayList<String> single = new ArrayList<String>();
 		ArrayList<String> doublee = new ArrayList<String>();
@@ -593,6 +599,12 @@ public class Hotel {
 
 	}
 	
+	/**
+	 * get method for the number of available rooms
+	 * @param roomType
+	 * @return
+	 * @throws RoomTypeNotFoundException
+	 */
 	public int getRooms(String roomType) throws RoomTypeNotFoundException {
 		switch(roomType) {
 		case "single":return this.noOfAvailable_single;
