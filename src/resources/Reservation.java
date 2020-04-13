@@ -26,13 +26,26 @@ public class Reservation {
 	 */
 	public Reservation(String reservationId,Guest guestDetails, Date dateOfCheckIn, Date dateOfCheckOut,
 			int noOfPeople,String paymentType,String roomType){
+//		this.reservationId=reservationId;
+//		this.guestDetails=guestDetails;
+//		this.dateOfCheckIn=dateOfCheckIn;
+//		this.dateOfCheckOut=dateOfCheckOut;
+//		this.noOfPeople=noOfPeople;
+//		this.paymentType=paymentType;
+//		this.status="not-received";
+//		this.roomType=roomType;
+		this(reservationId, guestDetails,dateOfCheckIn,dateOfCheckOut,noOfPeople,paymentType,"not-received",roomType);
+	}
+	
+	public Reservation(String reservationId,Guest guestDetails, Date dateOfCheckIn, Date dateOfCheckOut,
+			int noOfPeople,String paymentType,String status,String roomType){
 		this.reservationId=reservationId;
 		this.guestDetails=guestDetails;
 		this.dateOfCheckIn=dateOfCheckIn;
 		this.dateOfCheckOut=dateOfCheckOut;
 		this.noOfPeople=noOfPeople;
 		this.paymentType=paymentType;
-		this.status="not-received";
+		this.status=status;
 		this.roomType=roomType;
 	}
 	
@@ -169,6 +182,7 @@ public class Reservation {
 			reservation.getDateOfCheckOut(),
 			reservation.getNoOfPeople(),
 			reservation.getPaymentType(),
+			reservation.getStatus(),
 			reservation.getRoomType()
 		);
 	}

@@ -37,9 +37,11 @@ public class Guest {
 	 * @param nationality {String} the nationality
 	 * @param contact {int} the contact number
 	 * @param identity {String} the identity card number of the guest
+	 * @param startDateOfStay {Date} start date of guest's stay
+	 * @param endDateOfStay {Date} end date of guest's stay
 	 */
 	public Guest(String name, String cardDetails, String address, String country, String gender, 
-			String nationality, int contact, String identity) {
+			String nationality, int contact, String identity,Date startDateOfStay,Date endDateOfStay) {
 		this.name = name;
 		this.cardDetails = cardDetails;
 		this.address = address;
@@ -49,6 +51,9 @@ public class Guest {
 		this.contact = contact;
 		this.identity=identity; 
 		this.roomServiceList = new ArrayList<RoomService>();
+		this.startDateOfStay=startDateOfStay;
+		this.endDateOfStay=endDateOfStay;
+
 	}
 	
 	/**
