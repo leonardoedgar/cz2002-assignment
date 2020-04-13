@@ -23,26 +23,31 @@ public class Hotel {
 	// {"roomType": {"roomNo": Room()}}
 	Hashtable<String, Hashtable<String, Room>> roomTable = new Hashtable<String, Hashtable<String, Room>>();
 	private ReservationSystem reservationSystem;
-//	temporary, hard code to 12
+	private Date currentDate;
 	/**
 	 * A class constructor to create a hotel. 
-	 * @param roomConfigFilePath {String} the path to room configuration fileƒ
+	 * @param roomConfigFilePath {String} the path to room configuration file
 	 * @throws {HotelSetupFailureException} exception when hotel failed to set up
 	 */
 	public Hotel(String roomConfigFilePath) throws HotelSetupFailureException {
 		this.setupRooms(this.getRoomConfig(roomConfigFilePath));
 		this.reservationSystem = new ReservationSystem();
+		this.currentDate = new Date(new Date().toLocaleString().split(",")[0]);
 	}
-	
-	//added hashtable {"roomType":guestId:Guest()}
-	//during checkin, guess is assigned a roomNo
-	Hashtable<Guest,String> guestList = new Hashtable<Guest,String>();
+
 	private int noOfAvailable_single;
 	private int noOfAvailable_double;
 	private int noOfAvailable_deluxe;
 	private int noOfAvailable_vip;
-
 	
+	/**
+	 * A function to get hotel's current date.
+	 * @return {Date} the current date
+	 */
+	public Date getCurrentDate() {
+		return this.currentDate;
+	}
+
 	/**
 	 * A function to setup rooms in a hotel.
 	 * @param roomConfig {Hashtable<String, Hashtable<String, String>>} the room configuration to built from.
@@ -681,40 +686,5 @@ public class Hotel {
 		default: throw new RoomTypeNotFoundException();
 		}
 	}
-	
-//	public void printStatusReport() {
-//	for (String roomType: this.roomTable.keySet()) {
-//		for(String roomNo: this.roomTable.get(roomType).keySet()) {
-//			System.out.println("Room Type: " + roomType + " Room No: " + roomNo + " view: "+ this.roomTable.get(roomType).get(roomNo).view);
-//		}
-//	}
-//}
-//	
-//	public boolean reassignRoomByGuestName(String name, String newRoomNumber) {
-//	checkIfGuestInsideHotel();
-//	checkIfNewRoomNumberIsVacant();
-//	RemoveGuestFromRoom();
-//	AssignGuestToRoom();
-//	return true;
-//}
-//	
-//	public boolean createReservation(Guest guest, java.util.Date check_in_date, java.util.Date check_out_date, String roomType) {
-//		this.reservationSystem.add(guest, check_in_date, check_out_date, roomType);
-//	}
-//	
-//	public boolean checkRoomAvailability(java.util.Date start_date, java.util.Date end_date, String roomType) {
-//		return true;
-//	}
-//	public boolean checkIn(Guest guest, String roomType) {
-//		AssignGuestToRoom();
-//		this.reservationSystem.addReservation(CreateReservationFromGuest(guest));
-//		return true;
-//	}
-//	public void updateRoomStatus(String roomNo, String status) {
-//		// add switch case for valid status, then call room method to update its status
-//	}
-//	public void printReport() {
-//		//print rooms availability
-//	}
 }
 
