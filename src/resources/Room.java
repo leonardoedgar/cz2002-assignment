@@ -29,7 +29,7 @@ public class Room {
 		this.bedType = bedType;
 		this.wifi = wifi;
 		this.view = view;
-		this.smoking = smoking == "yes";
+		this.smoking = smoking.equals("yes");
 	}
 
 	/**
@@ -53,7 +53,7 @@ public class Room {
 	}
 	
 	void updateSmoking(String smoking) {
-		this.smoking = smoking == "yes";
+		this.smoking = smoking.contentEquals("yes");
 	}
 	
 	void updateView(String view) {

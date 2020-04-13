@@ -35,10 +35,10 @@ public class Hotel {
 	//added hashtable {"roomType":guestId:Guest()}
 	//during checkin, guess is assigned a roomNo
 	Hashtable<Guest,String> guestList = new Hashtable<Guest,String>();
-	public int noOfAvailable_single=3;
-	public int noOfAvailable_double =12;
-	public int noOfAvailable_deluxe =12;
-	public int noOfAvailable_vip =12;
+	private int noOfAvailable_single;
+	private int noOfAvailable_double;
+	private int noOfAvailable_deluxe;
+	private int noOfAvailable_vip;
 	
 	//in main app, everytime a guest is create, add them to the GuestList
 	/**
@@ -59,6 +59,21 @@ public class Hotel {
 		for (String roomType: roomConfig.keySet()) {
 			Hashtable<String, String> roomDetail = roomConfig.get(roomType);
 			Hashtable<String, Room> roomDataPerLevel = new Hashtable<String, Room>();
+			switch(roomType) {
+				case "single":
+					noOfAvailable_single = Integer.parseInt(roomDetail.get("numberOfRooms"));
+					break;
+				case "double":
+					noOfAvailable_double = Integer.parseInt(roomDetail.get("numberOfRooms"));
+					break;
+				case "deluxe":
+					noOfAvailable_deluxe = Integer.parseInt(roomDetail.get("numberOfRooms"));
+					break;
+				case "vip":
+					noOfAvailable_vip = Integer.parseInt(roomDetail.get("numberOfRooms"));
+					break;
+			
+			}
 			for(int i=1; i<= Integer.parseInt(roomDetail.get("numberOfRooms")); i++) {
 				String roomNo = "0" + Integer.toString(floorNo) + "-";
 				if (i > 9) {
@@ -195,36 +210,55 @@ public class Hotel {
 	 * @param newData
 	 * @throws RoomNotFoundException
 	 */
-	public void updateRoomDetails(String roomNo, char details, String newData) throws RoomNotFoundException{
+	public void updateRoomDetails(String roomNo, String details, String newData) throws RoomNotFoundException{
 		Room room = this.getRoomByNo(roomNo);
+		int delta=0;
 		switch(details) {
-		case 'a':
-		case 'A':{
+		case "status":{
 			room.updateStatus(newData);
+			if (newData.equals("under maintainance") | newData.equals("renovation")){
+				delta = -1;
+			}
+			else if (newData.equals("vacant")) {
+				delta=1;
+			}
+			if (!newData.equals(room.getStatus())) {
+				if (newData.split("-")[0].equals("01")) {
+					updateRoomAvailability("single",delta);
+					updateReservation("single",newData,delta);
+				}
+				else if (roomNo.split("-")[0].equals("02")) {
+					updateRoomAvailability("double",delta);
+					updateReservation("double",newData,delta);
+				}
+				else if (roomNo.split("-")[0].equals("03")) {
+					updateRoomAvailability("deluxe",delta);
+					updateReservation("deluxe",newData,delta);
+				}
+				else {
+					updateRoomAvailability("vip",delta);
+					updateReservation("vip",newData,delta);
+				}
+			}
 			break;
 		}
-		case 'b':
-		case 'B':{
+		case "price":{
 			room.updateCost(newData);
 			break;
 		}
-		case 'c':
-		case 'C':{
+		case "bed type":{
 			room.updateBedType(newData);
 			break;
 		}
-		case 'd':
-		case 'D':{
+		case "wifi":{
 			room.updateWifi(newData);
 			break;
 		}
-		case 'e':
-		case 'E':{
+		case "view":{
 			room.updateView(newData);
 			break;
 		}
-		case 'f':
-		case 'F':{
+		case "smoking":{
 			room.updateSmoking(newData);
 			break;
 		}
@@ -398,7 +432,26 @@ public class Hotel {
 		}
 		
 	}
-
+	
+	public void updateRoomAvailability(String room_type, int num_room) {
+		switch(room_type){
+			case "single": noOfAvailable_single = noOfAvailable_single +num_room;
+			case "double": noOfAvailable_double = noOfAvailable_double +num_room;
+			case "deluxe": noOfAvailable_deluxe = noOfAvailable_deluxe +num_room;
+			case "vip": noOfAvailable_vip = noOfAvailable_vip +num_room;
+		}
+	}
+	
+	public void updateReservation(String room_type, String new_status,int delta) {
+		switch(room_type) {
+		case "single": getReservationSystem().shiftReservation(noOfAvailable_single, "single",delta);
+		case "double": getReservationSystem().shiftReservation(noOfAvailable_double, "double",delta);
+		case "deluxe": getReservationSystem().shiftReservation(noOfAvailable_deluxe, "deluxe",delta);
+		case "vip": getReservationSystem().shiftReservation(noOfAvailable_vip, "vip",delta);
+	
+		}
+	}
+	
 //	public void printStatusReport() {
 //	for (String roomType: this.roomTable.keySet()) {
 //		for(String roomNo: this.roomTable.get(roomType).keySet()) {

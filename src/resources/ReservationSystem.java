@@ -74,17 +74,22 @@ public class ReservationSystem {
 	}
 	
 	/**
-	 * will loop through each reservation date and shift the ppl that is reserved to the left by delta index
-	 * @param delta
+	 * this method will shift the reservation list to have more or less "waitlist" depending on delta
+	 * @param num_room number of available rooms in certain roomtype
+	 * @param roomtype 
+	 * @param delta delta is the number of rooms to be changed to "vacant" or "under maintainance"
 	 */
-	public void shiftReservation(int num_room, int delta,String roomtype) {
+	public void shiftReservation(int num_room,String roomtype, int delta) {
 		int counter = 1;
 		for(String date: this.reservationTable.keySet()) {
 			for (Reservation reserve: this.reservationTable.get(date).get(roomtype)) {
 				counter ++;
 //				only set to waitlist if the person is between the current number of room and the prev number of room 
-				if (counter > num_room && counter <=num_room+delta) {
+				if (counter > num_room && counter <=num_room-delta && delta == -1) {
 					reserve.updateStatus("waitlist");
+				}
+				else if (counter > num_room && counter <=num_room+delta && delta == 1) {
+					reserve.updateStatus("vacant");
 				}
 			}
 		}

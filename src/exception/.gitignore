@@ -1,0 +1,10 @@
+/AppFailureException.class
+/DuplicateReservationFoundException.class
+/GuestDetailUpdateFailureException.class
+/GuestNotFoundException.class
+/HotelSetupFailureException.class
+/InvalidGuestDetailException.class
+/InvalidReservationDetailException.class
+/ReservationNotFoundException.class
+/RoomDetailUpdateFailureException.class
+/RoomNotFoundException.class
