@@ -6,16 +6,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.lang.NumberFormatException;
 //added import
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-
 import resources.Hotel;
 import resources.Menu;
 import resources.Room;
 import exception.GuestDetailUpdateFailureException;
 import exception.GuestNotFoundException;
 import exception.RoomNotFoundException;
+import exception.RoomTypeNotFoundException;
 import resources.Reservation;
 import resources.Guest;
 import exception.ReservationNotFoundException;
@@ -27,10 +24,6 @@ import exception.InvalidGuestDetailException;
 public class HotelApp {
 	
 	public static void main(String[] args) {
-//		Guest g1 = new Guest("g1","1","1","1","1","1",1,"1");
-//		Guest g2 = new Guest("g2","1","1","1","1","1",1,"1");
-//		Guest g3 = new Guest("g3","1","1","1","1","1",1,"1");
-//		Guest g4 = new Guest("g4","1","1","1","1","1",1,"1");
 		Scanner sc = new Scanner(System.in);
 		boolean exitApp = false;
 		
@@ -40,11 +33,6 @@ public class HotelApp {
 		
 			
 			Menu menu = new Menu("src/data/menu.txt");
-//			
-//			hotel.addToGuestList(g1, "single");
-//			hotel.addToGuestList(g2, "single");
-//			hotel.addToGuestList(g3, "single");
-//			hotel.addToGuestList(g4, "single");
 			while (!exitApp) {
 				HotelApp.printHotelAppMenu();
 				System.out.print("Enter user input: ");
@@ -165,11 +153,12 @@ public class HotelApp {
 			case "a":
 			case "A": {
 				try {
-					hotel.getReservationSystem().addReservation(
-							HotelApp.createNewReservation(hotel.getAvailableRoomTypes()));
+					Reservation reservation = HotelApp.createNewReservation(hotel.getAvailableRoomTypes());
+					hotel.getReservationSystem().addReservation(reservation, hotel.getRooms(reservation.getRoomType()));
+					
 					System.out.println("Reservation added successfully!\n");
 				} catch (InvalidGuestDetailException | InvalidReservationDetailException | 
-						DuplicateReservationFoundException e) {
+						DuplicateReservationFoundException | RoomTypeNotFoundException e) {
 					System.out.println(e.getMessage() + "\n");
 				}
 				break;
@@ -177,11 +166,12 @@ public class HotelApp {
 			case "b":
 			case "B": {
 				try {
+					Reservation reservation = HotelApp.createNewReservation(hotel.getAvailableRoomTypes());
 					hotel.getReservationSystem().updateReservation(
-						HotelApp.createNewReservation(hotel.getAvailableRoomTypes()));
+						reservation, hotel.getRooms(reservation.getRoomType()) );
 					System.out.println("Reservation updated successfully!\n");
 				} catch ( InvalidGuestDetailException | InvalidReservationDetailException | 
-						ReservationNotFoundException e) {
+						ReservationNotFoundException | RoomTypeNotFoundException e) {
 					System.out.println(e.getMessage()+ "\n");
 				} 
 				break;
@@ -190,9 +180,11 @@ public class HotelApp {
 			case "C": {
 				System.out.print("Enter reservation ID to remove: ");
 				try {
-					hotel.getReservationSystem().removeReservation(sc.nextLine().trim());
+					String reservationId = sc.nextLine().trim();
+					Reservation reservation = hotel.getReservationSystem().getReservation(reservationId);
+					hotel.getReservationSystem().removeReservation(reservationId, hotel.getRooms(reservation.getRoomType()));
 					System.out.println("Reservation removed successfully!\n");
-				} catch (ReservationNotFoundException e) {
+				} catch (ReservationNotFoundException | RoomTypeNotFoundException e) {
 					System.out.println(e.getMessage() + "\n");
 				}
 				break;
@@ -318,6 +310,7 @@ public class HotelApp {
 		case "F": choice = "smoking";break;
 		default: System.out.println("Invalid choice! Please try again.");
 		}
+
 		if (choice.equals("status")) {
 			System.out.print(""
 					+ "New room status: \n"
@@ -346,7 +339,7 @@ public class HotelApp {
 			System.out.println("Room Information Updated!");
 		}
 		}
-		catch (RoomNotFoundException e) {
+		catch (RoomNotFoundException | RoomTypeNotFoundException e) {
 			System.out.println(e.getMessage());
 		}
 		
@@ -407,7 +400,6 @@ public class HotelApp {
 
 		Scanner sc = new Scanner(System.in);
 			
-				DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
 				Date startDate = new Date();
 				Date endDate = new Date();
 				
@@ -450,7 +442,7 @@ public class HotelApp {
 				else {
 					System.out.println("Room type is not available.");
 				}		
-		}catch(ParseException e) {
+		}catch(RoomTypeNotFoundException e) {
 			System.out.println(e.getMessage());
 		}
 			
@@ -520,8 +512,7 @@ public class HotelApp {
 			//create new guest object and assign to room
 			try {
 				System.out.println("Enter new guest details:");
-				Guest newGuest = createNewGuest();
-				
+				Guest newGuest = createNewGuest();				
 				System.out.println("Enter guest's preferred roomType:");
 				String roomType = sc.next().trim();
 				boolean roomTypeChecker = false;
@@ -557,7 +548,7 @@ public class HotelApp {
 					newGuest=null;
 				}
 				
-			}catch(InvalidGuestDetailException e) {
+			}catch(InvalidGuestDetailException |RoomTypeNotFoundException e) {
 				System.out.println(e.getMessage());
 			}
 
