@@ -439,31 +439,31 @@ public class HotelApp {
 		case "A":{
 			System.out.println("Single:");
 			System.out.println("\tNumber:" + hotel.getOccupancyRate()[0].size() +" out of " + hotel.noOfAvailable_single);
-			System.out.println("\tRooms:" + hotel.getOccupancyRate()[0]);
+			System.out.println("\tRooms:" + hotel.getOccupancyRate()[0].toString().substring(1, hotel.getOccupancyRate()[0].toString().length()-1));
 			
 			System.out.println("Double");
 			System.out.println("\tNumber:" + hotel.getOccupancyRate()[1].size() +" out of " + hotel.noOfAvailable_double);
-			System.out.println("\tRooms:" + hotel.getOccupancyRate()[1]);
+			System.out.println("\tRooms:" + hotel.getOccupancyRate()[1].toString().substring(1, hotel.getOccupancyRate()[1].toString().length()-1));
 			
 			System.out.println("Deluxe");
 			System.out.println("\tNumber:" + hotel.getOccupancyRate()[2].size() +" out of " + hotel.noOfAvailable_deluxe);
-			System.out.println("\tRooms:" + hotel.getOccupancyRate()[2]);
+			System.out.println("\tRooms:" + hotel.getOccupancyRate()[2].toString().substring(1, hotel.getOccupancyRate()[2].toString().length()-1));
 			
 			System.out.println("VIP suite");
 			System.out.println("\tNumber:" + hotel.getOccupancyRate()[3].size() +" out of " + hotel.noOfAvailable_vip);
-			System.out.println("\tRooms:" + hotel.getOccupancyRate()[3]);
+			System.out.println("\tRooms:" + hotel.getOccupancyRate()[3].toString().substring(1, hotel.getOccupancyRate()[3].toString().length()-1));
 			break;
 		}
 		case "b":
 		case "B":{
 			System.out.println("Vacant :");
-			System.out.println(hotel.getStatusRoom()[0]);
+			System.out.println(hotel.getStatusRoom()[0].toString().substring(1, hotel.getStatusRoom()[0].toString().length()-1));
 			System.out.println("Occupied: ");
-			System.out.println(hotel.getStatusRoom()[1]);
+			System.out.println(hotel.getStatusRoom()[1].toString().substring(1, hotel.getStatusRoom()[1].toString().length()-1));
 			System.out.println("Under maintainance: ");
-			System.out.println(hotel.getStatusRoom()[2]);
+			System.out.println(hotel.getStatusRoom()[2].toString().substring(1, hotel.getStatusRoom()[2].toString().length()-1));
 			System.out.println("Others: ");
-			System.out.println(hotel.getStatusRoom()[3]);
+			System.out.println(hotel.getStatusRoom()[3].toString().substring(1, hotel.getStatusRoom()[3].toString().length()-1));
 			break;
 			
 		}
