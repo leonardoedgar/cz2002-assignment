@@ -349,6 +349,11 @@ public class ReservationSystem {
 		return reservationList;
 	}
 	
+	/**
+	 * A function to get the reservation object using the reservationId
+	 * @param reservationId The reservationId of the reservation object
+	 * @return {Reservation} The reservation object with the specified reservationId
+	 */
 	public Reservation getReservation(String reservationId) {
 		
 		for(String date: this.reservationTable.keySet()) {
