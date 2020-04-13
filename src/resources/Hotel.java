@@ -11,6 +11,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import exception.HotelSetupFailureException;
 import exception.RoomNotFoundException;
+import exception.RoomTypeNotFoundException;
 import exception.GuestDetailUpdateFailureException;
 import exception.GuestNotFoundException;
 
@@ -32,20 +33,8 @@ public class Hotel {
 		this.reservationSystem = new ReservationSystem();
 	}
 	
-	//added hashtable {"roomType":guestId:Guest()}
-	//during checkin, guess is assigned a roomNo
-	Hashtable<Guest,String> guestList = new Hashtable<Guest,String>();
+	//removed guestList
 	
-	//in main app, everytime a guest is create, add them to the GuestList
-	/**
-	 * A function to add new guests into the guestList HashTable
-	 * @param guest {Guest} the guest to be added
-	 * @param roomType {String} the roomType chosen by the guest
-	 */
-	public void addToGuestList(Guest guest,String roomType) {
-		guestList.put(guest,roomType);
-	}
-
 	/**
 	 * A function to setup rooms in a hotel.
 	 * @param roomConfig {Hashtable<String, Hashtable<String, String>>} the room configuration to built from.
@@ -56,14 +45,15 @@ public class Hotel {
 			Hashtable<String, String> roomDetail = roomConfig.get(roomType);
 			Hashtable<String, Room> roomDataPerLevel = new Hashtable<String, Room>();
 			for(int i=1; i<= Integer.parseInt(roomDetail.get("numberOfRooms")); i++) {
-				String roomNo = "0" + Integer.toString(floorNo) + "-";
+				String roomNo = "0" + roomDetail.get("level") + "-";
 				if (i > 9) {
 					roomNo += Integer.toString(i);
 				}
 				else {
-					roomNo += "0" + Integer.toString(i);
+					roomNo +=  "0" + Integer.toString(i);
 				}
 				final String finalRoomNo = roomNo;
+				
 				roomDataPerLevel.put(finalRoomNo, new Room(
 							finalRoomNo, 
 							Double.parseDouble(roomDetail.get("cost")),
@@ -76,6 +66,8 @@ public class Hotel {
 			roomTable.put(roomType, roomDataPerLevel);
 			floorNo += 1;
 		}
+		
+		
 	}
 	
 	/**
@@ -101,6 +93,7 @@ public class Hotel {
 					put("wifi", aLineArr[5].trim());
 					put("view", aLineArr[6].trim());
 					put("smoking", aLineArr[7].trim());
+					put("level", aLineArr[8].trim());
 				}});
 				aLine = brStream.readLine();
 			}
@@ -116,7 +109,9 @@ public class Hotel {
 			throw new HotelSetupFailureException();
 		}
 	}
-
+	
+	//added one line to check for null when getting guest
+	//change == condition to .equals when checking guest names
 	/** 
 	 * A function to get guest in the hotel by the name.
 	 * @param name {String} the name of the guest
@@ -127,9 +122,14 @@ public class Hotel {
 		for (String roomType: this.roomTable.keySet()) {
 			for(String roomNo: this.roomTable.get(roomType).keySet()) {
 				Room roomDetail = this.roomTable.get(roomType).get(roomNo);
-				if (roomDetail.getGuest().getName() == name) {
-					return roomDetail.getGuest();
+				
+				//added this if statement
+				if(roomDetail.getGuest()!=null) {
+					if (roomDetail.getGuest().getName().contentEquals(name)) {
+						return roomDetail.getGuest();
+					}
 				}
+				
 			}
 		}
 		throw new GuestNotFoundException();
@@ -248,6 +248,7 @@ public class Hotel {
 		return roomTypes;
 	}
 	
+	
 	/**
 	 * A function to check for Date clashes
 	 * @param newStartDate {Date} Start date of new guest
@@ -291,31 +292,88 @@ public class Hotel {
 	}
 	
 	/**
+	 * A function to check for number of guests staying in a roomType for a given date range
+	 * @param startDate {Date} Starting date
+	 * @param endDate {Date} Ending date
+	 * @param roomType {String} The room type you want to check for
+	 * @return {Integer} The number of rooms that currently have guests
+	 */
+	private int checkHotelClash(java.util.Date startDate, java.util.Date endDate,String roomType) {
+		int roomsClash=0;
+		Hashtable<String, Room> tempTable=roomTable.get(roomType);
+			
+			//checks for date clashes with guests that have already check-in
+			for(String key: tempTable.keySet()) {
+				
+				if(tempTable.get(key).getGuest()!=null) {
+					Room tempRoom = tempTable.get(key);
+					Guest tempGuest = tempRoom.getGuest();
+					roomsClash=roomsClash+checkDateClash(startDate,endDate,tempGuest.getstartDate(),tempGuest.getendDate()); //if dates clash, minus 1 from available rooms of that roomType
+				}
+	
+			}
+			
+			return roomsClash;
+	}
+	
+	/**
+	 * A function to check for number of guests staying in a roomType for a given date range
+	 * @param startDate {Date} Starting date
+	 * @param endDate {Date} Ending date
+	 * @param roomType {String} The room type you want to check for
+	 * @return {Integer} The number of rooms currently booked by reservation
+	 */
+	private int checkReservationClash(java.util.Date startDate, java.util.Date endDate,String roomType) {
+		int roomsClash=0;
+		
+		ArrayList<Reservation> tempList = new ArrayList<Reservation>();
+		//checks for date clashes with guests in the reservation system
+		tempList=reservationSystem.getRoomTypeReservation(roomType);
+		
+		//pass in start and end date of reservation
+		for(int i=0;i<tempList.size();i++){
+			//check each reservation with selected roomType
+			Reservation tempres=tempList.get(i);
+			if(!tempres.getStatus().contentEquals("checked-in")) {
+				roomsClash=roomsClash+checkDateClash(startDate,endDate,tempres.getDateOfCheckIn(),tempres.getDateOfCheckOut());
+			}
+			
+			
+		}
+		
+		return roomsClash;
+		
+	}
+	
+	
+	/**
 	 * A function to check if there are any rooms of a particular room type available
 	 * @param startDate {Date} Start date of new guest
 	 * @param endDate {Date} End date of new guest
 	 * @param roomType {String} roomType chosen by the new guest
-	 * @return boolean, true if available, false if not available
+	 * @return {boolean}, true if available, false if not available
+	 * @throws RoomTypeNotFoundException
 	 */
-	public boolean checkRoomAvailability(java.util.Date startDate, java.util.Date endDate, String roomType) {
+	public boolean checkRoomAvailability(java.util.Date startDate, java.util.Date endDate, String roomType){
 		//assume all rooms are available at the start
 		if(roomTable.get(roomType)==null) {
-			System.out.println("Room type does not exist.");
 			return false;
 		}
 		
-		int roomsLeftForDate=12;
+		//change this to refer to roomType for
+		//switch(roomType){
+		//case "single": roomsLeftForDate=singleRoomsAvailable; break; //<--rooms left attribute in hotel to be implemented
+		//case "double":roomsLeftForDate=doubleRoomsAvailable; break;
+		//case "deluxe":roomsLeftForDate=deluxeRoomsAvailable; break;
+		//case "vip":roomsLeftForDate=vipRoomsAvailable; break;
+		// default:return false;
+		
+		int roomsLeftForDate=12; //currently hardcoded to 12 until code is combined
 
-		//check all guests in guestList
-		for(Guest key: guestList.keySet()) {
-			
-			if(guestList.get(key).contentEquals(roomType)) {
-				roomsLeftForDate=roomsLeftForDate-checkDateClash(startDate,endDate,key.getstartDate(),key.getendDate()); //if dates clash, minus 1 from available rooms of that roomType
-		
-			}
-		}
-		
-		if(roomsLeftForDate==0) {
+		//checkHotel method
+		roomsLeftForDate=roomsLeftForDate-checkHotelClash(startDate,endDate,roomType)-checkReservationClash(startDate,endDate,roomType);
+
+		if(roomsLeftForDate<=0) {
 			return false; //not available
 		}
 		
@@ -324,77 +382,89 @@ public class Hotel {
 	}
 	
 	
-	/** 
-	 * A function to get guest in the hotel by the identity.
-	 * @param identity {String} the identity number of the guest
-	 * @return {Guest} the guest object containing the identity number
-	 * @throws {GuestNotFoundException} when guest's identity is not registered in the hotel
-	 */
-	public Guest getGuestByIdentity(String identity) throws GuestNotFoundException {
-		
-		for(Guest key:guestList.keySet()) {
-			if(key.getIdentity().contentEquals(identity)) {
-				return key;
-			}
-		}
-		throw new GuestNotFoundException();
-	}
-	
-	public String getGuestRoomType(Guest guest) {
-	String roomType=null;
-		
-		//check the roomType guest has requested for during creation of guest object
-		for(Guest key:guestList.keySet()) {
-			if(key==guest){
-				roomType=guestList.get(key);
-			}
-		}
-		
-		return roomType;
-	}
-	
 	//assuming staff checks for currently available rooms using report and assigns a room based on that
 	//add exception for invalid roomNo
+	//change javadoc
 	/**
 	 * A function to check-in a guest who arrived at the hotel into a room chosen by the staff
 	 * @param roomNo {String} roomNo of an empty room
 	 * @param guest {Guest} object of the guest who wants to check-in
-	 * @param roomType {String} roomType chosen by the guest whe
-	 * @return
+	 * @param roomType {String} roomType chosen by the guest 
+	 * @return {boolean} true if successful, false if failure
+	 * @throws RoomNotFoundException
 	 */
-	public boolean checkIn(Guest guest,String roomNo) {
-		String roomType=getGuestRoomType(guest);
+	public boolean checkIn (Guest guest,String roomNo, String roomType) throws RoomNotFoundException {
 		
 		Hashtable<String, Room> tempRoomList = roomTable.get(roomType);
 
-		if(tempRoomList==null) {
-			System.out.println("Room type does not exist.");
-			return false;
-		}
-		
-		//mapping of roomtype was different for some reason: double =1 single =4, vip=3, deluxe=2
 		Room tempRoom = tempRoomList.get(roomNo);
+		
 		if(tempRoom==null) {
-			System.out.println("Room number does not exist for room type "+roomType+".");
-			return false;
-		}
-		//use the method below to check for mapping of hashtable
-		//System.out.print(roomTable.get(roomType));
+			throw new RoomNotFoundException();
+			}
 		
 		if(tempRoom.getStatus().equals("vacant")) {
 			tempRoom.assignGuestToRoom(guest);
-			//need to change room status from vacant to nonvacant
-			//updateRoomStatus();
-			System.out.println("Check-in successful!");
+			tempRoom.updateStatus("occupied");
+			
 			return true;
 		}
 		else {
-			System.out.println("Room is currently unavailable. Choose another room.");
+			return false;
+		}
+		
+		
+	}
+	
+
+
+	/**
+	 * A function to check-in a guest with a reservation who arrived at the hotel into a room chosen by the staff
+	 * @param roomNo {String} roomNo of an empty room
+	 * @param guest {Guest} object of the guest who wants to check-in
+	 * @param roomType {String} roomType chosen by the guest 
+	 * @param reservation {Reservation} reservation object belonging to the guest
+	 * @return {boolean} true if successful, false if failure
+	 * @throws RoomNotFoundException
+	 */
+	public boolean checkIn(Guest guest,String roomNo, String roomType,Reservation reservation) throws RoomNotFoundException {
+		
+		Hashtable<String, Room> tempRoomList = roomTable.get(roomType);
+		
+		Room tempRoom = tempRoomList.get(roomNo);
+		
+		if(tempRoom==null) {
+		throw new RoomNotFoundException();
+		}
+		
+		if(tempRoom.getStatus().equals("vacant")) {
+			
+			tempRoom.assignGuestToRoom(guest);
+			tempRoom.updateStatus("occupied");
+			reservation.updateStatus("checked-in");
+
+			return true;
+		}
+		else {
 			return false;
 		}
 		
 	}
-
+	
+	/**
+	 * A function to check if roomType exists in the hotel
+	 * @param roomType {String} the roomType you want to check
+	 * @return {boolean} true if roomType exists, false if roomType does not exist
+	 */
+	public boolean roomTypeExists(String roomType) {
+		for(int i=0;i<getAvailableRoomTypes().size();i++) {
+			if(roomType.equals(getAvailableRoomTypes().get(i))) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 //	public void printStatusReport() {
 //	for (String roomType: this.roomTable.keySet()) {
 //		for(String roomNo: this.roomTable.get(roomType).keySet()) {
