@@ -3,24 +3,29 @@ import java.util.Date;
 import java.util.Set;
 import java.lang.reflect.Field;
 import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.ArrayList;
+
+import exception.FoodNotOnMenuException;
 import exception.GuestDetailUpdateFailureException;
+import resources.Payment;
 
 /**
  * A class to represent a guest in a hotel.
  */
 public class Guest {
-	String name;
-	String cardDetails;
-	String address;
-	String country;
-	String gender;
-	String nationality;
-	int contact;
-	String identity;
-	Payment payment;
-	RoomService roomService;
-	Date startDateOfStay;
-	Date endDateOfStay;
+	private String name;
+	private String cardDetails;
+	private String address;
+	private String country;
+	private String gender;
+	private String nationality;
+	private int contact;
+	private String identity;
+	private String paymentType;
+	private ArrayList<RoomService> roomServiceList;
+	private Date startDateOfStay;
+	private Date endDateOfStay;
 	
 	/**
 	 * A class constructor to create a guest.
@@ -45,8 +50,10 @@ public class Guest {
 		this.nationality = nationality;
 		this.contact = contact;
 		this.identity=identity; 
+		this.roomServiceList = new ArrayList<RoomService>();
 		this.startDateOfStay=startDateOfStay;
 		this.endDateOfStay=endDateOfStay;
+
 	}
 	
 	/**
@@ -145,5 +152,27 @@ public class Guest {
 	 */
 	public String getIdentity() {
 		return identity;
+	}
+	
+	/**
+	 * A function for guest to make order.
+	 * @param menu {Menu} menu of food in the hotel
+	 * @param orderMap {Hashtable<String, String>} the order and quantity from the guest 
+	 * @throws {FoodNotOnMenuException} when food ordered not on menu
+	 */
+	public void makeOrder(Menu menu, Hashtable<String, String> orderMap) throws FoodNotOnMenuException {
+		RoomService roomService = new RoomService(menu);
+		roomService.makeOrder(orderMap);
+		this.roomServiceList.add(roomService);
+	}
+	
+	/**
+	 * A function for guest to make payment.
+	 * @param roomType {String} the room type the guest stayed at
+	 * @param roomCost {Double} the room cost the guest stayed at
+	 */
+	public void makePayment(String roomType, double roomCost) {
+		Payment payment = new Payment(this.paymentType, roomType, roomCost, this.roomServiceList);
+		payment.printReceipt();
 	}
 }

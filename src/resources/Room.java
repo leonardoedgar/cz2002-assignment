@@ -119,4 +119,20 @@ public class Room {
 	public String getStatus(){
 		return status;
 	}
+	
+	/**
+	 * A function to get the room cost.
+	 * @return {double} the room cost
+	 */
+	public double getRoomCost() {
+		return this.roomCost;
+	}
+	
+	/**
+	 * A function to remove a guest from the room.
+	 */
+	public void removeGuest() {
+		this.guest = null;
+		this.status = "vacant";
+	}
 }

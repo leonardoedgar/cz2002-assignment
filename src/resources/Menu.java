@@ -7,12 +7,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Scanner;
+import exception.FoodNotOnMenuException;
 
 public class Menu {
-	public Hashtable<String,Double> Menu_list;
+	private Hashtable<String,Double> foodTable;
 	public Menu(String filepath) throws FileNotFoundException, IOException {
-		Hashtable<String,Double> Menu_list = new Hashtable<String, Double>();
-		this.Menu_list = getMenu(filepath);
+		this.foodTable = getMenu(filepath);
 	}
 	
 /**
@@ -23,7 +23,7 @@ public class Menu {
 	public void addItems(String foodname, double price) {
 		// Append new food and price to the .txt file
 		boolean isFoodOnMenu = false;
-		for (String food: this.Menu_list.keySet()) {
+		for (String food: this.foodTable.keySet()) {
 			if (food.equals(foodname)){
 				System.out.println("The food is already in the menu.");
 				isFoodOnMenu = true;
@@ -31,7 +31,7 @@ public class Menu {
 			}
 		}
 		if (isFoodOnMenu == false) {
-			this.Menu_list.put(foodname, price);
+			this.foodTable.put(foodname, price);
 			System.out.println("Modification success!");}
 		isFoodOnMenu= false;
 	}
@@ -45,10 +45,10 @@ public class Menu {
 		// Check if foodName is inside the .txt file, if so modify the price
 		// If not, raise error
 		boolean isFoodOnMenu = false;
-		for (String food: this.Menu_list.keySet()) {
+		for (String food: this.foodTable.keySet()) {
 			if (food.equals(foodname)){
-				this.Menu_list.remove(foodname);
-				this.Menu_list.put(foodname, price);
+				this.foodTable.remove(foodname);
+				this.foodTable.put(foodname, price);
 				System.out.println("Modification success!");
 				isFoodOnMenu = true;
 				break;
@@ -68,9 +68,9 @@ public class Menu {
 		// Check if foodName is inside the .txt file, if so remove the food name
 		// If not, raise error
 		boolean isFoodOnMenu = false;
-		for (String food: this.Menu_list.keySet()) {
+		for (String food: this.foodTable.keySet()) {
 			if (food.equals(foodname)){
-				this.Menu_list.remove(foodname);
+				this.foodTable.remove(foodname);
 				System.out.println("Modification success!");
 				isFoodOnMenu = true;
 				break;
@@ -86,8 +86,8 @@ public class Menu {
  */
 	public void printItems() {
 		System.out.println("Food \t\t\t\tPrice");
-		for (String food: this.Menu_list.keySet()) {
-			System.out.printf("%-30.30s  %-30.30s%n", food, Menu_list.get(food));
+		for (String food: this.foodTable.keySet()) {
+			System.out.printf("%-30.30s  %-30.30s%n", food, foodTable.get(food));
 		}	
 	}
 	
@@ -104,6 +104,21 @@ public class Menu {
 		csvReader.close();
 		
 		return Menu;
+	}
+	
+	/**
+	 * A function to get the cost of a food on the menu.
+	 * @param foodName {String} the food name
+	 * @return {Double} the cost of the food
+	 * @throws {FoodNotOnMenuException} when the food is not on the menu
+	 */
+	public double getCostOfAFood(String foodName) throws FoodNotOnMenuException {
+		if (this.foodTable.containsKey(foodName)) {
+			return this.foodTable.get(foodName);
+		}
+		else {
+			throw new FoodNotOnMenuException();
+		}
 	}
 	
 }

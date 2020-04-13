@@ -11,6 +11,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import exception.HotelSetupFailureException;
 import exception.RoomNotFoundException;
+import exception.FoodNotOnMenuException;
 import exception.RoomTypeNotFoundException;
 import exception.GuestDetailUpdateFailureException;
 import exception.GuestNotFoundException;
@@ -95,7 +96,7 @@ public class Hotel {
 	/**
 	 * A function to get the room configuration.
 	 * @param roomConfigFilePath {String} the path to the room configuration file
-	 * @return {Hashtable<String, Hashtable<String. String>>} the room configuration 
+	 * @return {Hashtable<String, Hashtable<String. String>} the room configuration 
 	 * @throws {HotelSetupException} failure in setting up the hotel (configuration file not found)
 	 */
 	@SuppressWarnings("serial")
@@ -488,6 +489,73 @@ public class Hotel {
 	}
 	
 	/**
+	 * A function to make room service order.
+	 * @param roomNo {String} the room number of the guest
+	 * @param menu {Menu} the room service menu
+	 * @param orderMap {Hashtable<String, String>} the ordered items and quantity from the menu
+	 * @throws GuestNotFoundException 
+	 * @throws {FoodNotOnMenuException} when food ordered is not on the menu 
+	 * @throws {RoomNotFoundException} when room number is not found in the hotel
+	 */
+	public void makeRoomServiceOrder(String roomNo, Menu menu, 
+			Hashtable<String, String> orderMap) throws FoodNotOnMenuException, 
+			RoomNotFoundException, GuestNotFoundException {
+		try {
+			this.getRoomByNo(roomNo).getGuest().makeOrder(menu, orderMap);
+		} catch (NullPointerException e){
+			throw new GuestNotFoundException();
+		}
+	}
+	
+	/**
+	 * A function to get the room type from a room number.
+	 * @param roomNo {String} the room number
+	 * @return {String} the room type
+	 * @throws {RoomNotFoundException} when the room number is not found
+	 */
+	private String getRoomTypeFromRoomNo(String roomNo) throws RoomNotFoundException {
+		String theRoomType = null;
+		for (String roomType: this.roomTable.keySet()) {
+			if (this.roomTable.get(roomType).containsKey(roomNo)) {
+				theRoomType = roomType;
+				break;
+			}
+		}
+		if (theRoomType == null) {
+			throw new RoomNotFoundException();
+		}
+		return theRoomType;
+	}
+	
+	/**
+	 * A function to perform check out in a hotel.
+	 * @param roomNo {String} the room number
+	 * @param guestName {String} the guest name
+	 * @return {boolean} represents the success of the check out process
+	 * @throws {GuestNotFoundException} when guest is not in the hotel
+	 * @throws {RoomNotFoundException} when room to be checked out is not found
+	 */
+	public boolean checkOut(String roomNo, String guestName) throws RoomNotFoundException, GuestNotFoundException {
+		Room guestRoom = this.getRoomByNo(roomNo);
+		Guest guestToCheckOut = guestRoom.getGuest();
+		try {
+			if (guestToCheckOut.getName().equals(guestName)) {
+				String roomType = this.getRoomTypeFromRoomNo(roomNo);
+				guestToCheckOut.makePayment(roomType, guestRoom.getRoomCost());
+				guestRoom.removeGuest();
+				return true;
+			}
+			else {
+				return false;
+			}
+		} catch (NullPointerException e) {
+			throw new GuestNotFoundException();
+		}
+		
+		
+	}
+
+	/**
 	 * To print the report based on status (feature I (b))
 	 * @return
 	 */
@@ -546,7 +614,6 @@ public class Hotel {
 		return result;
 				
 	}
-
 
  /**
 	 * A function to update the number of available room in a certain room type
