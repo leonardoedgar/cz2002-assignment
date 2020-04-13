@@ -13,7 +13,6 @@ import exception.DuplicateReservationFoundException;
  */
 public class ReservationSystem {
 	//{"DD MM YYYY": {"roomType": Reservation}}
-	
 	private ConcurrentHashMap<String, ConcurrentHashMap<String, ArrayList<Reservation>>> reservationTable;
 	
 	ReservationSystem() {

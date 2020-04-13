@@ -105,9 +105,8 @@ public class HotelApp {
 	/**
 	 * A function to show menu A.
 	 * @param hotel {Hotel} indicates the hotel object
-	 * @throws {GuestNotFoundException} exception when searching unknown guests
 	 */
-	public static void showMenuA(Hotel hotel) throws GuestNotFoundException {
+	public static void showMenuA(Hotel hotel) {
 		Scanner sc = new Scanner(System.in);
 		System.out.print(""
 				+ "|==================================|\n"
@@ -136,7 +135,11 @@ public class HotelApp {
 			case "b":
 			case "B": {
 				System.out.println("Enter guest name to display his/her details: ");
-				hotel.printGuestDetailsByName(sc.nextLine().trim());
+				try {
+					hotel.printGuestDetailsByName(sc.nextLine().trim());
+				} catch (GuestNotFoundException e) {
+					System.out.println(e.getMessage());
+				}
 				break;
 			}
 			default: System.out.println("Invalid input. Retry\n"); 
@@ -161,10 +164,16 @@ public class HotelApp {
 			case "a":
 			case "A": {
 				try {
-					Reservation reservation = HotelApp.createNewReservation(hotel.getAvailableRoomTypes());
-					hotel.getReservationSystem().addReservation(reservation, hotel.getRooms(reservation.getRoomType()));
-					
+					Reservation reservation = HotelApp.createNewReservation(
+							hotel.getAvailableRoomTypes(), hotel.getCurrentDate());
+					hotel.getReservationSystem().addReservation(reservation, hotel.getRooms(
+							reservation.getRoomType()));
+					if (!hotel.checkRoomAvailability(reservation.getDateOfCheckIn(), 
+							reservation.getDateOfCheckOut(), reservation.getRoomType())) {
+						reservation.updateStatus("waitlist");
+					}
 					System.out.println("Reservation added successfully!\n");
+					
 				} catch (InvalidGuestDetailException | InvalidReservationDetailException | 
 						DuplicateReservationFoundException | RoomTypeNotFoundException e) {
 					System.out.println(e.getMessage() + "\n");
@@ -174,7 +183,8 @@ public class HotelApp {
 			case "b":
 			case "B": {
 				try {
-					Reservation reservation = HotelApp.createNewReservation(hotel.getAvailableRoomTypes());
+					Reservation reservation = HotelApp.createNewReservation(
+							hotel.getAvailableRoomTypes(), hotel.getCurrentDate());
 					hotel.getReservationSystem().updateReservation(
 						reservation, hotel.getRooms(reservation.getRoomType()) );
 					System.out.println("Reservation updated successfully!\n");
@@ -211,11 +221,12 @@ public class HotelApp {
 	 * @throws {InvalidGuestDetailException} exception when guest detail input is not valid 
 	 */
 	@SuppressWarnings("deprecation")
-	public static Reservation createNewReservation(ArrayList<String> roomTypes) throws InvalidReservationDetailException, InvalidGuestDetailException {
+	public static Reservation createNewReservation(ArrayList<String> roomTypes, Date currentDate) 
+			throws InvalidReservationDetailException, InvalidGuestDetailException {
 		Scanner sc = new Scanner(System.in);
 		System.out.print("Enter reservation ID                 : ");
 		String reservationId = sc.nextLine().trim();
-		Guest guest = HotelApp.createNewGuest();
+		Guest guest = HotelApp.createNewGuest(true, currentDate);
 		Date checkInDate=guest.getstartDate();
 		Date checkOutDate = guest.getendDate();
 		System.out.print("Enter room type                      : ");
@@ -233,10 +244,14 @@ public class HotelApp {
 	
 	/**
 	 * A function to create a new Guest.
+	 * @param isForReservation {boolean} whether the guest created wants to make a reservation
+	 * @param currentDate {Date} the current date in the hotel system
 	 * @return {Guest} the guest object
+	 * @throws InvalidReservationDetailException  exception when check in date is later than check out date
 	 * @throws {InvalidGuestDetailException} exception when guest detail input is not valid 
 	 */
-	public static Guest createNewGuest() throws InvalidGuestDetailException {
+	public static Guest createNewGuest(boolean isForReservation, Date currentDate) 
+			throws InvalidGuestDetailException, InvalidReservationDetailException {
 		Scanner sc = new Scanner(System.in);
 		System.out.print("Enter guest name                     : ");
 		String guestName = sc.nextLine().trim();
@@ -254,21 +269,22 @@ public class HotelApp {
 		String contact = sc.nextLine().trim();
 		System.out.print("Enter identity                       : ");
 		String identity = sc.nextLine().trim();
-		
-		//added date
 		Date startDate= new Date();
 		Date endDate= new Date();
-		//DateFormat df = new SimpleDateFormat("MM/DD/YYYY");
-		try {
+		if (isForReservation) {
 			System.out.print("Enter date of check-in (MM/DD/YYYY)  : ");
 			startDate=new Date(sc.nextLine().trim());
-
-			System.out.print("Enter date of check-out (MM/DD/YYYY) : ");
-			 endDate=new Date(sc.nextLine().trim());	
-		
-		}catch(Exception e){
-			System.out.println("Date format is invalid.");
-			throw new InvalidGuestDetailException();
+			if (startDate.compareTo(currentDate) < 0) {
+				throw new InvalidReservationDetailException();
+			}
+		}
+		else {
+			startDate = currentDate;
+		}
+		System.out.print("Enter date of check-out (MM/DD/YYYY) : ");
+		endDate=new Date(sc.nextLine().trim());	
+		if (startDate.compareTo(endDate) >= 0) {
+			throw new InvalidReservationDetailException();
 		}
 		
 		try {
@@ -567,7 +583,7 @@ public class HotelApp {
 			//create new guest object and assign to room
 			try {
 				System.out.println("Enter new guest details:");
-				Guest newGuest = createNewGuest();				
+				Guest newGuest = HotelApp.createNewGuest(false, hotel.getCurrentDate());				
 				System.out.println("Enter guest's preferred roomType:");
 				String roomType = sc.next().trim();
 				boolean roomTypeChecker = false;
@@ -603,11 +619,11 @@ public class HotelApp {
 					newGuest=null;
 				}
 				
-			}catch(InvalidGuestDetailException |RoomTypeNotFoundException e) {
-				System.out.println(e.getMessage());
+			} catch(InvalidGuestDetailException |RoomTypeNotFoundException | 
+					InvalidReservationDetailException e) {
+					System.out.println(e.getMessage());
+			  }
 			}
-			}
-
 		}
 	public static void showMenuH(Hotel hotel) {
 		Scanner sc = new Scanner(System.in);

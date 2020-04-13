@@ -7,7 +7,7 @@ import java.util.ArrayList;
 public class Payment {
 	private String paymentType;
 	private String roomType;
-	private double roomCost;
+	private double totalRoomCost;
 	private ArrayList<RoomService> roomServiceList;
 	private double taxRate;
 	private double discountRate;
@@ -16,40 +16,40 @@ public class Payment {
 	 * A class constructor to create payment object
 	 * @param paymentType {String} indicates the payment type
 	 * @param roomType {String} the room type the person stayed at the hotel
-	 * @param roomCost {Double} the room cost the person stayed at the hotel
+	 * @param totalRoomCost {Double} the total room cost the person stayed at the hotel
 	 * @param roomServiceList {ArrayList<RoomService>} the room services that are made by the guest
 	 * @param taxRate {Double} tax rate for the payment
 	 * @param discountRate {Double} discount for the payment
 	 */
-	public Payment(String paymentType, String roomType, double roomCost, 
+	public Payment(String paymentType, String roomType, double totalRoomCost, 
 			ArrayList<RoomService> roomServiceList, double taxRate, double discountRate) {
 		this.paymentType = paymentType;
 		this.roomType = roomType;
-		this.roomCost = roomCost;
+		this.totalRoomCost = totalRoomCost;
 		this.roomServiceList = roomServiceList;
 		this.taxRate = taxRate;
 		this.discountRate = discountRate;
 	}
 	
-	public Payment(String paymentType, String roomType, double roomCost, 
+	public Payment(String paymentType, String roomType, double totalRoomCost, 
 			ArrayList<RoomService> roomServiceList) {
-		this(paymentType, roomType, roomCost, roomServiceList, 0.07, 0);
+		this(paymentType, roomType, totalRoomCost, roomServiceList, 0.07, 0);
 	}
 	
-	public Payment(String paymentType, String roomType, double roomCost, 
+	public Payment(String paymentType, String roomType, double totalRoomCost, 
 			ArrayList<RoomService> roomServiceList, double taxRate) {
-		this(paymentType, roomType, roomCost, roomServiceList, taxRate, 0);
+		this(paymentType, roomType, totalRoomCost, roomServiceList, taxRate, 0);
 	}
 	
 	/**
 	 * A function to print the payment receipt.
 	 */
 	public void printReceipt() {
-		double totalCost = this.roomCost;
+		double totalCost = this.totalRoomCost;
 		System.out.println("           HOTEL CHECKOUT");
 		System.out.println("===================================");
 		System.out.println("Room type\t: " + this.roomType);
-		System.out.println("Room cost\t: SGD" + String.format("%.2f", this.roomCost));
+		System.out.println("Total room cost\t: SGD" + String.format("%.2f", this.totalRoomCost));
 		System.out.println("Room order history: ");
 		for (RoomService roomService: roomServiceList) {
 			roomService.printOrderHistory();
