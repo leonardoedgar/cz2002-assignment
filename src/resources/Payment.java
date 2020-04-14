@@ -46,13 +46,16 @@ public class Payment {
 	 */
 	public void printReceipt() {
 		double totalCost = this.totalRoomCost;
+		System.out.println("===================================");
 		System.out.println("           HOTEL CHECKOUT");
 		System.out.println("===================================");
 		System.out.println("Room type\t: " + this.roomType);
 		System.out.println("Total room cost\t: SGD" + String.format("%.2f", this.totalRoomCost));
 		System.out.println("Room order history: ");
+		System.out.println("-----------------------------------");
 		for (RoomService roomService: roomServiceList) {
 			roomService.printOrderHistory();
+			System.out.println("-----------------------------------");
 			totalCost += roomService.getTotalCost();
 		}
 		System.out.println("===================================");
