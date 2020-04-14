@@ -375,23 +375,31 @@ public class Hotel {
 		int roomsClash=0;
 		
 		ArrayList<Reservation> tempList = new ArrayList<Reservation>();
+		ArrayList<String> reservationIdInDateRange = new ArrayList<String>();
+		
 		//checks for date clashes with guests in the reservation system
 		tempList=reservationSystem.getRoomTypeReservation(roomType);
 		
+		
 		//pass in start and end date of reservation
 		for(int i=0;i<tempList.size();i++){
-			//check each reservation with selected roomType
-			Reservation tempres=tempList.get(i);
-			if(!tempres.getStatus().contentEquals("checked-in")) {
-				roomsClash=roomsClash+checkDateClash(startDate,endDate,tempres.getDateOfCheckIn(),tempres.getDateOfCheckOut());
+			Reservation tempRes=tempList.get(i);
+			
+			if(!(reservationIdInDateRange.contains(tempRes.getReservationId()))) {
+				//add new id to arraylist
+				reservationIdInDateRange.add(tempRes.getReservationId());
+		
+				if(!tempRes.getStatus().contentEquals("checked-in")) {
+							roomsClash=roomsClash+checkDateClash(startDate,endDate,tempRes.getDateOfCheckIn(),tempRes.getDateOfCheckOut());
+					}
+				}
+				
 			}
-			
-			
-		}
 		
 		return roomsClash;
-		
 	}
+		
+
 	
 	
 	/**
@@ -408,11 +416,9 @@ public class Hotel {
 			return false;
 		}
 		
-		int roomsLeftForDate=this.getRooms(roomType); //currently hardcoded to 12 until code is combined
-
-		//checkHotel method
+		int roomsLeftForDate=this.getRooms(roomType); 
 		roomsLeftForDate=roomsLeftForDate-checkHotelClash(startDate,endDate,roomType)-checkReservationClash(startDate,endDate,roomType);
-
+		System.out.println("rooms left"+roomsLeftForDate);
 		if(roomsLeftForDate<=0) {
 			return false; //not available
 		}
@@ -483,7 +489,9 @@ public class Hotel {
 			
 			tempRoom.assignGuestToRoom(guest);
 			tempRoom.updateStatus("occupied");
-			reservation.updateStatus("checked-in");
+			
+			
+			this.reservationSystem.updateAllReservationStatus(reservation.getReservationId(),"checked-in",roomType);
 
 			return true;
 		}

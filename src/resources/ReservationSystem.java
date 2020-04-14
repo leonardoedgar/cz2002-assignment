@@ -20,6 +20,73 @@ public class ReservationSystem {
 				new ConcurrentHashMap<String, ConcurrentHashMap<String, ArrayList<Reservation>>>();
 	}
 	
+	
+	private String currentReservationId="R000000001";
+	private String walkInId="W000000001";
+	
+	/**
+	 * A function to provide a reservationId to a new reservation object
+	 * @return {String} the new reservationId
+	 */
+	public String setReservationId() {
+		String reservationId = this.currentReservationId;
+		updateReservationId();
+		return reservationId;
+	}
+	
+	/**
+	 * A function to update the reservationId
+	 */
+	public void updateReservationId() {
+		String reservationIdNumber = this.currentReservationId.substring(1);
+		int reservationNumber = Integer.parseInt(reservationIdNumber);
+		reservationNumber=reservationNumber+1;
+		reservationIdNumber = String.format("%09d",reservationNumber);
+		this.currentReservationId=this.currentReservationId.substring(0, 1)+reservationIdNumber;
+		
+	}
+	
+	/**
+	 * A function to provide a walkInId to a new reservation object when created through the checkIn function
+	 * @return {String} the new walkInId
+	 */
+	public String setWalkInId() {
+		String walkInId = this.walkInId;
+		updateWalkInId();
+		return walkInId;
+	}
+	
+	/**
+	 * A function to update the walkInId
+	 */
+	public void updateWalkInId() {
+		String reservationIdNumber = this.walkInId.substring(1);
+		int walkInNumber = Integer.parseInt(reservationIdNumber);
+		walkInNumber=walkInNumber+1;
+		reservationIdNumber = String.format("%09d",walkInNumber);
+		this.walkInId=this.walkInId.substring(0, 1)+reservationIdNumber;
+		
+	}
+	
+	/**
+	 * A function to update the reservation status of all reservation objects with the corresponding reservationId
+	 * @param reservationId {String} the reservationId
+	 * @param updatedStatus {String} the new status of the reservation
+	 */
+	public void updateAllReservationStatus(String reservationId, String updatedStatus,String roomType) {
+		
+		for(String date: this.reservationTable.keySet()) {
+			for(Reservation reservation:this.reservationTable.get(date).get(roomType)) {
+				if(reservation.getReservationId().equals(reservationId)){
+					reservation.updateStatus(updatedStatus);
+				}
+				
+			}
+		}
+	}
+	
+	
+
 	/**
 	 * A function to add a reservation.
 	 * @param reservation { Reservation} the reservation to add
