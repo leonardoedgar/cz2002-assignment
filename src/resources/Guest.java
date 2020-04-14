@@ -135,7 +135,7 @@ public class Guest {
 	 * A function to get date when guest will check in
 	 * @return {Date} the Date object
 	 */
-	public Date getstartDate() {
+	public Date getStartDate() {
 		return startDateOfStay;
 	}
 	
@@ -143,7 +143,7 @@ public class Guest {
 	 * A function to get date when guest will check out
 	 * @return {Date} the Date object
 	 */
-	public Date getendDate() {
+	public Date getEndDate() {
 		return endDateOfStay;
 	}
 	/**

@@ -353,7 +353,7 @@ public class Hotel {
 				if(tempTable.get(key).getGuest()!=null) {
 					Room tempRoom = tempTable.get(key);
 					Guest tempGuest = tempRoom.getGuest();
-					roomsClash=roomsClash+checkDateClash(startDate,endDate,tempGuest.getstartDate(),tempGuest.getendDate()); //if dates clash, minus 1 from available rooms of that roomType
+					roomsClash=roomsClash+checkDateClash(startDate,endDate,tempGuest.getStartDate(),tempGuest.getEndDate()); //if dates clash, minus 1 from available rooms of that roomType
 				}
 	
 			}
