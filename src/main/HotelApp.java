@@ -661,7 +661,7 @@ public class HotelApp {
 						ArrayList<String> roomTypeList = hotel.getAvailableRoomTypes();
 						for (String roomType: roomTypeList) {
 							ArrayList<String> vacantRoomNoList = 
-									hotel.getRoomTypeToVacantRoomNoListTable().get(roomType);
+									hotel.getRoomTypeToVacantRoomNoListTable(true).get(roomType);
 							System.out.println(Character.toUpperCase(roomType.charAt(0)) + 
 									roomType.substring(1) + ": ");
 							System.out.println("\tNumber: " + 
@@ -676,7 +676,7 @@ public class HotelApp {
 				case "b":
 				case "B":{
 					Hashtable<String, ArrayList<String>> roomStatusToRoomNoListTable = 
-							hotel.getRoomStatusToRoomNoListTable();
+							hotel.getRoomStatusToRoomNoListTable(true);
 					for (String roomStatus: roomStatusToRoomNoListTable.keySet()) {
 						System.out.println(Character.toUpperCase(roomStatus.charAt(0)) + 
 								roomStatus.substring(1) + " :");

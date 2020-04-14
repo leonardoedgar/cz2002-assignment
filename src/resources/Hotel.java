@@ -517,10 +517,11 @@ public class Hotel {
 
 	/**
 	 * A function to get the room status to room number list table.
+	 * @param sort {boolean} whether to get sorted room number list
 	 * @return {<Hashtable<String, ArrayList<Room>>>} the room status to room number list table
 	 */
 	@SuppressWarnings("serial")
-	public Hashtable<String, ArrayList<String>> getRoomStatusToRoomNoListTable() {
+	public Hashtable<String, ArrayList<String>> getRoomStatusToRoomNoListTable(boolean sort) {
 		Hashtable<String, ArrayList<String>> roomStatusToRoomNoListTable = 
 				new Hashtable<String, ArrayList<String>>();
 		for (String roomType: this.roomTable.keySet()) {
@@ -536,16 +537,22 @@ public class Hotel {
 				}
 			}
 		}
+		if (sort) {
+			for (String roomStatus: roomStatusToRoomNoListTable.keySet()) {
+				roomStatusToRoomNoListTable.replace(roomStatus, 
+						Hotel.getSortedRoomNoList(roomStatusToRoomNoListTable.get(roomStatus)));
+			}
+		}
 		return roomStatusToRoomNoListTable;
-				
 	}
-	
+
 	/**
 	 * A function to get room type to vacant room number list table.
+	 * @param sort {boolean} whether to get sorted room number list
 	 * @return {Hashtable<String, ArrayList<String>>} the room type to vacant room number list table
 	 */
 	@SuppressWarnings("serial")
-	public Hashtable<String, ArrayList<String>> getRoomTypeToVacantRoomNoListTable() {
+	public Hashtable<String, ArrayList<String>> getRoomTypeToVacantRoomNoListTable(boolean sort) {
 		Hashtable<String, ArrayList<String>> roomTypeToVacantRoomNoListTable = 
 				new Hashtable<String, ArrayList<String>>();
 		for (String roomType: this.roomTable.keySet()) {
@@ -563,7 +570,48 @@ public class Hotel {
 				}
 			}
 		}
+		if (sort) {
+			for (String roomType: roomTypeToVacantRoomNoListTable.keySet()) {
+				roomTypeToVacantRoomNoListTable.replace(roomType, 
+						Hotel.getSortedRoomNoList(roomTypeToVacantRoomNoListTable.get(roomType)));
+			}
+		}
 		return roomTypeToVacantRoomNoListTable;		
+	}
+	
+	/**
+	 * A static method to get sorted list of room number.
+	 * @param {roomNoListToSort} the list of room number to sort
+	 * @return {ArrayList<String>} the sorted list of room number
+	 */
+	public static ArrayList<String> getSortedRoomNoList(ArrayList<String> roomNoListToSort) {
+		ArrayList<String> sortedRoomNoList = new ArrayList<String>();
+		for (String roomNo: roomNoListToSort) {
+			if (sortedRoomNoList.size() == 0) {
+				sortedRoomNoList.add(roomNo);
+			}
+			else {
+				boolean roomAdded = false;
+				for (int index=0; index<sortedRoomNoList.size(); index++) {
+					String levelNo = roomNo.split("-")[0];
+					String explicitRoomNo = roomNo.split("-")[1];
+					String levelNoOfRoomInSortedList = sortedRoomNoList.get(index).split("-")[0];
+					String explicitRoomNoInSortedList = sortedRoomNoList.get(index).split("-")[1];
+					if (Integer.parseInt(levelNoOfRoomInSortedList) > Integer.parseInt(levelNo) || 
+							(Integer.parseInt(levelNoOfRoomInSortedList) == Integer.parseInt(levelNo) && 
+							Integer.parseInt(explicitRoomNoInSortedList) > 
+							Integer.parseInt(explicitRoomNo))) {
+							sortedRoomNoList.add(index, roomNo);
+							roomAdded = true;
+							break;
+					}
+				}
+				if (!roomAdded) {
+					sortedRoomNoList.add(roomNo);
+				}
+			}
+		}
+		return sortedRoomNoList;
 	}
   
 	 /**
