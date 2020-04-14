@@ -1,7 +1,5 @@
 package resources;
 
-import exception.RoomNotFoundException;
-
 /**
  * A class to represent a room in a hotel.
  */

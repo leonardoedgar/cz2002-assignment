@@ -166,8 +166,8 @@ public class HotelApp {
 				try {
 					Reservation reservation = HotelApp.createNewReservation(
 							hotel.getAvailableRoomTypes(), hotel.getCurrentDate());
-					hotel.getReservationSystem().addReservation(reservation, hotel.getRooms(
-							reservation.getRoomType()));
+					hotel.getReservationSystem().addReservation(reservation, 
+							hotel.getNumberOfRoomsByRoomType(reservation.getRoomType()));
 					if (!hotel.checkRoomAvailability(reservation.getDateOfCheckIn(), 
 							reservation.getDateOfCheckOut(), reservation.getRoomType())) {
 						reservation.updateStatus("waitlist");
@@ -186,7 +186,7 @@ public class HotelApp {
 					Reservation reservation = HotelApp.createNewReservation(
 							hotel.getAvailableRoomTypes(), hotel.getCurrentDate());
 					hotel.getReservationSystem().updateReservation(
-						reservation, hotel.getRooms(reservation.getRoomType()) );
+						reservation, hotel.getNumberOfRoomsByRoomType(reservation.getRoomType()) );
 					System.out.println("Reservation updated successfully!\n");
 				} catch ( InvalidGuestDetailException | InvalidReservationDetailException | 
 						ReservationNotFoundException | RoomTypeNotFoundException e) {
@@ -200,7 +200,8 @@ public class HotelApp {
 				try {
 					String reservationId = sc.nextLine().trim();
 					Reservation reservation = hotel.getReservationSystem().getReservation(reservationId);
-					hotel.getReservationSystem().removeReservation(reservationId, hotel.getRooms(reservation.getRoomType()));
+					hotel.getReservationSystem().removeReservation(reservationId, 
+							hotel.getNumberOfRoomsByRoomType(reservation.getRoomType()));
 					System.out.println("Reservation removed successfully!\n");
 				} catch (ReservationNotFoundException | RoomTypeNotFoundException e) {
 					System.out.println(e.getMessage() + "\n");
@@ -467,6 +468,7 @@ public class HotelApp {
 	 * A function to show the functional requirements f
 	 * @param hotel
 	 */
+	@SuppressWarnings("deprecation")
 	public static void showMenuF(Hotel hotel) {
 
 		Scanner sc = new Scanner(System.in);
@@ -500,7 +502,7 @@ public class HotelApp {
 				
 				boolean roomTypeChecker = false;
 				while(roomTypeChecker == false) {
-					roomTypeChecker=hotel.roomTypeExists(roomType);
+					roomTypeChecker=hotel.doesRoomTypeExists(roomType);
 					if(roomTypeChecker==false) {
 						System.out.println("Invalid room type. Try again:");
 						roomType = sc.next().trim();
@@ -588,7 +590,7 @@ public class HotelApp {
 				String roomType = sc.next().trim();
 				boolean roomTypeChecker = false;
 				while(roomTypeChecker == false) {
-					roomTypeChecker=hotel.roomTypeExists(roomType);
+					roomTypeChecker=hotel.doesRoomTypeExists(roomType);
 					if(roomTypeChecker==false) {
 						System.out.println("Invalid room type. Try again:");
 						roomType = sc.next().trim();
@@ -622,8 +624,7 @@ public class HotelApp {
 			} catch(InvalidGuestDetailException |RoomTypeNotFoundException | 
 					InvalidReservationDetailException e) {
 					System.out.println(e.getMessage());
-			  }
-			}
+			}}
 		}
 	public static void showMenuH(Hotel hotel) {
 		Scanner sc = new Scanner(System.in);
@@ -654,41 +655,38 @@ public class HotelApp {
 						   "|============================|\n"+
 						   "Enter your choice:");
 		try {
-		switch(sc.nextLine()) {
-		case "a":
-		case "A":{
-			System.out.println("Single:");
-			System.out.println("\tNumber:" + hotel.getOccupancyRate()[0].size() +" out of " + hotel.getRooms("single"));
-			System.out.println("\tRooms:" + hotel.getOccupancyRate()[0].toString().substring(1, hotel.getOccupancyRate()[0].toString().length()-1));
-			
-			System.out.println("Double");
-			System.out.println("\tNumber:" + hotel.getOccupancyRate()[1].size() +" out of " + hotel.getRooms("double"));
-			System.out.println("\tRooms:" + hotel.getOccupancyRate()[1].toString().substring(1, hotel.getOccupancyRate()[1].toString().length()-1));
-			
-			System.out.println("Deluxe");
-			System.out.println("\tNumber:" + hotel.getOccupancyRate()[2].size() +" out of " + hotel.getRooms("deluxe"));
-			System.out.println("\tRooms:" + hotel.getOccupancyRate()[2].toString().substring(1, hotel.getOccupancyRate()[2].toString().length()-1));
-			
-			System.out.println("VIP suite");
-			System.out.println("\tNumber:" + hotel.getOccupancyRate()[3].size() +" out of " + hotel.getRooms("vip"));
-			System.out.println("\tRooms:" + hotel.getOccupancyRate()[3].toString().substring(1, hotel.getOccupancyRate()[3].toString().length()-1));
-			break;
+			switch(sc.nextLine()) {
+				case "a":
+				case "A":{
+						ArrayList<String> roomTypeList = hotel.getAvailableRoomTypes();
+						for (String roomType: roomTypeList) {
+							ArrayList<String> vacantRoomNoList = 
+									hotel.getRoomTypeToVacantRoomNoListTable().get(roomType);
+							System.out.println(Character.toUpperCase(roomType.charAt(0)) + 
+									roomType.substring(1) + ": ");
+							System.out.println("\tNumber: " + 
+									vacantRoomNoList.size() + " out of " 
+									+ hotel.getNumberOfRoomsByRoomType(roomType));
+							String vacantRoomListString = vacantRoomNoList.toString();
+							System.out.println("\tRooms: " + vacantRoomListString.substring(1, 
+									vacantRoomListString.length()-1));
+						}
+						break;
+				}
+				case "b":
+				case "B":{
+					Hashtable<String, ArrayList<String>> roomStatusToRoomNoListTable = 
+							hotel.getRoomStatusToRoomNoListTable();
+					for (String roomStatus: roomStatusToRoomNoListTable.keySet()) {
+						System.out.println(Character.toUpperCase(roomStatus.charAt(0)) + 
+								roomStatus.substring(1) + " :");
+						String roomListString = roomStatusToRoomNoListTable.get(roomStatus).toString();
+						System.out.println(roomListString.substring(1, roomListString.length()-1));
+					}
+					break;
+				}
 		}
-		case "b":
-		case "B":{
-			System.out.println("Vacant :");
-			System.out.println(hotel.getStatusRoom()[0].toString().substring(1, hotel.getStatusRoom()[0].toString().length()-1));
-			System.out.println("Occupied: ");
-			System.out.println(hotel.getStatusRoom()[1].toString().substring(1, hotel.getStatusRoom()[1].toString().length()-1));
-			System.out.println("Under maintainance: ");
-			System.out.println(hotel.getStatusRoom()[2].toString().substring(1, hotel.getStatusRoom()[2].toString().length()-1));
-			break;
-			
-		}
-		}
-		}
-		catch(RoomTypeNotFoundException e){
-			System.out.println(e.getMessage());
-		}
-	}
-	}
+	} catch(RoomTypeNotFoundException e){
+		System.out.println(e.getMessage());
+	}}
+}

@@ -21,24 +21,21 @@ import exception.GuestNotFoundException;
  */
 public class Hotel {
 	// {"roomType": {"roomNo": Room()}}
-	Hashtable<String, Hashtable<String, Room>> roomTable = new Hashtable<String, Hashtable<String, Room>>();
+	Hashtable<String, Hashtable<String, Room>> roomTable;
 	private ReservationSystem reservationSystem;
 	private Date currentDate;
+
 	/**
 	 * A class constructor to create a hotel. 
 	 * @param roomConfigFilePath {String} the path to room configuration file
 	 * @throws {HotelSetupFailureException} exception when hotel failed to set up
 	 */
+	@SuppressWarnings("deprecation")
 	public Hotel(String roomConfigFilePath) throws HotelSetupFailureException {
 		this.setupRooms(this.getRoomConfig(roomConfigFilePath));
 		this.reservationSystem = new ReservationSystem();
 		this.currentDate = new Date(new Date().toLocaleString().split(",")[0]);
 	}
-
-	private int noOfAvailable_single;
-	private int noOfAvailable_double;
-	private int noOfAvailable_deluxe;
-	private int noOfAvailable_vip;
 	
 	/**
 	 * A function to get hotel's current date.
@@ -53,25 +50,10 @@ public class Hotel {
 	 * @param roomConfig {Hashtable<String, Hashtable<String, String>>} the room configuration to built from.
 	 */
 	private void setupRooms(Hashtable<String, Hashtable<String, String>> roomConfig) {
-		int floorNo = 1;
+		this.roomTable = new Hashtable<String, Hashtable<String, Room>>();
 		for (String roomType: roomConfig.keySet()) {
 			Hashtable<String, String> roomDetail = roomConfig.get(roomType);
 			Hashtable<String, Room> roomDataPerLevel = new Hashtable<String, Room>();
-			switch(roomType) {
-				case "single":
-					noOfAvailable_single = Integer.parseInt(roomDetail.get("numberOfRooms"));
-					break;
-				case "double":
-					noOfAvailable_double = Integer.parseInt(roomDetail.get("numberOfRooms"));
-					break;
-				case "deluxe":
-					noOfAvailable_deluxe = Integer.parseInt(roomDetail.get("numberOfRooms"));
-					break;
-				case "vip":
-					noOfAvailable_vip = Integer.parseInt(roomDetail.get("numberOfRooms"));
-					break;
-			
-			}
 			for(int i=1; i<= Integer.parseInt(roomDetail.get("numberOfRooms")); i++) {
 				String roomNo = "0" + roomDetail.get("level") + "-";
 				if (i > 9) {
@@ -92,7 +74,6 @@ public class Hotel {
 					)); 
 				};
 			roomTable.put(roomType, roomDataPerLevel);
-			floorNo += 1;
 		}
 		
 		
@@ -138,8 +119,6 @@ public class Hotel {
 		}
 	}
 	
-	//added one line to check for null when getting guest
-	//change == condition to .equals when checking guest names
 	/** 
 	 * A function to get guest in the hotel by the name.
 	 * @param name {String} the name of the guest
@@ -171,7 +150,8 @@ public class Hotel {
 	 * @throws {GuestNotFoundException} when guest's name is not registered in the system
 	 * @throws {GuestDetailUpdateFailureException} when system failed to update guest's data due to data does not exist
 	 */
-	public void updateGuestDetailsByName(String name, String detailToUpdate, String newData) throws GuestNotFoundException, GuestDetailUpdateFailureException {
+	public void updateGuestDetailsByName(String name, String detailToUpdate, String newData) 
+			throws GuestNotFoundException, GuestDetailUpdateFailureException {
 		Guest guest = this.getGuestByName(name);
 		guest.updateDetails(detailToUpdate, newData);
 	}
@@ -186,40 +166,32 @@ public class Hotel {
 		guest.printDetails();
 	}
 
-/**
- * this method will try to find if the room exist in the hotel system by comparing the room number. If no such roome exist, we will throw roomnotfound error.
- * @param Room_num
- * @return
- * @throws RoomNotFoundException
- */
-	public Room getRoomByNo(String Room_num) throws RoomNotFoundException{
+	/**
+	 * A function to get a room by its number
+	 * @param roomNum {String} the room number
+	 * @return {Room} the room object
+	 * @throws {RoomNotFoundException} when room is not found in the hotel system
+	 */
+	public Room getRoomByNo(String roomNum) throws RoomNotFoundException{
 		for (String roomType: this.roomTable.keySet()) {
 			for (String roomNo: this.roomTable.get(roomType).keySet()) {
-				if ((roomNo).equals(Room_num)) {
+				if ((roomNo).equals(roomNum)) {
 					return this.roomTable.get(roomType).get(roomNo);
 				}
 			}
 		}
 		throw new RoomNotFoundException();
 	}
-//	public Room getRoomByNo(String Room_num){
-//		for (String roomType: this.roomTable.keySet()) {
-//			for (String roomNo: this.roomTable.get(roomType).keySet()) {
-//				if ((roomType+"-"+roomNo).equals(Room_num)) {
-//					return this.roomTable.get(roomType).get(roomNo);
-//				}
-//			}
-//		}
-//	}
 
 	/**
-	 * details refer to the choice of information to be updated by the user of this app.
-	 * @param roomNo
-	 * @param details
-	 * @param newData
-	 * @throws RoomNotFoundException
+	 * A function to update room details.
+	 * @param roomNo {String} the room number
+	 * @param details {String} the room detail to update
+	 * @param newData {newData} the new detail
+	 * @throws {RoomNotFoundException} when room is not found in the hotel system
 	 */
-	public void updateRoomDetails(String roomNo, String details, String newData) throws RoomNotFoundException, RoomTypeNotFoundException{
+	public void updateRoomDetails(String roomNo, String details, String newData) 
+			throws RoomNotFoundException, RoomTypeNotFoundException{
 		Room room = this.getRoomByNo(roomNo);
 		int delta=0;
 		switch(details) {
@@ -228,28 +200,14 @@ public class Hotel {
 				delta = -1;
 			}
 			else if (newData.equals("vacant")) {
-				delta=1;
+				delta = 1 ;
 			}
 			if (!newData.equals(room.getStatus())) {
-				if (newData.split("-")[0].equals("01")) {
-					updateRoomAvailability("single",delta);
-					updateReservation("single",newData,delta);
-				}
-				else if (roomNo.split("-")[0].equals("02")) {
-					updateRoomAvailability("double",delta);
-					updateReservation("double",newData,delta);
-				}
-				else if (roomNo.split("-")[0].equals("03")) {
-					updateRoomAvailability("deluxe",delta);
-					updateReservation("deluxe",newData,delta);
-				}
-				else {
-					updateRoomAvailability("vip",delta);
-					updateReservation("vip",newData,delta);
-				}
+				String roomType = this.getRoomTypeFromRoomNo(roomNo);
+				this.getReservationSystem().shiftReservation(this.getNumberOfRoomsByRoomType(roomType), 
+						roomType, delta);
 				room.updateStatus(newData);
 			}
-			
 			break;
 		}
 		case "price":{
@@ -381,9 +339,10 @@ public class Hotel {
 		//pass in start and end date of reservation
 		for(int i=0;i<tempList.size();i++){
 			//check each reservation with selected roomType
-			Reservation tempres=tempList.get(i);
-			if(!tempres.getStatus().contentEquals("checked-in")) {
-				roomsClash=roomsClash+checkDateClash(startDate,endDate,tempres.getDateOfCheckIn(),tempres.getDateOfCheckOut());
+			Reservation tempRes=tempList.get(i);
+			if(!tempRes.getStatus().contentEquals("checked-in")) {
+				roomsClash=roomsClash+checkDateClash(startDate, endDate, 
+						tempRes.getDateOfCheckIn(),tempRes.getDateOfCheckOut());
 			}
 			
 			
@@ -408,7 +367,7 @@ public class Hotel {
 			return false;
 		}
 		
-		int roomsLeftForDate=this.getRooms(roomType); //currently hardcoded to 12 until code is combined
+		int roomsLeftForDate=this.getNumberOfRoomsByRoomType(roomType);
 
 		//checkHotel method
 		roomsLeftForDate=roomsLeftForDate-checkHotelClash(startDate,endDate,roomType)-checkReservationClash(startDate,endDate,roomType);
@@ -420,11 +379,7 @@ public class Hotel {
 		return true; //available
 	
 	}
-	
-	
-	//assuming staff checks for currently available rooms using report and assigns a room based on that
-	//add exception for invalid roomNo
-	//change javadoc
+
 	/**
 	 * A function to check-in a guest who arrived at the hotel into a room chosen by the staff
 	 * @param roomNo {String} roomNo of an empty room
@@ -561,99 +516,68 @@ public class Hotel {
 	}
 
 	/**
-	 * To print the report based on status (feature I (b))
-	 * @return
+	 * A function to get the room status to room number list table.
+	 * @return {<Hashtable<String, ArrayList<Room>>>} the room status to room number list table
 	 */
-	public ArrayList[] getStatusRoom() {
-		ArrayList<String> vacant = new ArrayList<String>();
-		ArrayList<String> occupied = new ArrayList<String>();
-		ArrayList<String> renov = new ArrayList<String>();
-		ArrayList<String> others = new ArrayList<String>();
+	@SuppressWarnings("serial")
+	public Hashtable<String, ArrayList<String>> getRoomStatusToRoomNoListTable() {
+		Hashtable<String, ArrayList<String>> roomStatusToRoomNoListTable = 
+				new Hashtable<String, ArrayList<String>>();
 		for (String roomType: this.roomTable.keySet()) {
 			for(String roomNo: this.roomTable.get(roomType).keySet()) {
-				Room roomDetail = this.roomTable.get(roomType).get(roomNo);
-				if (roomDetail.getStatus().equals("vacant")) {
-					vacant.add(roomNo);
+				Room room = this.roomTable.get(roomType).get(roomNo);
+				String roomStatus = room.getStatus();
+				if (roomStatusToRoomNoListTable.containsKey(roomStatus)) {
+					roomStatusToRoomNoListTable.get(roomStatus).add(roomNo);
 				}
-				else if (roomDetail.getStatus().equals("occupied")) {
-					occupied.add(roomNo);
+				else {
+					roomStatusToRoomNoListTable.put(roomStatus, 
+							new ArrayList<String>() {{add(roomNo);}});
 				}
-				else if (roomDetail.getStatus().equals("under maintainance")) {
-					renov.add(roomNo);
-				}
-				else {others.add(roomNo);}
 			}
 		}
-		ArrayList[] result = {vacant,occupied,renov,others};
-		return result;
+		return roomStatusToRoomNoListTable;
 				
 	}
 	
 	/**
-	 * To get the report based on Occupancy rate (feature I(a))
-	 * @return
+	 * A function to get room type to vacant room number list table.
+	 * @return {Hashtable<String, ArrayList<String>>} the room type to vacant room number list table
 	 */
-	public ArrayList[] getOccupancyRate() {
-		ArrayList<String> single = new ArrayList<String>();
-		ArrayList<String> doublee = new ArrayList<String>();
-		ArrayList<String> deluxe = new ArrayList<String>();
-		ArrayList<String> vip = new ArrayList<String>();
+	@SuppressWarnings("serial")
+	public Hashtable<String, ArrayList<String>> getRoomTypeToVacantRoomNoListTable() {
+		Hashtable<String, ArrayList<String>> roomTypeToVacantRoomNoListTable = 
+				new Hashtable<String, ArrayList<String>>();
 		for (String roomType: this.roomTable.keySet()) {
 			for(String roomNo: this.roomTable.get(roomType).keySet()) {
-				Room roomDetail = this.roomTable.get(roomType).get(roomNo);
-				if (roomDetail.getStatus().equals("vacant") && roomType.equals("single")) {
-					single.add(roomNo);
-				}
-				else if (roomDetail.getStatus().equals("vacant") && roomType.equals("double")) {
-					doublee.add(roomNo);
-				}
-				else if (roomDetail.getStatus().equals("vacant") && roomType.equals("deluxe")) {
-					deluxe.add(roomNo);
-				}
-				else if (roomDetail.getStatus().equals("vacant") && roomType.equals("vip")) {
-					vip.add(roomNo);
+				Room room = this.roomTable.get(roomType).get(roomNo);
+				if (room.getStatus().equals("vacant")) {
+					if (roomTypeToVacantRoomNoListTable.containsKey(roomType)) {
+						roomTypeToVacantRoomNoListTable.get(roomType).add(roomNo);
+					}
+					else {
+						roomTypeToVacantRoomNoListTable.put(roomType, new ArrayList<String>() {{
+							add(roomNo);
+						}});
+					}
 				}
 			}
 		}
-		ArrayList[] result = {single,doublee,deluxe,vip};
-		return result;
-				
-	}
-
- /**
-	 * A function to update the number of available room in a certain room type
-	 * @param room_type {String} this is the room type that we will refer to
-   * @param num_room {int} this is the number of available room of the corresponding room type
-	 * @return {void} 
- * @throws RoomTypeNotFoundException 
-	 */
-	public void updateRoomAvailability(String room_type, int num_room) throws RoomTypeNotFoundException {
-		switch(room_type){
-			case "single": noOfAvailable_single = noOfAvailable_single +num_room;break;
-			case "double": noOfAvailable_double = noOfAvailable_double +num_room;break;
-			case "deluxe": noOfAvailable_deluxe = noOfAvailable_deluxe +num_room;break;
-			case "vip": noOfAvailable_vip = noOfAvailable_vip +num_room;break;
-			default: throw new RoomTypeNotFoundException();
-		}
+		return roomTypeToVacantRoomNoListTable;		
 	}
   
 	 /**
 	 * A function to update the number of available room in a certain room type
-	 * @param room_type {String} this is the room type that we will refer to
-   * @param num_room {int} this is the number of available room of the corresponding room type
-   * @param delta {int} the number of rooms that the status should be change (1 if you are changing waitlist to confirmed, -1 otherwise)
+	 * @param room_type {String} the room type
+	 * @param num_room {int} this is the number of available room of the corresponding room type
+	 * @param delta {int} the number of rooms that the status should be change (1 if you are changing waitlist to confirmed, -1 otherwise)
 	 * @return {void} 
 	 * @throws RoomTypeNotFoundException 
 	 */
-	public void updateReservation(String room_type, String new_status,int delta) throws RoomTypeNotFoundException {
-		switch(room_type) {
-		case "single": getReservationSystem().shiftReservation(noOfAvailable_single, "single",delta);break;
-		case "double": getReservationSystem().shiftReservation(noOfAvailable_double, "double",delta);break;
-		case "deluxe": getReservationSystem().shiftReservation(noOfAvailable_deluxe, "deluxe",delta);break;
-		case "vip": getReservationSystem().shiftReservation(noOfAvailable_vip, "vip",delta);break;
-		default: throw new RoomTypeNotFoundException();
-	
-		}
+	public void updateReservation(String roomType, int delta) 
+			throws RoomTypeNotFoundException {
+		this.getReservationSystem().shiftReservation(this.getNumberOfRoomsByRoomType(roomType), 
+				roomType, delta);
 	}
 
 	/**
@@ -661,7 +585,7 @@ public class Hotel {
 	 * @param roomType {String} the roomType you want to check
 	 * @return {boolean} true if roomType exists, false if roomType does not exist
 	 */
-	public boolean roomTypeExists(String roomType) {
+	public boolean doesRoomTypeExists(String roomType) {
 		for(int i=0;i<getAvailableRoomTypes().size();i++) {
 			if(roomType.equals(getAvailableRoomTypes().get(i))) {
 				return true;
@@ -672,18 +596,28 @@ public class Hotel {
 	}
 	
 	/**
-	 * get method for the number of available rooms
-	 * @param roomType
-	 * @return
-	 * @throws RoomTypeNotFoundException
+	 * A function to get the number of available rooms by its type.
+	 * @param roomType {String} the room type
+	 * @return {int} the number of rooms
+	 * @throws {RoomTypeNotFoundException} when the room type is not in the hotel system
 	 */
-	public int getRooms(String roomType) throws RoomTypeNotFoundException {
-		switch(roomType) {
-		case "single":return this.noOfAvailable_single;
-		case "double":return this.noOfAvailable_double;
-		case "deluxe":return this.noOfAvailable_deluxe;
-		case "vip":return this.noOfAvailable_vip;
-		default: throw new RoomTypeNotFoundException();
+	public int getNumberOfRoomsByRoomType(String aRoomType) throws RoomTypeNotFoundException {
+		int numberOfRooms = 0;
+		for (String roomType: this.roomTable.keySet()) {
+			if (roomType.equals(aRoomType)) {
+				for (String roomNo: this.roomTable.get(roomType).keySet()) {
+					Room room = this.roomTable.get(roomType).get(roomNo);
+					if (room.getStatus() == "vacant" || room.getStatus() == "occupied") {
+						numberOfRooms += 1;
+					}
+				}
+			}
+		}
+		if (numberOfRooms > 0) {
+			return numberOfRooms;
+		}
+		else {
+			throw new RoomTypeNotFoundException();
 		}
 	}
 }
