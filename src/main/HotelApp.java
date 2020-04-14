@@ -575,16 +575,10 @@ public class HotelApp {
 				if (!hotel.getAvailableRoomTypes().contains(roomType)) {
 					throw new InvalidReservationDetailException();
 				}
-
-
-				System.out.println(((int)(newGuest.getEndDate().getTime()-newGuest.getStartDate().getTime())/(1000*60*60*24)));
-				System.out.println(newGuest.getEndDate().compareTo(newGuest.getStartDate()));
 				Reservation reservation =null;
 				if(((int)(newGuest.getEndDate().getTime()-newGuest.getStartDate().getTime())/(1000*60*60*24)) > 1) {
 					reservation = new Reservation(hotel.getReservationSystem().generateNewId(), newGuest, newGuest.getStartDate(), newGuest.getEndDate(), numOfPeople, paymentType,roomType);
 				}
-					
-					
 				boolean roomNoChecker=false;
 				
 				if(hotel.checkRoomAvailability(newGuest.getStartDate(), newGuest.getEndDate(), roomType)==true) {
