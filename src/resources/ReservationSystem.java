@@ -8,6 +8,7 @@ import java.util.Comparator;
 import resources.Reservation;
 import exception.ReservationNotFoundException;
 import exception.DuplicateReservationFoundException;
+import exception.IdGenerationFailedException;
 
 /**
  * A class to represent a reservation system.
@@ -25,16 +26,22 @@ public class ReservationSystem {
 	 * A function to generate a new random alphanumeric ReservationId of length 10
 	 * @return {String} the new ReservationId
 	 */
-	public String generateNewId() {
+	public String generateNewId() throws IdGenerationFailedException {
 		String validIdCharacters="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 		int idLength=10;
+		int maxtry=1;
+		int noOfTry=0;
 		StringBuilder newReservationId = new StringBuilder(idLength);
 		
 		do {
 		for(int i=0;i<idLength;i++) {
+			if(noOfTry>=maxtry) {
+				throw new IdGenerationFailedException();
+			}
 			int index = (int) (Math.random()*validIdCharacters.length());
 			newReservationId.append(validIdCharacters.charAt(index));
 		}
+		noOfTry++;
 		}while(doesDuplicateReservationIdExist(newReservationId.toString()));
 		
 		return newReservationId.toString();

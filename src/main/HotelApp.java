@@ -12,6 +12,7 @@ import resources.Menu;
 import resources.Room;
 import exception.GuestDetailUpdateFailureException;
 import exception.GuestNotFoundException;
+import exception.IdGenerationFailedException;
 import exception.RoomNotFoundException;
 import exception.RoomTypeNotFoundException;
 import resources.Reservation;
@@ -173,7 +174,7 @@ public class HotelApp {
 					System.out.println("Reservation added successfully!\n");
 					
 				} catch (InvalidGuestDetailException | InvalidReservationDetailException | 
-						DuplicateReservationFoundException | RoomTypeNotFoundException e) {
+						DuplicateReservationFoundException | RoomTypeNotFoundException | IdGenerationFailedException e) {
 					System.out.println(e.getMessage() + "\n");
 				}
 				break;
@@ -187,7 +188,7 @@ public class HotelApp {
 						reservation, hotel.getRooms(reservation.getRoomType()) );
 					System.out.println("Reservation updated successfully!\n");
 				} catch ( InvalidGuestDetailException | InvalidReservationDetailException | 
-						ReservationNotFoundException | RoomTypeNotFoundException e) {
+						ReservationNotFoundException | RoomTypeNotFoundException | IdGenerationFailedException e) {
 					System.out.println(e.getMessage()+ "\n");
 				} 
 				break;
@@ -621,7 +622,7 @@ public class HotelApp {
 				}
 				
 			} catch(InvalidGuestDetailException |RoomTypeNotFoundException | 
-					InvalidReservationDetailException | DuplicateReservationFoundException e) {
+					InvalidReservationDetailException | DuplicateReservationFoundException | IdGenerationFailedException e) {
 					System.out.println(e.getMessage());
 			  }
 			}
