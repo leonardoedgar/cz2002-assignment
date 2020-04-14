@@ -21,7 +21,6 @@ public class ReservationSystem {
 		this.reservationTable = 
 				new ConcurrentHashMap<String, ConcurrentHashMap<String, ArrayList<Reservation>>>();
 	}
-	
 	/**
 	 * A function to generate a new random alphanumeric ReservationId of length 10
 	 * @return {String} the new ReservationId
@@ -29,7 +28,7 @@ public class ReservationSystem {
 	public String generateNewId() throws IdGenerationFailedException {
 		String validIdCharacters="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 		int idLength=10;
-		int maxtry=1;
+		int maxtry=10;
 		int noOfTry=0;
 		StringBuilder newReservationId = new StringBuilder(idLength);
 		
@@ -46,8 +45,6 @@ public class ReservationSystem {
 		
 		return newReservationId.toString();
 	}
-	
-	
 	/**
 	 * A function to update the reservation status of all reservation objects with the corresponding reservationId
 	 * @param reservationId {String} the reservationId
@@ -64,8 +61,6 @@ public class ReservationSystem {
 			}
 		}
 	}
-	
-	
 
 	/**
 	 * A function to add a reservation.

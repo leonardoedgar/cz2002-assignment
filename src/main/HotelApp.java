@@ -238,7 +238,7 @@ public class HotelApp {
 		}
 		return new Reservation(reservationId, guest, checkInDate, checkOutDate, 
 			numOfPeople, paymentType, roomType);
-		}catch(InvalidReservationDetailException |NumberFormatException e) {
+		}catch(NumberFormatException e) {
 			throw new InvalidReservationDetailException();
 		}
 	}
@@ -255,42 +255,42 @@ public class HotelApp {
 			throws InvalidGuestDetailException, InvalidReservationDetailException {
 		Scanner sc = new Scanner(System.in);
 		try {
-		System.out.print("Enter guest name                     : ");
-		String guestName = sc.nextLine().trim();
-		System.out.print("Enter card details                   : ");
-		String cardDetails = sc.nextLine().trim();
-		System.out.print("Enter address                        : ");
-		String address = sc.nextLine().trim();
-		System.out.print("Enter country                        : ");
-		String country = sc.nextLine().trim();
-		System.out.print("Enter nationality                    : ");
-		String nationality = sc.nextLine().trim();
-		System.out.print("Enter gender                         : ");
-		String gender = sc.nextLine().trim();
-		System.out.print("Enter contact                        : ");
-		String contact = sc.nextLine().trim();
-		System.out.print("Enter identity                       : ");
-		String identity = sc.nextLine().trim();
-		Date startDate= new Date();
-		Date endDate= new Date();
-		if (isForReservation) {
-			System.out.print("Enter date of check-in (MM/DD/YYYY)  : ");
-			startDate=new Date(sc.nextLine().trim());
-			if (startDate.compareTo(currentDate) < 0) {
+			System.out.print("Enter guest name                     : ");
+			String guestName = sc.nextLine().trim();
+			System.out.print("Enter card details                   : ");
+			String cardDetails = sc.nextLine().trim();
+			System.out.print("Enter address                        : ");
+			String address = sc.nextLine().trim();
+			System.out.print("Enter country                        : ");
+			String country = sc.nextLine().trim();
+			System.out.print("Enter nationality                    : ");
+			String nationality = sc.nextLine().trim();
+			System.out.print("Enter gender                         : ");
+			String gender = sc.nextLine().trim();
+			System.out.print("Enter contact                        : ");
+			String contact = sc.nextLine().trim();
+			System.out.print("Enter identity                       : ");
+			String identity = sc.nextLine().trim();
+			Date startDate= new Date();
+			Date endDate= new Date();
+			if (isForReservation) {
+				System.out.print("Enter date of check-in (MM/DD/YYYY)  : ");
+				startDate=new Date(sc.nextLine().trim());
+				if (startDate.compareTo(currentDate) < 0) {
+					throw new InvalidReservationDetailException();
+				}
+			}
+			else {
+				startDate = currentDate;
+			}
+			System.out.print("Enter date of check-out (MM/DD/YYYY) : ");
+			endDate=new Date(sc.nextLine().trim());	
+			if (startDate.compareTo(endDate) >= 0) {
 				throw new InvalidReservationDetailException();
 			}
-		}
-		else {
-			startDate = currentDate;
-		}
-		System.out.print("Enter date of check-out (MM/DD/YYYY) : ");
-		endDate=new Date(sc.nextLine().trim());	
-		if (startDate.compareTo(endDate) >= 0) {
-			throw new InvalidReservationDetailException();
-		}
-		
-			return new Guest(guestName, cardDetails, address, country, 
-					gender, nationality, Integer.parseInt(contact), identity,startDate,endDate);
+			
+				return new Guest(guestName, cardDetails, address, country, 
+						gender, nationality, Integer.parseInt(contact), identity,startDate,endDate);
 		}
 		catch (IllegalArgumentException e) {
 			throw new InvalidGuestDetailException();
@@ -474,56 +474,47 @@ public class HotelApp {
 	public static void showMenuF(Hotel hotel) {
 
 		Scanner sc = new Scanner(System.in);
-			
-			Date startDate = new Date();
-			Date endDate = new Date();
+		Date startDate = new Date();
+		Date endDate = new Date();
+
+		System.out.println("Enter start date in the following format: MM/DD/YYYY");
 				
-				
-			System.out.println("Enter start date in the following format: MM/DD/YYYY");
-				
-			try {
-				startDate= new Date(sc.nextLine().trim());
-		
-				System.out.println("Enter end date in the following format: MM/DD/YYYY");
-				int checker=1;
+		try {
+			startDate= new Date(sc.nextLine().trim());
+			System.out.println("Enter end date in the following format: MM/DD/YYYY");
+			int checker=1;
+			while(checker==1) {
 	
-				while(checker==1) {
-	
-					endDate= new Date(sc.nextLine().trim());
-						
-					if(endDate.compareTo(startDate)>0) {
-							checker=0;
-					}
-					else {
-						System.out.println("End date must be after startDate, enter another end date:");
-					}
-				}
-						
-				System.out.println("Enter roomType:");
-				String roomType=sc.next().trim();
-					
-				boolean roomTypeChecker = false;
-				while(roomTypeChecker == false) {
-					roomTypeChecker=hotel.roomTypeExists(roomType);
-					if(roomTypeChecker==false) {
-						System.out.println("Invalid room type. Try again:");
-						roomType = sc.next().trim();
-					}
-				}
-					
-				if(hotel.checkRoomAvailability(startDate, endDate, roomType)==true) {
-					System.out.println("Room type is available.");
+				endDate= new Date(sc.nextLine().trim());	
+				if(endDate.compareTo(startDate)>0) {
+						checker=0;
 				}
 				else {
-					System.out.println("Room type is not available.");
-				}		
-				}catch(RoomTypeNotFoundException | IllegalArgumentException e) {
-					System.out.println(e.getMessage());
+					System.out.println("End date must be after startDate, enter another end date:");
+				}
+			}		
+			
+			System.out.println("Enter roomType:");
+			String roomType=sc.next().trim();
+					
+			boolean roomTypeChecker = false;
+			while(roomTypeChecker == false) {
+				roomTypeChecker=hotel.roomTypeExists(roomType);
+				if(roomTypeChecker==false) {
+					System.out.println("Invalid room type. Try again:");
+					roomType = sc.next().trim();
+				}
 			}
-			
-			
-}
-	
+			if(hotel.checkRoomAvailability(startDate, endDate, roomType)==true) {
+				System.out.println("Room type is available.");
+			}
+			else {
+				System.out.println("Room type is not available.");
+			}		
+			}catch(RoomTypeNotFoundException | IllegalArgumentException e) {
+					System.out.println(e.getMessage());
+		}		
+	}
 	/**
 	 * A function to show the functional requirements of G
 	 * @param hotel
@@ -561,7 +552,7 @@ public class HotelApp {
 				System.out.println("Enter the room number guest will be assigned to:");
 				System.out.println("Guest's chosen room type is "+roomType+".");
 				String roomNo=sc.next().trim();
-				
+			
 				try{
 					checker=hotel.checkIn(tempGuest, roomNo, roomType,tempreservation);
 				
@@ -579,18 +570,12 @@ public class HotelApp {
 			else {
 				System.out.println("Reservation Id is invalid.");
 			}
-			
-			
 		}
-		
 		else if(hasReservation.equals("n")||hasReservation.equals("N")) {
 			//create new guest object and assign to room
 			try {
-								
-				
 				Reservation reservation = HotelApp.createNewReservation(
 						false,hotel.getReservationSystem().generateNewId(), hotel.getAvailableRoomTypes(), hotel.getCurrentDate());
-				
 				
 				boolean roomNoChecker=false;
 				
@@ -601,32 +586,34 @@ public class HotelApp {
 						roomNoChecker=hotel.checkIn(reservation.getGuest(), roomNo, reservation.getRoomType());
 					
 					
-					if(roomNoChecker==true) {
-						System.out.println("Check-in successful!");
-						hotel.getReservationSystem().addReservation(reservation, hotel.getRooms(
-								reservation.getRoomType()));
+						if(roomNoChecker==true) {
+							System.out.println("Check-in successful!");
+							hotel.getReservationSystem().addReservation(reservation, hotel.getRooms(
+									reservation.getRoomType()));
 						
-						hotel.getReservationSystem().updateAllReservationStatus(reservation.getReservationId(),"checked-in",reservation.getRoomType());
-					}
-					else {
-						System.out.println("Room is currently unavailable. Choose another room.");
-						reservation=null;
-					}
-					}catch (RoomNotFoundException e) {
+							hotel.getReservationSystem().updateAllReservationStatus(reservation.getReservationId(),"checked-in",reservation.getRoomType());
+						}
+						else {
+							System.out.println("Room is currently unavailable. Choose another room.");
+							reservation=null;
+						}
+						}catch (RoomNotFoundException e) {
 						System.out.println(e.getMessage());
-					}
+						}
 				}else {
 					System.out.println("Room type is currently fully booked. Guest is not assigned to a room and the details will be deleted.");
 					reservation=null;
-					
-				}
-				
-			} catch(InvalidGuestDetailException |RoomTypeNotFoundException | 
+				}	
+				}catch(InvalidGuestDetailException |RoomTypeNotFoundException | 
 					InvalidReservationDetailException | DuplicateReservationFoundException | IdGenerationFailedException e) {
 					System.out.println(e.getMessage());
 			  }
 			}
 		}
+	/**
+	 * Show the functions of H
+	 * @param hotel
+	 */
 	public static void showMenuH(Hotel hotel) {
 		Scanner sc = new Scanner(System.in);
 		System.out.println("Enter room number to check out: ");

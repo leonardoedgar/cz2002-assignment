@@ -93,9 +93,7 @@ public class Hotel {
 				};
 			roomTable.put(roomType, roomDataPerLevel);
 			floorNo += 1;
-		}
-		
-		
+		}		
 	}
 	
 	/**
@@ -296,7 +294,6 @@ public class Hotel {
 		return roomTypes;
 	}
 	
-	
 	/**
 	 * A function to check for Date clashes
 	 * @param newStartDate {Date} Start date of new guest
@@ -399,9 +396,6 @@ public class Hotel {
 		return roomsClash;
 	}
 		
-
-	
-	
 	/**
 	 * A function to check if there are any rooms of a particular room type available
 	 * @param startDate {Date} Start date of new guest
@@ -488,8 +482,7 @@ public class Hotel {
 			
 			tempRoom.assignGuestToRoom(guest);
 			tempRoom.updateStatus("occupied");
-			
-			
+
 			this.reservationSystem.updateAllReservationStatus(reservation.getReservationId(),"checked-in",roomType);
 
 			return true;
@@ -562,9 +555,7 @@ public class Hotel {
 			}
 		} catch (NullPointerException e) {
 			throw new GuestNotFoundException();
-		}
-		
-		
+		}	
 	}
 
 	/**
