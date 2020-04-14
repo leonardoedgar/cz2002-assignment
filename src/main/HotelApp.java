@@ -115,7 +115,7 @@ public class HotelApp {
 				break;
 			}
 			case "b": {
-				System.out.println("Enter guest name to display his/her details: ");
+				System.out.print("Enter guest name to display his/her details: ");
 				try {
 					hotel.printGuestDetailsByName(HotelApp.scanner.nextLine().trim());
 				} catch (GuestNotFoundException e) {
@@ -208,8 +208,7 @@ public class HotelApp {
 		String roomType = HotelApp.scanner.nextLine().trim();
 		System.out.print("Enter number of people                              : ");
 		int numOfPeople = Integer.parseInt(HotelApp.scanner.nextLine().trim());
-		System.out.print("Enter payment type                                  : ");
-		String paymentType = HotelApp.scanner.nextLine().trim();
+		String paymentType = guest.getPaymentType();
 		if (checkInDate.compareTo(checkOutDate) >=0 || !roomTypes.contains(roomType)) {
 			throw new InvalidReservationDetailException();
 		}
@@ -244,8 +243,8 @@ public class HotelApp {
 		String contact = HotelApp.scanner.nextLine().trim();
 		System.out.print("Enter identity (driving license or passport number) : ");
 		String identity = HotelApp.scanner.nextLine().trim();
-		Date startDate= new Date();
-		Date endDate= new Date();
+		Date startDate = new Date();
+		Date endDate = new Date();
 		try {
 			if (isForReservation) {
 				System.out.print("Enter date of check-in (MM/DD/YYYY)                 : ");
@@ -259,14 +258,16 @@ public class HotelApp {
 				startDate = currentDate;
 			}
 			System.out.print("Enter date of check-out (MM/DD/YYYY)                : ");
-			endDate=new Date(HotelApp.scanner.nextLine().trim());	
+			endDate = new Date(HotelApp.scanner.nextLine().trim());	
 			if (startDate.compareTo(endDate) >= 0) {
 				throw new InvalidReservationDetailException("Check out date "
 						+ "cannot be before the check in date.");
 			}
-		
+			System.out.print("Enter payment type                                  : ");
+			String paymentType = HotelApp.scanner.nextLine().trim();
 			return new Guest(guestName, cardDetails, address, country, 
-					gender, nationality, Integer.parseInt(contact), identity,startDate,endDate);
+					gender, nationality, Integer.parseInt(contact), identity, startDate, endDate, 
+					paymentType);
 		}
 		catch (IllegalArgumentException e) {
 			throw new InvalidGuestDetailException();
@@ -449,27 +450,30 @@ public class HotelApp {
 	public static void showMenuF(Hotel hotel) {
 		Date startDate = new Date();
 		Date endDate = new Date();
-		System.out.print("Enter start date in the following format (MM/DD/YYYY): ");
+		boolean isUserInputValid = false;
 		try {
-			startDate= new Date(HotelApp.scanner.nextLine().trim());
-			System.out.println("Enter end date in the following format (MM/DD/YYYY): ");
-			boolean isUserInputValid = false;
-			while(isUserInputValid) {
+			while (!isUserInputValid) {
+				System.out.print("Enter start date in the following format (MM/DD/YYYY): ");
+				startDate = new Date(HotelApp.scanner.nextLine().trim());
+				System.out.print("Enter end date in the following format (MM/DD/YYYY)  : ");
 				endDate= new Date(HotelApp.scanner.nextLine().trim());
-				if(endDate.compareTo(startDate)>0) {
-					isUserInputValid = true;
+				if (startDate.compareTo(hotel.getCurrentDate()) < 0) {
+					System.out.println("Start date must be from today's date onwards. Retry.");
+				}
+				else if (endDate.compareTo(startDate) <= 0) {
+					System.out.println("End date must be after start date. Retry.");
 				}
 				else {
-					System.out.println("End date must be after start date, enter another end date:");
+					isUserInputValid = true;
 				}
 			}
-			System.out.println("Enter room type: ");
+			System.out.print("Enter room type                                      : ");
 			String roomType = HotelApp.scanner.nextLine().trim();
 			boolean roomTypeExists = false;
 			while(!roomTypeExists) {
 				roomTypeExists = hotel.doesRoomTypeExists(roomType);
 				if(!roomTypeExists) {
-					System.out.println("Invalid room type. Try again: ");
+					System.out.print("Invalid room type. Try again: ");
 					roomType = HotelApp.scanner.nextLine().trim();
 				}
 			}

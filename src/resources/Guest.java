@@ -41,7 +41,8 @@ public class Guest {
 	 * @param endDateOfStay {Date} end date of guest's stay
 	 */
 	public Guest(String name, String cardDetails, String address, String country, String gender, 
-			String nationality, int contact, String identity,Date startDateOfStay,Date endDateOfStay) {
+			String nationality, int contact, String identity,Date startDateOfStay,Date endDateOfStay,
+			String paymentType) {
 		this.name = name;
 		this.cardDetails = cardDetails;
 		this.address = address;
@@ -53,7 +54,7 @@ public class Guest {
 		this.roomServiceList = new ArrayList<RoomService>();
 		this.startDateOfStay=startDateOfStay;
 		this.endDateOfStay=endDateOfStay;
-
+		this.paymentType=paymentType;
 	}
 	
 	/**
@@ -176,5 +177,13 @@ public class Guest {
 		Payment payment = new Payment(this.paymentType, roomType, roomCost*numberOfDays, 
 				this.roomServiceList);
 		payment.printReceipt();
+	}
+	
+	/**
+	 * A function to get the guest payment type.
+	 * @return {String} the payment type
+	 */
+	public String getPaymentType() {
+		return this.paymentType;
 	}
 }

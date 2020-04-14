@@ -71,7 +71,7 @@ public class Payment {
 			String.format("%.2f", taxAmount));
 		System.out.println("Total cost after tax\t: SGD" + 
 			String.format("%.2f", totalCost));
-		System.out.println("Payment made by\t: " + this.paymentType);
+		System.out.println("Payment made by\t\t: " + this.paymentType);
 		System.out.println("===================================");
 		System.out.println("  THANK YOU FOR STAYING WITH US!");
 		System.out.println("           SEE YOU AGAIN!");

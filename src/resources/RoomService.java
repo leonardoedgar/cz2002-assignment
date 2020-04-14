@@ -56,10 +56,10 @@ public class RoomService {
 			for (String foodName: this.orderMap.keySet()) {
 				String foodQuantity = this.orderMap.get(foodName);
 				try {
-					double costPerFood = 
+					double totalCostPerFood = 
 							this.menu.getCostOfAFood(foodName)*Integer.parseInt(foodQuantity);
-					System.out.println(foodQuantity + " " + foodName + "\t: SGD" + 
-							String.format("%.2f", costPerFood));	
+					System.out.println(foodQuantity + " " + foodName + ": SGD" + 
+							String.format("%.2f", totalCostPerFood));	
 				} catch (FoodNotOnMenuException e) {
 					continue;
 				}
