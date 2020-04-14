@@ -386,8 +386,35 @@ public class ReservationSystem {
 				}
 			}
 		}
-		
 		return null;
 	}
 	
+	/**
+	 * A function to remove reservation by the guest and the room type.
+	 * @param aGuest {Guest} the guest object
+	 * @param aRoomType {String} the room type
+	 * @param numberOfRooms {int} the number of rooms that are available for the specified room type
+	 * @throws {ReservationNotFoundException} when reservation to be removed is not found 
+	 */
+	public void removeReservationByGuestAndRoomType(Guest aGuest, String aRoomType, int numberOfRooms) 
+			throws ReservationNotFoundException {
+		String reservationId = null;
+		for (String date: this.reservationTable.keySet()) {
+			for (String roomType: this.reservationTable.get(date).keySet()) {
+				for (Reservation reservation: this.reservationTable.get(date).get(roomType)) {
+					if (Guest.isIdentical(reservation.getGuest(), aGuest) && 
+							reservation.getRoomType().equals(aRoomType)) {
+						reservationId = reservation.getReservationId();
+						break;
+					}
+				}
+			}
+		}
+		if (reservationId != null) {
+			this.removeReservation(reservationId, numberOfRooms);
+		}
+		else {
+			throw new ReservationNotFoundException();
+		}
+	}
 }

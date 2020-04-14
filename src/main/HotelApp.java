@@ -227,8 +227,8 @@ public class HotelApp {
 		System.out.print("Enter reservation ID                 : ");
 		String reservationId = sc.nextLine().trim();
 		Guest guest = HotelApp.createNewGuest(true, currentDate);
-		Date checkInDate=guest.getstartDate();
-		Date checkOutDate = guest.getendDate();
+		Date checkInDate=guest.getStartDateOfStay();
+		Date checkOutDate = guest.getEndDateOfStay();
 		System.out.print("Enter room type                      : ");
 		String roomType = sc.nextLine().trim();
 		System.out.print("Enter number of people               : ");
@@ -598,7 +598,8 @@ public class HotelApp {
 				
 				boolean roomNoChecker=false;
 				
-				if(hotel.checkRoomAvailability(newGuest.getstartDate(), newGuest.getendDate(), roomType)==true) {
+				if(hotel.checkRoomAvailability(newGuest.getStartDateOfStay(), 
+						newGuest.getEndDateOfStay(), roomType)==true) {
 					System.out.println("Enter the room number guest will be assigned to:");
 					String roomNo=sc.next().trim();
 					try{

@@ -10,6 +10,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import exception.HotelSetupFailureException;
+import exception.ReservationNotFoundException;
 import exception.RoomNotFoundException;
 import exception.FoodNotOnMenuException;
 import exception.RoomTypeNotFoundException;
@@ -202,15 +203,6 @@ public class Hotel {
 		}
 		throw new RoomNotFoundException();
 	}
-//	public Room getRoomByNo(String Room_num){
-//		for (String roomType: this.roomTable.keySet()) {
-//			for (String roomNo: this.roomTable.get(roomType).keySet()) {
-//				if ((roomType+"-"+roomNo).equals(Room_num)) {
-//					return this.roomTable.get(roomType).get(roomNo);
-//				}
-//			}
-//		}
-//	}
 
 	/**
 	 * details refer to the choice of information to be updated by the user of this app.
@@ -356,7 +348,8 @@ public class Hotel {
 				if(tempTable.get(key).getGuest()!=null) {
 					Room tempRoom = tempTable.get(key);
 					Guest tempGuest = tempRoom.getGuest();
-					roomsClash=roomsClash+checkDateClash(startDate,endDate,tempGuest.getstartDate(),tempGuest.getendDate()); //if dates clash, minus 1 from available rooms of that roomType
+					roomsClash=roomsClash+checkDateClash(startDate, endDate, 
+							tempGuest.getStartDateOfStay(),tempGuest.getEndDateOfStay()); //if dates clash, minus 1 from available rooms of that roomType
 				}
 	
 			}
@@ -548,6 +541,20 @@ public class Hotel {
 				String roomType = this.getRoomTypeFromRoomNo(roomNo);
 				guestToCheckOut.makePayment(roomType, guestRoom.getRoomCost());
 				guestRoom.removeGuest();
+				int numberOfRooms;
+				switch (roomType) {
+					case "single": numberOfRooms = this.noOfAvailable_single; break;
+					case "double": numberOfRooms = this.noOfAvailable_double; break;
+					case "deluxe": numberOfRooms = this.noOfAvailable_deluxe; break;
+					case "vip": numberOfRooms = this.noOfAvailable_vip; break;
+					default: throw new RoomNotFoundException();
+				}
+				try {
+					this.getReservationSystem().removeReservationByGuestAndRoomType(guestToCheckOut,
+							roomType, numberOfRooms);
+				} catch (ReservationNotFoundException e) {
+					
+				}
 				return true;
 			}
 			else {
@@ -556,8 +563,6 @@ public class Hotel {
 		} catch (NullPointerException e) {
 			throw new GuestNotFoundException();
 		}
-		
-		
 	}
 
 	/**
