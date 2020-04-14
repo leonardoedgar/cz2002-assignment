@@ -1,5 +1,6 @@
 package resources;
 import java.util.Date;
+import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,53 +21,25 @@ public class ReservationSystem {
 				new ConcurrentHashMap<String, ConcurrentHashMap<String, ArrayList<Reservation>>>();
 	}
 	
-	
-	private String currentReservationId="R000000001";
-	private String walkInId="W000000001";
-	
 	/**
-	 * A function to provide a reservationId to a new reservation object
-	 * @return {String} the new reservationId
+	 * A function to generate a new random alphanumeric ReservationId of length 10
+	 * @return {String} the new ReservationId
 	 */
-	public String setReservationId() {
-		String reservationId = this.currentReservationId;
-		updateReservationId();
-		return reservationId;
-	}
-	
-	/**
-	 * A function to update the reservationId
-	 */
-	public void updateReservationId() {
-		String reservationIdNumber = this.currentReservationId.substring(1);
-		int reservationNumber = Integer.parseInt(reservationIdNumber);
-		reservationNumber=reservationNumber+1;
-		reservationIdNumber = String.format("%09d",reservationNumber);
-		this.currentReservationId=this.currentReservationId.substring(0, 1)+reservationIdNumber;
+	public String generateNewId() {
+		String validIdCharacters="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+		int idLength=10;
+		StringBuilder newReservationId = new StringBuilder(idLength);
 		
-	}
-	
-	/**
-	 * A function to provide a walkInId to a new reservation object when created through the checkIn function
-	 * @return {String} the new walkInId
-	 */
-	public String setWalkInId() {
-		String walkInId = this.walkInId;
-		updateWalkInId();
-		return walkInId;
-	}
-	
-	/**
-	 * A function to update the walkInId
-	 */
-	public void updateWalkInId() {
-		String reservationIdNumber = this.walkInId.substring(1);
-		int walkInNumber = Integer.parseInt(reservationIdNumber);
-		walkInNumber=walkInNumber+1;
-		reservationIdNumber = String.format("%09d",walkInNumber);
-		this.walkInId=this.walkInId.substring(0, 1)+reservationIdNumber;
+		do {
+		for(int i=0;i<idLength;i++) {
+			int index = (int) (Math.random()*validIdCharacters.length());
+			newReservationId.append(validIdCharacters.charAt(index));
+		}
+		}while(doesDuplicateReservationIdExist(newReservationId.toString()));
 		
+		return newReservationId.toString();
 	}
+	
 	
 	/**
 	 * A function to update the reservation status of all reservation objects with the corresponding reservationId

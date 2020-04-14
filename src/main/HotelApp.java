@@ -32,8 +32,6 @@ public class HotelApp {
 		try {
 			Hotel hotel = new Hotel("src/data/roomConfig.txt");
 			
-		
-			
 			Menu menu = new Menu("src/data/menu.txt");
 			while (!exitApp) {
 				HotelApp.printHotelAppMenu();
@@ -165,7 +163,7 @@ public class HotelApp {
 			case "A": {
 				try {
 					Reservation reservation = HotelApp.createNewReservation(
-							true,hotel.getReservationSystem().setReservationId(),hotel.getAvailableRoomTypes(), hotel.getCurrentDate());
+							true,hotel.getReservationSystem().generateNewId(),hotel.getAvailableRoomTypes(), hotel.getCurrentDate());
 					hotel.getReservationSystem().addReservation(reservation, hotel.getRooms(
 							reservation.getRoomType()));
 					if (!hotel.checkRoomAvailability(reservation.getDateOfCheckIn(), 
@@ -184,7 +182,7 @@ public class HotelApp {
 			case "B": {
 				try {
 					Reservation reservation = HotelApp.createNewReservation(
-							true,hotel.getReservationSystem().setReservationId(),hotel.getAvailableRoomTypes(), hotel.getCurrentDate());
+							true,hotel.getReservationSystem().generateNewId(),hotel.getAvailableRoomTypes(), hotel.getCurrentDate());
 					hotel.getReservationSystem().updateReservation(
 						reservation, hotel.getRooms(reservation.getRoomType()) );
 					System.out.println("Reservation updated successfully!\n");
@@ -590,7 +588,7 @@ public class HotelApp {
 								
 				
 				Reservation reservation = HotelApp.createNewReservation(
-						false,hotel.getReservationSystem().setWalkInId(), hotel.getAvailableRoomTypes(), hotel.getCurrentDate());
+						false,hotel.getReservationSystem().generateNewId(), hotel.getAvailableRoomTypes(), hotel.getCurrentDate());
 				
 				
 				boolean roomNoChecker=false;

@@ -418,7 +418,6 @@ public class Hotel {
 		
 		int roomsLeftForDate=this.getRooms(roomType); 
 		roomsLeftForDate=roomsLeftForDate-checkHotelClash(startDate,endDate,roomType)-checkReservationClash(startDate,endDate,roomType);
-		System.out.println("rooms left"+roomsLeftForDate);
 		if(roomsLeftForDate<=0) {
 			return false; //not available
 		}
