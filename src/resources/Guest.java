@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 import exception.FoodNotOnMenuException;
 import exception.GuestDetailUpdateFailureException;
+import exception.GuestNotFoundException;
 import exception.OrderIdNotFoundException;
 import resources.Payment;
 
@@ -246,11 +247,19 @@ public class Guest {
 	/**
 	 * To print the roomservicelist per guest
 	 */
-	public void printRoomServiceList() throws NullPointerException {
-		System.out.println("The list of orders are as follows:");
-		for(RoomService rs: this.roomServiceList) {
-			System.out.println("Order ID: "+rs.getOrderId() +"\n"+"Order Status: "+ rs.getStatus()+"\n"+ "List of Orders: "+ rs.getOrderMap());
-
+	public void printRoomServiceList() throws GuestNotFoundException {
+		try {
+			System.out.println("The list of orders are as follows:");
+			for(RoomService rs: this.roomServiceList) {
+				System.out.println("-------------------------------------");
+				System.out.println("Order ID: "+rs.getOrderId() +"\n"+
+							"Order Status: "+ rs.getStatus()+"\n"+ 
+							"List of Orders: "+ rs.getOrderMap());
+				System.out.println("-------------------------------------");
+			}
+		}
+		catch(NullPointerException e){
+			throw new GuestNotFoundException();
 		}
 	}
 	

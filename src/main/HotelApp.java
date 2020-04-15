@@ -467,8 +467,8 @@ public class HotelApp {
 					guest.printRoomServiceList();
 				} catch (RoomNotFoundException e) {
 					System.out.println(e.getMessage());
-				} catch (NullPointerException e) {
-					System.out.println("No order is available");
+				} catch (GuestNotFoundException | NullPointerException e) {
+					System.out.println("No Guest Assigned to The Room");
 				}
 				break;
 				
