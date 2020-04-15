@@ -282,7 +282,8 @@ public class HotelApp {
 						+ "cannot be before the check in date.");
 			}
 			return new Guest(guestName, cardDetails, address, country, 
-					gender, nationality, Integer.parseInt(contact), identity, paymentType, startDate, endDate);
+					gender, nationality, Integer.parseInt(contact), identity, 
+					paymentType, startDate, endDate);
 		}
 		catch (IllegalArgumentException e) {
 			throw new InvalidGuestDetailException();
@@ -616,7 +617,10 @@ public class HotelApp {
 					String roomType = tempreservation.getRoomType();
 					Guest tempGuest = tempreservation.getGuest();
 					boolean success = false;
-					System.out.println(hotel.printAvailableRoomNoByRoomType(roomType));
+					String vacantRoomListString = 
+							hotel.getRoomTypeToVacantRoomNoListTable(true).get(roomType).toString();
+					System.out.println("Available rooms: " + vacantRoomListString.substring(1,
+							vacantRoomListString.length()-1));
 					System.out.print("Enter the room number guest will be assigned to: ");
 					String roomNo = HotelApp.scanner.nextLine().trim();
 					try{
@@ -664,7 +668,10 @@ public class HotelApp {
 					boolean roomNoAvailable = false;
 					if(hotel.checkRoomAvailability(newGuest.getStartDateOfStay(), newGuest.getEndDateOfStay(), 
 							roomType)) {
-						System.out.println(hotel.printAvailableRoomNoByRoomType(roomType));
+						String vacantRoomListString = 
+								hotel.getRoomTypeToVacantRoomNoListTable(true).get(roomType).toString();
+						System.out.println("Available rooms: " + vacantRoomListString.substring(1,
+								vacantRoomListString.length()-1));
 						System.out.print("Enter the room number to assign to                  : ");
 						String roomNo = HotelApp.scanner.nextLine().trim();
 						try{
