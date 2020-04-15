@@ -93,9 +93,7 @@ public class Hotel {
 				};
 			roomTable.put(roomType, roomDataPerLevel);
 			floorNo += 1;
-		}
-		
-		
+		}		
 	}
 	
 	/**
@@ -296,7 +294,6 @@ public class Hotel {
 		return roomTypes;
 	}
 	
-	
 	/**
 	 * A function to check for Date clashes
 	 * @param newStartDate {Date} Start date of new guest
@@ -356,7 +353,7 @@ public class Hotel {
 				if(tempTable.get(key).getGuest()!=null) {
 					Room tempRoom = tempTable.get(key);
 					Guest tempGuest = tempRoom.getGuest();
-					roomsClash=roomsClash+checkDateClash(startDate,endDate,tempGuest.getstartDate(),tempGuest.getendDate()); //if dates clash, minus 1 from available rooms of that roomType
+					roomsClash=roomsClash+checkDateClash(startDate,endDate,tempGuest.getStartDate(),tempGuest.getEndDate()); //if dates clash, minus 1 from available rooms of that roomType
 				}
 	
 			}
@@ -375,25 +372,30 @@ public class Hotel {
 		int roomsClash=0;
 		
 		ArrayList<Reservation> tempList = new ArrayList<Reservation>();
+		ArrayList<String> reservationIdInDateRange = new ArrayList<String>();
+		
 		//checks for date clashes with guests in the reservation system
 		tempList=reservationSystem.getRoomTypeReservation(roomType);
 		
+		
 		//pass in start and end date of reservation
 		for(int i=0;i<tempList.size();i++){
-			//check each reservation with selected roomType
-			Reservation tempres=tempList.get(i);
-			if(!tempres.getStatus().contentEquals("checked-in")) {
-				roomsClash=roomsClash+checkDateClash(startDate,endDate,tempres.getDateOfCheckIn(),tempres.getDateOfCheckOut());
+			Reservation tempRes=tempList.get(i);
+			
+			if(!(reservationIdInDateRange.contains(tempRes.getReservationId()))) {
+				//add new id to arraylist
+				reservationIdInDateRange.add(tempRes.getReservationId());
+		
+				if(!tempRes.getStatus().contentEquals("checked-in")) {
+							roomsClash=roomsClash+checkDateClash(startDate,endDate,tempRes.getDateOfCheckIn(),tempRes.getDateOfCheckOut());
+					}
+				}
+				
 			}
-			
-			
-		}
 		
 		return roomsClash;
-		
 	}
-	
-	
+		
 	/**
 	 * A function to check if there are any rooms of a particular room type available
 	 * @param startDate {Date} Start date of new guest
@@ -408,11 +410,8 @@ public class Hotel {
 			return false;
 		}
 		
-		int roomsLeftForDate=this.getRooms(roomType); //currently hardcoded to 12 until code is combined
-
-		//checkHotel method
+		int roomsLeftForDate=this.getRooms(roomType); 
 		roomsLeftForDate=roomsLeftForDate-checkHotelClash(startDate,endDate,roomType)-checkReservationClash(startDate,endDate,roomType);
-
 		if(roomsLeftForDate<=0) {
 			return false; //not available
 		}
@@ -483,7 +482,8 @@ public class Hotel {
 			
 			tempRoom.assignGuestToRoom(guest);
 			tempRoom.updateStatus("occupied");
-			reservation.updateStatus("checked-in");
+
+			this.reservationSystem.updateAllReservationStatus(reservation.getReservationId(),"checked-in",roomType);
 
 			return true;
 		}
@@ -555,9 +555,7 @@ public class Hotel {
 			}
 		} catch (NullPointerException e) {
 			throw new GuestNotFoundException();
-		}
-		
-		
+		}	
 	}
 
 	/**
