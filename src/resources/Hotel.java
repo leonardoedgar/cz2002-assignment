@@ -677,7 +677,11 @@ public class Hotel {
 			throw new RoomTypeNotFoundException();
 		}
 	}
-	
+	/**
+	 * A function to print available rooms for a given room type
+	 * @param roomType {String} the room type 
+	 * @return {String} A string of the available rooms
+	 */
 	public String printAvailableRoomNoByRoomType(String roomType) {
 		StringBuilder vacantRooms = new StringBuilder();
 		vacantRooms=vacantRooms.append("Available rooms: ");
