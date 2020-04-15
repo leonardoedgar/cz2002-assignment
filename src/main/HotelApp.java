@@ -587,6 +587,7 @@ public class HotelApp {
 	 * A function to show the functional requirements of G
 	 * @param hotel
 	 */
+	@SuppressWarnings("deprecation")
 	public static void showMenuG(Hotel hotel){
 		if (new Date().getTime() < hotel.getCheckInDate().getTime()) {
 			System.out.println("Check-in is only available from 2PM");
@@ -615,7 +616,7 @@ public class HotelApp {
 					String roomType = tempreservation.getRoomType();
 					Guest tempGuest = tempreservation.getGuest();
 					boolean success = false;
-          System.out.println(hotel.printAvailableRoomNoByRoomType(roomType));
+					System.out.println(hotel.printAvailableRoomNoByRoomType(roomType));
 					System.out.print("Enter the room number guest will be assigned to: ");
 					String roomNo = HotelApp.scanner.nextLine().trim();
 					try{
@@ -652,24 +653,28 @@ public class HotelApp {
 							roomType = HotelApp.scanner.nextLine().trim();
 						}
 					}
-					Reservation reservation =null;
-					if(((int)(newGuest.getEndDateOfStay().getTime()-newGuest.getStartDateOfStay().getTime())/(1000*60*60*24)) > 1) {
-						reservation = new Reservation(hotel.getReservationSystem().generateNewId(), newGuest, newGuest.getStartDateOfStay(), 
-								newGuest.getEndDateOfStay(), numOfPeople, paymentType,roomType);
+					Reservation reservation = null;
+					if(((int)(new Date(
+							newGuest.getEndDateOfStay().toLocaleString().split(",")[0]).getTime() - 
+							new Date(newGuest.getStartDateOfStay().toLocaleString(
+									).split(",")[0]).getTime())/(1000*60*60*24)) > 1) {
+						reservation = new Reservation(hotel.getReservationSystem().generateNewId(), newGuest, 
+								newGuest.getStartDateOfStay(), newGuest.getEndDateOfStay(), numOfPeople, paymentType, roomType);
 					}
 					boolean roomNoAvailable = false;
 					if(hotel.checkRoomAvailability(newGuest.getStartDateOfStay(), newGuest.getEndDateOfStay(), 
 							roomType)) {
-            System.out.println(hotel.printAvailableRoomNoByRoomType(roomType));
+						System.out.println(hotel.printAvailableRoomNoByRoomType(roomType));
 						System.out.print("Enter the room number to assign to                  : ");
 						String roomNo = HotelApp.scanner.nextLine().trim();
 						try{
 							roomNoAvailable = hotel.checkIn(newGuest, roomNo, roomType);
 							if(roomNoAvailable) {
 								if(reservation != null) {
-								hotel.getReservationSystem().addReservation(reservation, 
-										hotel.getNumberOfRoomsByRoomType(reservation.getRoomType()));
-								hotel.getReservationSystem().updateAllReservationStatus(reservation.getReservationId(),"checked-in",reservation.getRoomType());
+									hotel.getReservationSystem().addReservation(reservation, 
+											hotel.getNumberOfRoomsByRoomType(reservation.getRoomType()));
+									hotel.getReservationSystem().updateAllReservationStatus(reservation.getReservationId(), 
+											"checked-in", reservation.getRoomType());
 								}
 								System.out.println("Check-in successful!");
 							}

@@ -742,7 +742,7 @@ public class Hotel {
 	 */
 	public int getCheckOutTimeInMilliSeconds() {
 		return this.checkOutTimeInMilliSeconds;
-
+	}
 	/**
 	 * A function to print available rooms for a given room type
 	 * @param roomType {String} the room type 

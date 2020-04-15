@@ -49,14 +49,12 @@ public class ReservationSystem {
 	 * @param reservationId {String} the reservationId
 	 * @param updatedStatus {String} the new status of the reservation
 	 */
-	public void updateAllReservationStatus(String reservationId, String updatedStatus,String roomType) {
-		
+	public void updateAllReservationStatus(String reservationId, String updatedStatus, String roomType) {
 		for(String date: this.reservationTable.keySet()) {
-			for(Reservation reservation:this.reservationTable.get(date).get(roomType)) {
-				if(reservation.getReservationId().equals(reservationId)){
+			for(Reservation reservation: this.reservationTable.get(date).get(roomType)) {
+				if(reservation.getReservationId().equals(reservationId)) {
 					reservation.updateStatus(updatedStatus);
 				}
-				
 			}
 		}
 	}

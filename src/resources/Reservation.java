@@ -26,20 +26,21 @@ public class Reservation {
 	 * @param roomType {String} the room type
 	 */
 	public Reservation(String reservationId,Guest guestDetails, Date dateOfCheckIn, Date dateOfCheckOut,
-			int noOfPeople,String paymentType,String status,String roomType){
-		this.reservationId=reservationId;
-		this.guestDetails=guestDetails;
-		this.dateOfCheckIn=dateOfCheckIn;
-		this.dateOfCheckOut=dateOfCheckOut;
-		this.noOfPeople=noOfPeople;
-		this.paymentType=paymentType;
-		this.status=status;
-		this.roomType=roomType;
+			int noOfPeople, String paymentType, String status, String roomType){
+		this.reservationId = reservationId;
+		this.guestDetails = guestDetails;
+		this.dateOfCheckIn = dateOfCheckIn;
+		this.dateOfCheckOut = dateOfCheckOut;
+		this.noOfPeople = noOfPeople;
+		this.paymentType = paymentType;
+		this.status = status;
+		this.roomType = roomType;
 	}
 	
 	public Reservation(String reservationId,Guest guestDetails, Date dateOfCheckIn, Date dateOfCheckOut,
-			int noOfPeople,String paymentType,String roomType){
-		this(reservationId, guestDetails,dateOfCheckIn,dateOfCheckOut,noOfPeople,paymentType,"not-received",roomType);
+			int noOfPeople, String paymentType, String roomType){
+		this(reservationId, guestDetails, dateOfCheckIn, dateOfCheckOut, noOfPeople, paymentType, 
+				"not-received", roomType);
 	}
 	
 	/**
