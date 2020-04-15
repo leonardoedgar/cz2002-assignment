@@ -52,16 +52,14 @@ public class RoomService {
 	 */
 	public void printOrderHistory() {
 		if (this.totalCost != 0) {
-			System.out.println("-----------------------------------");
 			System.out.println("Date of transaction: " + this.dateOfTransaction.toString());
 			for (String foodName: this.orderMap.keySet()) {
 				String foodQuantity = this.orderMap.get(foodName);
 				try {
-					double costPerFood = 
+					double totalCostPerFood = 
 							this.menu.getCostOfAFood(foodName)*Integer.parseInt(foodQuantity);
 					System.out.println(foodQuantity + " " + foodName + ": SGD" + 
-							costPerFood);	
-					System.out.println("-----------------------------------");
+							String.format("%.2f", totalCostPerFood));	
 				} catch (FoodNotOnMenuException e) {
 					continue;
 				}

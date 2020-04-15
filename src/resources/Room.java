@@ -1,7 +1,5 @@
 package resources;
 
-import exception.RoomNotFoundException;
-
 /**
  * A class to represent a room in a hotel.
  */
@@ -12,7 +10,7 @@ public class Room {
 	private double roomCost;
 	private String bedType; 
 	private String wifi;
-	public String view;
+	private String view;
 	private boolean smoking;
 	
 	/**
@@ -24,7 +22,7 @@ public class Room {
 	 * @param view {String} the view from the room
 	 * @param smoking {String} the smoking restriction
 	 */
-	Room(String roomNo, double roomCost, String bedType, String wifi, String view, String smoking) {
+	public Room(String roomNo, double roomCost, String bedType, String wifi, String view, String smoking) {
 		this.roomNo = roomNo;
 		this.status = "vacant";
 		this.roomCost = roomCost;
