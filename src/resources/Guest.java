@@ -18,8 +18,8 @@ public class Guest {
 	private String cardDetails;
 	private String address;
 	private String country;
-	private String gender;
 	private String nationality;
+	private String gender;
 	private int contact;
 	private String identity;
 	private String paymentType;
@@ -41,8 +41,8 @@ public class Guest {
 	 * @param endDateOfStay {Date} end date of guest's stay
 	 */
 	public Guest(String name, String cardDetails, String address, String country, String gender, 
-			String nationality, int contact, String identity,Date startDateOfStay,Date endDateOfStay,
-			String paymentType) {
+			String nationality, int contact, String identity, String paymentType, 
+			Date startDateOfStay, Date endDateOfStay) {
 		this.name = name;
 		this.cardDetails = cardDetails;
 		this.address = address;
@@ -50,11 +50,11 @@ public class Guest {
 		this.gender = gender;
 		this.nationality = nationality;
 		this.contact = contact;
-		this.identity=identity; 
+		this.identity = identity; 
 		this.roomServiceList = new ArrayList<RoomService>();
-		this.startDateOfStay=startDateOfStay;
-		this.endDateOfStay=endDateOfStay;
-		this.paymentType=paymentType;
+		this.paymentType = paymentType;
+		this.startDateOfStay = startDateOfStay;
+		this.endDateOfStay = endDateOfStay;
 	}
 	
 	/**
@@ -70,7 +70,7 @@ public class Guest {
 	 * @return {String} the card detail
 	 */
 	public String getCardDetails() {
-		return cardDetails;
+		return this.cardDetails;
 	}
 	
 	/**
@@ -136,23 +136,23 @@ public class Guest {
 	 * A function to get date when guest will check in
 	 * @return {Date} the Date object
 	 */
-	public Date getstartDate() {
-		return startDateOfStay;
+	public Date getStartDateOfStay() {
+		return this.startDateOfStay;
 	}
 	
 	/**
 	 * A function to get date when guest will check out
 	 * @return {Date} the Date object
 	 */
-	public Date getendDate() {
-		return endDateOfStay;
+	public Date getEndDateOfStay() {
+		return this.endDateOfStay;
 	}
 	/**
 	 * A function to get identity number of the guest
 	 * @return {String} String of identity
 	 */
 	public String getIdentity() {
-		return identity;
+		return this.identity;
 	}
 	
 	/**
@@ -178,12 +178,72 @@ public class Guest {
 				this.roomServiceList);
 		payment.printReceipt();
 	}
+
+	/**
+	 * A function to get the address of the guest.
+	 * @return {String} the address of the guest
+	 */
+	public String getAddress() {
+		return this.address;
+	}
 	
 	/**
-	 * A function to get the guest payment type.
+	 * A function to get the country where the guest comes from.
+	 * @return {String} the country
+	 */
+	public String getCountry() {
+		return this.country;
+	}
+	
+	/**
+	 * A function to get the nationality of the guest.
+	 * @return {String} the nationality
+	 */
+	public String getNationality() {
+		return this.nationality;
+	}
+	
+	/**
+	 * A function to get the gender of the guest.
+	 * @return {String} the gender
+	 */
+	public String getGender() {
+		return this.gender;
+	}
+	
+	/**
+	 * A function to get the contact number of the guest.
+	 * @return {int} the contact number
+	 */
+	public int getContact() {
+		return this.contact;
+	}
+	
+	/**
+	 * A function to get the payment type of the guest.
 	 * @return {String} the payment type
 	 */
 	public String getPaymentType() {
 		return this.paymentType;
+	}
+
+	/**
+	 * A function to check if 2 guests object are identical.
+	 * @param firstGuest {Guest} the first guest object
+	 * @param secondGuest {Guest} the second guest object
+	 * @return {boolean} whether the two guests objects are identical
+	 */
+	public static boolean isIdentical(Guest firstGuest, Guest secondGuest) {
+		return (firstGuest.getName().equals(secondGuest.getName()) && 
+				firstGuest.getCardDetails().equals(secondGuest.getCardDetails()) &&
+				firstGuest.getAddress().equals(secondGuest.getAddress()) && 
+				firstGuest.getCountry().equals(secondGuest.getCountry()) &&
+				firstGuest.getNationality().equals(secondGuest.getNationality()) &&
+				firstGuest.getGender().equals(secondGuest.getGender()) &&
+				firstGuest.getContact() == secondGuest.getContact() &&
+				firstGuest.getIdentity().equals(secondGuest.getIdentity()) &&
+				firstGuest.getPaymentType().equals(secondGuest.getPaymentType()) &&
+				firstGuest.getStartDateOfStay().compareTo(secondGuest.getStartDateOfStay()) == 0 && 
+				firstGuest.getEndDateOfStay().compareTo(secondGuest.getEndDateOfStay()) == 0);
 	}
 }

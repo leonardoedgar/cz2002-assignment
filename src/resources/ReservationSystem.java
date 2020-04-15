@@ -1,5 +1,6 @@
 package resources;
 import java.util.Date;
+import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -7,6 +8,7 @@ import java.util.Comparator;
 import resources.Reservation;
 import exception.ReservationNotFoundException;
 import exception.DuplicateReservationFoundException;
+import exception.IdGenerationFailedException;
 
 /**
  * A class to represent a reservation system.
@@ -19,7 +21,47 @@ public class ReservationSystem {
 		this.reservationTable = 
 				new ConcurrentHashMap<String, ConcurrentHashMap<String, ArrayList<Reservation>>>();
 	}
-	
+	/**
+	 * A function to generate a new random alphanumeric ReservationId of length 10
+	 * @return {String} the new ReservationId
+	 */
+	public String generateNewId() throws IdGenerationFailedException {
+		String validIdCharacters="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+		int idLength=10;
+		int maxtry=10;
+		int noOfTry=0;
+		StringBuilder newReservationId = new StringBuilder(idLength);
+		
+		do {
+		for(int i=0;i<idLength;i++) {
+			if(noOfTry>=maxtry) {
+				throw new IdGenerationFailedException();
+			}
+			int index = (int) (Math.random()*validIdCharacters.length());
+			newReservationId.append(validIdCharacters.charAt(index));
+		}
+		noOfTry++;
+		}while(doesDuplicateReservationIdExist(newReservationId.toString()));
+		
+		return newReservationId.toString();
+	}
+	/**
+	 * A function to update the reservation status of all reservation objects with the corresponding reservationId
+	 * @param reservationId {String} the reservationId
+	 * @param updatedStatus {String} the new status of the reservation
+	 */
+	public void updateAllReservationStatus(String reservationId, String updatedStatus,String roomType) {
+		
+		for(String date: this.reservationTable.keySet()) {
+			for(Reservation reservation:this.reservationTable.get(date).get(roomType)) {
+				if(reservation.getReservationId().equals(reservationId)){
+					reservation.updateStatus(updatedStatus);
+				}
+				
+			}
+		}
+	}
+
 	/**
 	 * A function to add a reservation.
 	 * @param reservation { Reservation} the reservation to add
@@ -386,8 +428,35 @@ public class ReservationSystem {
 				}
 			}
 		}
-		
 		return null;
 	}
 	
+	/**
+	 * A function to remove reservation by the guest and the room type.
+	 * @param aGuest {Guest} the guest object
+	 * @param aRoomType {String} the room type
+	 * @param numberOfRooms {int} the number of rooms that are available for the specified room type
+	 * @throws {ReservationNotFoundException} when reservation to be removed is not found 
+	 */
+	public void removeReservationByGuestAndRoomType(Guest aGuest, String aRoomType, int numberOfRooms) 
+			throws ReservationNotFoundException {
+		String reservationId = null;
+		for (String date: this.reservationTable.keySet()) {
+			for (String roomType: this.reservationTable.get(date).keySet()) {
+				for (Reservation reservation: this.reservationTable.get(date).get(roomType)) {
+					if (Guest.isIdentical(reservation.getGuest(), aGuest) && 
+							reservation.getRoomType().equals(aRoomType)) {
+						reservationId = reservation.getReservationId();
+						break;
+					}
+				}
+			}
+		}
+		if (reservationId != null) {
+			this.removeReservation(reservationId, numberOfRooms);
+		}
+		else {
+			throw new ReservationNotFoundException();
+		}
+	}
 }
