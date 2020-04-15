@@ -677,5 +677,21 @@ public class Hotel {
 			throw new RoomTypeNotFoundException();
 		}
 	}
+	/**
+	 * A function to print available rooms for a given room type
+	 * @param roomType {String} the room type 
+	 * @return {String} A string of the available rooms
+	 */
+	public String printAvailableRoomNoByRoomType(String roomType) {
+		StringBuilder vacantRooms = new StringBuilder();
+		vacantRooms=vacantRooms.append("Available rooms: ");
+		for(String roomNo: this.roomTable.get(roomType).keySet()) {
+			if(this.roomTable.get(roomType).get(roomNo).getStatus().equals("vacant")){
+				vacantRooms.append(roomNo);
+			}
+			vacantRooms.append(", ");
+		}
+		return(vacantRooms.toString().substring(0, vacantRooms.length()-2));
+	}
 }
 
