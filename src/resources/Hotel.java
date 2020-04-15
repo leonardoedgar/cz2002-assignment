@@ -63,18 +63,20 @@ public class Hotel {
 				else {
 					roomNo +=  "0" + Integer.toString(i);
 				}
-				final String finalRoomNo = roomNo;
-				
+				final String finalRoomNo = roomNo;		
 				roomDataPerLevel.put(finalRoomNo, new Room(
-							finalRoomNo, 
-							Double.parseDouble(roomDetail.get("cost")),
-							roomDetail.get("bedType"),
-							roomDetail.get("wifi"),
-							roomDetail.get("view"),
-							roomDetail.get("smoking")
-					)); 
+									finalRoomNo, 
+									Double.parseDouble(roomDetail.get("cost")),
+									roomDetail.get("bedType"),
+									roomDetail.get("wifi"),
+									roomDetail.get("view"),
+									roomDetail.get("smoking")
+								)); 
 				};
-			roomTable.put(roomType, roomDataPerLevel);
+			if (Integer.parseInt(roomDetail.get("numberOfRooms")) > 0) {
+				roomTable.put(roomType, roomDataPerLevel);
+			}
+		}
 	}
 	
 	/**
@@ -490,25 +492,20 @@ public class Hotel {
 	 * @param roomNo {String} the room number
 	 * @param guestName {String} the guest name
 	 * @return {boolean} represents the success of the check out process
+	 * @throws RoomTypeNotFoundException when room type is not in the hotel
 	 * @throws {GuestNotFoundException} when guest is not in the hotel
 	 * @throws {RoomNotFoundException} when room to be checked out is not found
 	 */
-	public boolean checkOut(String roomNo, String guestName) throws RoomNotFoundException, GuestNotFoundException {
+	public boolean checkOut(String roomNo, String guestName) throws 
+	RoomNotFoundException, GuestNotFoundException, RoomTypeNotFoundException {
 		Room guestRoom = this.getRoomByNo(roomNo);
 		Guest guestToCheckOut = guestRoom.getGuest();
 		try {
 			if (guestToCheckOut.getName().equals(guestName)) {
 				String roomType = this.getRoomTypeFromRoomNo(roomNo);
 				guestToCheckOut.makePayment(roomType, guestRoom.getRoomCost());
-				int numberOfRooms;
+				int numberOfRooms = this.getNumberOfRoomsByRoomType(roomType);
 				guestRoom.removeGuest();
-				switch (roomType) {
-					case "single": numberOfRooms = this.noOfAvailable_single; break;
-					case "double": numberOfRooms = this.noOfAvailable_double; break;
-					case "deluxe": numberOfRooms = this.noOfAvailable_deluxe; break;
-					case "vip": numberOfRooms = this.noOfAvailable_vip; break;
-					default: throw new RoomNotFoundException();
-				}
 				if (guestToCheckOut.getEndDateOfStay().compareTo(this.currentDate) > 0) {
 					try {
 						this.getReservationSystem().removeReservationByGuestAndRoomType(

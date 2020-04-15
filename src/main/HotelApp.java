@@ -148,8 +148,8 @@ public class HotelApp {
 							reservation.getDateOfCheckOut(), reservation.getRoomType())) {
 						reservation.updateStatus("waitlist");
 					}
-					hotel.getReservationSystem().addReservation(reservation, hotel.getRooms(
-							reservation.getRoomType()));
+					hotel.getReservationSystem().addReservation(reservation, 
+							hotel.getNumberOfRoomsByRoomType(reservation.getRoomType()));
 					System.out.println("Reservation added successfully!\n");
 					
 				} catch (InvalidGuestDetailException | InvalidReservationDetailException | 
@@ -199,8 +199,8 @@ public class HotelApp {
 			throws InvalidReservationDetailException, InvalidGuestDetailException {
     try {
 		Guest guest = HotelApp.createNewGuest(true, currentDate);
-		Date checkInDate = guest.getstartDateOfStay();
-		Date checkOutDate = guest.getendDateOfStay();
+		Date checkInDate = guest.getStartDateOfStay();
+		Date checkOutDate = guest.getEndDateOfStay();
 		System.out.print("Enter room type                                     : ");
 		String roomType = HotelApp.scanner.nextLine().trim();
 		System.out.print("Enter number of people                              : ");
@@ -306,7 +306,9 @@ public class HotelApp {
 					case "e": detailToUpdate = "view"; break;
 					case "f": detailToUpdate = "smoking"; break;
 					default: {
-						System.out.println("Invalid choice! Please try again."); 
+						System.out.println("Invalid choice! Please try again.");
+						System.out.println("Enter user input: ");
+						userInput = HotelApp.scanner.nextLine().toLowerCase();
 						isUserInputValid=false;
 					}
 				}
@@ -335,7 +337,11 @@ public class HotelApp {
 							isUserInputValid = true;
 							break;
 						}
-						default: System.out.println("Invalid choice, please try again");
+						default: {
+							System.out.println("Invalid choice, please try again");
+							System.out.println("Enter user input: ");
+							userInput = HotelApp.scanner.nextLine().toLowerCase();
+						}
 					}
 				}
 				
@@ -416,6 +422,7 @@ public class HotelApp {
 			foodname = HotelApp.scanner.nextLine().trim();
 			System.out.println("Enter the price of the food:");
 			price = HotelApp.scanner.nextDouble();
+			HotelApp.scanner.nextLine();
 			menu.addItems(foodname, price);
 			break;
 			}
@@ -430,6 +437,7 @@ public class HotelApp {
 			foodname = HotelApp.scanner.nextLine().trim();
 			System.out.println("Enter the price of the food:");
 			price = HotelApp.scanner.nextDouble();
+			HotelApp.scanner.nextLine();
 			menu.updateItems(foodname, price);
 			break;
 			}
@@ -539,9 +547,8 @@ public class HotelApp {
 				Guest newGuest = HotelApp.createNewGuest(false, hotel.getCurrentDate());				
 				System.out.print("Enter guest's preferred room type                   : ");
 				String roomType = HotelApp.scanner.nextLine().trim();
-        String roomType = sc.nextLine().trim();
-				System.out.print("Enter number of people               : ");
-				int numOfPeople = Integer.parseInt(sc.nextLine().trim());
+				System.out.print("Enter number of people                              : ");
+				int numOfPeople = Integer.parseInt(HotelApp.scanner.nextLine().trim());
 				String paymentType = newGuest.getPaymentType();
 				boolean roomTypeExists = false;
 				while(!roomTypeExists) {
@@ -551,22 +558,22 @@ public class HotelApp {
 						roomType = HotelApp.scanner.nextLine().trim();
 					}
 				}
-        Reservation reservation =null;
+				Reservation reservation =null;
 				if(((int)(newGuest.getEndDateOfStay().getTime()-newGuest.getStartDateOfStay().getTime())/(1000*60*60*24)) > 1) {
 					reservation = new Reservation(hotel.getReservationSystem().generateNewId(), newGuest, newGuest.getStartDateOfStay(), 
 							newGuest.getEndDateOfStay(), numOfPeople, paymentType,roomType);
 				}
 				boolean roomNoAvailable = false;
-				if(hotel.checkRoomAvailability(newGuest.getstartDate(), newGuest.getendDate(), 
+				if(hotel.checkRoomAvailability(newGuest.getStartDateOfStay(), newGuest.getEndDateOfStay(), 
 						roomType)) {
 					System.out.print("Enter the room number to assign to                  : ");
 					String roomNo = HotelApp.scanner.nextLine().trim();
 					try{
 						roomNoAvailable = hotel.checkIn(newGuest, roomNo, roomType);
 						if(roomNoAvailable) {
-              if(reservation != null) {
-							hotel.getReservationSystem().addReservation(reservation, hotel.getRooms(
-									reservation.getRoomType()));
+							if(reservation != null) {
+							hotel.getReservationSystem().addReservation(reservation, 
+									hotel.getNumberOfRoomsByRoomType(reservation.getRoomType()));
 							hotel.getReservationSystem().updateAllReservationStatus(reservation.getReservationId(),"checked-in",reservation.getRoomType());
 							}
 							System.out.println("Check-in successful!");
@@ -602,7 +609,7 @@ public class HotelApp {
 			if (!success) {
 				System.out.println("Check out failed. Identity is not verified.");
 			}
-		} catch (RoomNotFoundException | GuestNotFoundException e) {
+		} catch (RoomNotFoundException | GuestNotFoundException | RoomTypeNotFoundException e) {
 			System.out.println(e.getMessage());
 		} 
 	}
@@ -627,12 +634,19 @@ public class HotelApp {
 								hotel.getRoomTypeToVacantRoomNoListTable(true).get(roomType);
 						System.out.println(Character.toUpperCase(roomType.charAt(0)) + 
 								roomType.substring(1) + ": ");
-						System.out.println("\tNumber: " + 
-								vacantRoomNoList.size() + " out of " 
-								+ hotel.getNumberOfRoomsByRoomType(roomType));
-						String vacantRoomListString = vacantRoomNoList.toString();
-						System.out.println("\tRooms: " + vacantRoomListString.substring(1, 
-								vacantRoomListString.length()-1));
+						if (vacantRoomNoList != null){
+							System.out.println("\tNumber: " + 
+									vacantRoomNoList.size() + " out of " 
+									+ hotel.getNumberOfRoomsByRoomType(roomType));
+							String vacantRoomListString = vacantRoomNoList.toString();
+							System.out.println("\tRooms: " + vacantRoomListString.substring(1, 
+									vacantRoomListString.length()-1));
+						}
+						else {
+							System.out.println("\tNumber: 0 out of " + 
+									hotel.getNumberOfRoomsByRoomType(roomType));
+							System.out.println("\tRooms: ");
+						}
 						}
 					break;
 				}
