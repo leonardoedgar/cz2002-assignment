@@ -523,6 +523,7 @@ public class HotelApp {
 				String roomType = tempreservation.getRoomType();
 				Guest tempGuest = tempreservation.getGuest();
 				boolean success = false;
+				System.out.println(hotel.printAvailableRoomNoByRoomType(roomType));
 				System.out.print("Enter the room number guest will be assigned to: ");
 				String roomNo = HotelApp.scanner.nextLine().trim();
 				try{
@@ -566,6 +567,7 @@ public class HotelApp {
 				boolean roomNoAvailable = false;
 				if(hotel.checkRoomAvailability(newGuest.getStartDateOfStay(), newGuest.getEndDateOfStay(), 
 						roomType)) {
+					System.out.println(hotel.printAvailableRoomNoByRoomType(roomType));
 					System.out.print("Enter the room number to assign to                  : ");
 					String roomNo = HotelApp.scanner.nextLine().trim();
 					try{
