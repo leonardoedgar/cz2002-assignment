@@ -361,7 +361,7 @@ public class Hotel {
 	 * @param roomType {String} The room type you want to check for
 	 * @return {Integer} The number of rooms currently booked by reservation
 	 */
-	private int checkReservationClash(java.util.Date startDate, java.util.Date endDate,String roomType) {
+	private int checkReservationClash(java.util.Date startDate, java.util.Date endDate, String roomType) {
 		int roomsClash=0;
 		
 		ArrayList<Reservation> tempList = new ArrayList<Reservation>();
@@ -372,20 +372,19 @@ public class Hotel {
 		
 		
 		//pass in start and end date of reservation
-		for(int i=0;i<tempList.size();i++){
-			Reservation tempRes=tempList.get(i);
-			
+		for(int i=0; i<tempList.size(); i++){
+			Reservation tempRes = tempList.get(i);
 			if(!(reservationIdInDateRange.contains(tempRes.getReservationId()))) {
 				//add new id to arraylist
 				reservationIdInDateRange.add(tempRes.getReservationId());
 		
 				if(!tempRes.getStatus().contentEquals("checked-in")) {
-							roomsClash=roomsClash+checkDateClash(startDate,endDate,tempRes.getDateOfCheckIn(),tempRes.getDateOfCheckOut());
+							roomsClash += checkDateClash(startDate, endDate, 
+									tempRes.getDateOfCheckIn(), tempRes.getDateOfCheckOut());
 					}
 				}
 				
 			}
-		
 		return roomsClash;
 	}
 		
@@ -540,8 +539,8 @@ public class Hotel {
 			if (guestToCheckOut.getName().equals(guestName)) {
 				String roomType = this.getRoomTypeFromRoomNo(roomNo);
 				guestToCheckOut.makePayment(roomType, guestRoom.getRoomCost());
-				guestRoom.removeGuest();
 				int numberOfRooms;
+				guestRoom.removeGuest();
 				switch (roomType) {
 					case "single": numberOfRooms = this.noOfAvailable_single; break;
 					case "double": numberOfRooms = this.noOfAvailable_double; break;
@@ -549,11 +548,13 @@ public class Hotel {
 					case "vip": numberOfRooms = this.noOfAvailable_vip; break;
 					default: throw new RoomNotFoundException();
 				}
-				try {
-					this.getReservationSystem().removeReservationByGuestAndRoomType(guestToCheckOut,
-							roomType, numberOfRooms);
-				} catch (ReservationNotFoundException e) {
-					
+				if (guestToCheckOut.getEndDateOfStay().compareTo(this.currentDate) > 0) {
+					try {
+						this.getReservationSystem().removeReservationByGuestAndRoomType(
+								guestToCheckOut, roomType, numberOfRooms);
+					} catch (ReservationNotFoundException e) {
+						System.out.println(e.getMessage());
+					}
 				}
 				return true;
 			}

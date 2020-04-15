@@ -161,13 +161,14 @@ public class HotelApp {
 			case "A": {
 				try {
 					Reservation reservation = HotelApp.createNewReservation(
-							hotel.getReservationSystem().generateNewId(),hotel.getAvailableRoomTypes(), hotel.getCurrentDate());
-					hotel.getReservationSystem().addReservation(reservation, hotel.getRooms(
-							reservation.getRoomType()));
+							hotel.getReservationSystem().generateNewId(), 
+							hotel.getAvailableRoomTypes(), hotel.getCurrentDate());
 					if (!hotel.checkRoomAvailability(reservation.getDateOfCheckIn(), 
 							reservation.getDateOfCheckOut(), reservation.getRoomType())) {
 						reservation.updateStatus("waitlist");
 					}
+					hotel.getReservationSystem().addReservation(reservation, hotel.getRooms(
+							reservation.getRoomType()));
 					System.out.println("Reservation added successfully!\n");
 					
 				} catch (InvalidGuestDetailException | InvalidReservationDetailException | 
@@ -227,8 +228,7 @@ public class HotelApp {
 		String roomType = sc.nextLine().trim();
 		System.out.print("Enter number of people               : ");
 		int numOfPeople = Integer.parseInt(sc.nextLine().trim());
-		System.out.print("Enter payment type                   : ");
-		String paymentType = sc.nextLine().trim();
+		String paymentType = guest.getPaymentType();
 		if (checkInDate.compareTo(checkOutDate) >=0 || !roomTypes.contains(roomType)) {
 			throw new InvalidReservationDetailException();
 		}
@@ -268,6 +268,8 @@ public class HotelApp {
 			String identity = sc.nextLine().trim();
 			Date startDate= new Date();
 			Date endDate= new Date();
+			System.out.print("Enter payment type                   : ");
+			String paymentType = sc.nextLine().trim();
 			if (isForReservation) {
 				System.out.print("Enter date of check-in (MM/DD/YYYY)  : ");
 				startDate=new Date(sc.nextLine().trim());
@@ -285,7 +287,8 @@ public class HotelApp {
 			}
 			
 				return new Guest(guestName, cardDetails, address, country, 
-						gender, nationality, Integer.parseInt(contact), identity,startDate,endDate);
+						gender, nationality, Integer.parseInt(contact), identity, paymentType, 
+						startDate, endDate);
 		}
 		catch (IllegalArgumentException e) {
 			throw new InvalidGuestDetailException();
@@ -570,14 +573,14 @@ public class HotelApp {
 				String roomType = sc.nextLine().trim();
 				System.out.print("Enter number of people               : ");
 				int numOfPeople = Integer.parseInt(sc.nextLine().trim());
-				System.out.print("Enter payment type                   : ");
-				String paymentType = sc.nextLine().trim();
+				String paymentType = newGuest.getPaymentType();
 				if (!hotel.getAvailableRoomTypes().contains(roomType)) {
 					throw new InvalidReservationDetailException();
 				}
 				Reservation reservation =null;
-				if(((int)(newGuest.getEndDate().getTime()-newGuest.getStartDate().getTime())/(1000*60*60*24)) > 1) {
-					reservation = new Reservation(hotel.getReservationSystem().generateNewId(), newGuest, newGuest.getStartDate(), newGuest.getEndDate(), numOfPeople, paymentType,roomType);
+				if(((int)(newGuest.getEndDateOfStay().getTime()-newGuest.getStartDateOfStay().getTime())/(1000*60*60*24)) > 1) {
+					reservation = new Reservation(hotel.getReservationSystem().generateNewId(), newGuest, newGuest.getStartDateOfStay(), 
+							newGuest.getEndDateOfStay(), numOfPeople, paymentType,roomType);
 				}
 				boolean roomNoChecker=false;
 				
