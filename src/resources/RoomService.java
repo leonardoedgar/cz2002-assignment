@@ -12,12 +12,16 @@ public class RoomService {
 	private double totalCost;
 	private Hashtable<String, String> orderMap;
 	private Date dateOfTransaction;
+	private String status;
+	private int orderId;
 	/**
 	 * A class constructor to construct a room service.
 	 * @param menu {Menu} the room service menu in a hotel
 	 */
-	public RoomService(Menu menu) {
+	public RoomService(Menu menu,int orderId) {
 		this.menu = menu;
+		this.status = "confirmed";
+		this.orderId = orderId;
 	}
 	
 	/**
@@ -77,4 +81,45 @@ public class RoomService {
 	public double getTotalCost() {
 		return this.totalCost;
 	}
+	
+	/**
+	 * this function will get the recent status of the room service
+	 */
+	public String getStatus() {
+		return this.status;
+	}
+	
+	/**
+	 * to update the current status of the room service
+	 * @param status
+	 */
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	
+	/**
+	 * to update the orderId
+	 * @param orderId
+	 */
+	public static int updateOrderId(int orderId) {
+		orderId++;
+		orderId = orderId% 2000000000;
+		return orderId;
+	}
+	
+	/**
+	 * get OrderMap
+	 */
+	public Hashtable<String, String> getOrderMap() {
+		return this.orderMap;
+	}
+	
+	/**
+	 * to get the orderID
+	 * @return
+	 */
+	public int getOrderId() {
+		return this.orderId;
+	}
+	
 }

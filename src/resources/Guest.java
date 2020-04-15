@@ -8,6 +8,8 @@ import java.util.ArrayList;
 
 import exception.FoodNotOnMenuException;
 import exception.GuestDetailUpdateFailureException;
+import exception.GuestNotFoundException;
+import exception.OrderIdNotFoundException;
 import resources.Payment;
 
 /**
@@ -161,8 +163,8 @@ public class Guest {
 	 * @param orderMap {Hashtable<String, String>} the order and quantity from the guest 
 	 * @throws {FoodNotOnMenuException} when food ordered not on menu
 	 */
-	public void makeOrder(Menu menu, Hashtable<String, String> orderMap) throws FoodNotOnMenuException {
-		RoomService roomService = new RoomService(menu);
+	public void makeOrder(Menu menu, Hashtable<String, String> orderMap, int orderId) throws FoodNotOnMenuException {
+		RoomService roomService = new RoomService(menu, orderId);
 		roomService.makeOrder(orderMap);
 		this.roomServiceList.add(roomService);
 	}
@@ -227,6 +229,40 @@ public class Guest {
 		return this.paymentType;
 	}
 
+	/**
+	 * get the room service object by orderId
+	 * @param orderId
+	 * @return
+	 * @throws OrderIdNotFoundException
+	 */
+	public RoomService getRoomServiceByOrderId(int orderId) throws OrderIdNotFoundException {
+		for(RoomService rs: this.roomServiceList) {
+			if (rs.getOrderId() == orderId) {
+				return rs;
+			}
+		}
+		throw new OrderIdNotFoundException();
+	}
+	
+	/**
+	 * To print the roomservicelist per guest
+	 */
+	public void printRoomServiceList() throws GuestNotFoundException {
+		try {
+			System.out.println("The list of orders are as follows:");
+			for(RoomService rs: this.roomServiceList) {
+				System.out.println("-------------------------------------");
+				System.out.println("Order ID: "+rs.getOrderId() +"\n"+
+							"Order Status: "+ rs.getStatus()+"\n"+ 
+							"List of Orders: "+ rs.getOrderMap());
+				System.out.println("-------------------------------------");
+			}
+		}
+		catch(NullPointerException e){
+			throw new GuestNotFoundException();
+		}
+	}
+	
 	/**
 	 * A function to check if 2 guests object are identical.
 	 * @param firstGuest {Guest} the first guest object
