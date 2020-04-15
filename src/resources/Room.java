@@ -98,7 +98,7 @@ public class Room {
 	 * A function to get the guest of the room
 	 * @return {Guest} the guest object
 	 */
-	Guest getGuest() {
+	public Guest getGuest() {
 		return this.guest;
 	}
 	

@@ -9,6 +9,7 @@ import java.util.InputMismatchException;
 import resources.Hotel;
 import resources.Menu;
 import resources.Room;
+import resources.RoomService;
 import exception.GuestDetailUpdateFailureException;
 import exception.GuestNotFoundException;
 import exception.IdGenerationFailedException;
@@ -18,6 +19,7 @@ import resources.Reservation;
 import resources.Guest;
 import exception.ReservationNotFoundException;
 import exception.InvalidReservationDetailException;
+import exception.OrderIdNotFoundException;
 import exception.AppFailureException;
 import exception.DuplicateReservationFoundException;
 import exception.FoodNotOnMenuException;
@@ -364,44 +366,115 @@ public class HotelApp {
 	 * @throws RoomNotFoundException 
 	 * @throws FoodNotOnMenuException 
 	 */
+	static int orderId=0;
 	public static void showMenuD(Hotel hotel, Menu menu) {
+			String roomNo;
+			Guest guest;
+			String status;
+			RoomService roomService;
 			Hashtable<String, String> orderMap = new Hashtable<String, String>();
 			boolean orderMore = true, orderSuccess = true;
-			menu.printItems();
-			System.out.print("Enter room number: ");
-			String roomNo = HotelApp.scanner.nextLine().trim();
-			while (orderMore) {
-				System.out.print("Enter food name: ");
-				String foodName = HotelApp.scanner.nextLine().trim();
-				System.out.print("Enter quantity to order: ");
-				try {
-					String quantity = Integer.toString(HotelApp.scanner.nextInt());
-					HotelApp.scanner.nextLine();
-					if (orderMap.containsKey(foodName)) {
-						String newQuantity = Integer.toString(
-								Integer.parseInt(orderMap.get(foodName)) + Integer.parseInt(quantity));
-						orderMap.replace(foodName, newQuantity);
-					}
-					else {
-						orderMap.put(foodName, quantity);
-					}
-					System.out.println("current order: " + orderMap.toString());
-					System.out.print("Order more (yes/no): ");
-					orderMore = HotelApp.scanner.nextLine().trim().equalsIgnoreCase("yes");
+			System.out.print(""
+					+ "Please select one of the actions: \n"
+					+ "|===========================|\n"
+					+ "|(A) Change Order Status    |\n"
+					+ "|(B) Create a New Order     |\n"
+					+ "|(C) Print List of Orders   |\n"
+					+ "|===========================|\n"
+					+ "\nEnter user input: ");
+			switch(scanner.nextLine().trim()) {
+			case "a":
+			case "A":{
+				System.out.print("Enter room number: ");
+				roomNo = HotelApp.scanner.nextLine().trim();
+				System.out.print("Enter the order ID: ");
+				orderId = HotelApp.scanner.nextInt();
+				System.out.print("Enter new status: \n"
+						+ "|=================|\n"
+						+ "|(A) Confirmed    |\n"
+						+ "|(B) Preparing    |\n"
+						+ "|(C) Delivered    |\n"
+						+ "|=================|\n"
+						+ "\nEnter user input: ");
+				HotelApp.scanner.nextLine();
+				status = HotelApp.scanner.nextLine().trim();
+				switch(status) {
+				case "a":
+				case "A": status = "confirmed";break;
+				case "b":
+				case "B": status = "preparing";break;
+				case "c":
+				case "C": status = "delivered";break;
+				default: System.out.println("Invalid choice! Please retry.");
 				}
-				catch(InputMismatchException e) {
-					System.out.println("Invalid input. Re-entry the last order to reorder.");
-					orderSuccess = false;
-				}
-			}
-			if (orderSuccess) {
 				try {
-					hotel.makeRoomServiceOrder(roomNo, menu, orderMap);
-					System.out.println("Order successful!");
-				} catch (FoodNotOnMenuException | RoomNotFoundException | GuestNotFoundException e ) {
+					guest = hotel.getRoomByNo(roomNo).getGuest();
+					roomService = guest.getRoomServiceByOrderId(orderId);
+					roomService.setStatus(status);
+				} catch (RoomNotFoundException | OrderIdNotFoundException e) {
 					System.out.println(e.getMessage());
-				} 
+				}
+				break;
+				
 			}
+			case "b":
+			case "B":{
+				menu.printItems();
+				System.out.print("Enter room number: ");
+				roomNo = HotelApp.scanner.nextLine().trim();
+				while (orderMore) {
+					System.out.print("Enter food name: ");
+					String foodName = HotelApp.scanner.nextLine().trim();
+					System.out.print("Enter quantity to order: ");
+					try {
+						String quantity = Integer.toString(HotelApp.scanner.nextInt());
+						HotelApp.scanner.nextLine();
+						if (orderMap.containsKey(foodName)) {
+							String newQuantity = Integer.toString(
+									Integer.parseInt(orderMap.get(foodName)) + Integer.parseInt(quantity));
+							orderMap.replace(foodName, newQuantity);
+						}
+						else {
+							orderMap.put(foodName, quantity);
+						}
+						System.out.println("current order: " + orderMap.toString());
+						System.out.print("Order more (yes/no): ");
+						orderMore = HotelApp.scanner.nextLine().trim().equalsIgnoreCase("yes");
+					}
+					catch(InputMismatchException e) {
+						System.out.println("Invalid input. Re-entry the last order to reorder.");
+						orderSuccess = false;
+					}
+				}
+				if (orderSuccess) {
+					try {
+						hotel.makeRoomServiceOrder(roomNo, menu, orderMap, orderId);
+						orderId=orderId+1;
+						orderId = (orderId % 2000000000);
+						System.out.println("Order successful!");
+					} catch (FoodNotOnMenuException | RoomNotFoundException | GuestNotFoundException e ) {
+						System.out.println(e.getMessage());
+					} 
+				}
+				break;
+			}
+			case "c":
+			case "C":{
+				System.out.print("Enter room number: ");
+				roomNo = HotelApp.scanner.nextLine().trim();
+				try {
+					guest = hotel.getRoomByNo(roomNo).getGuest();
+					guest.printRoomServiceList();
+				} catch (RoomNotFoundException e) {
+					System.out.println(e.getMessage());
+				} catch (NullPointerException e) {
+					System.out.println("No order is available");
+				}
+				break;
+				
+			}
+			}
+			
 	}
 	public static void showMenuE(Menu menu) {
 		String foodname;
