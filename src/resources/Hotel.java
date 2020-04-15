@@ -25,17 +25,19 @@ public class Hotel {
 	Hashtable<String, Hashtable<String, Room>> roomTable;
 	private ReservationSystem reservationSystem;
 	private Date currentDate;
-
+	private int checkInTimeInMilliSeconds; 
+	private int checkOutTimeInMilliSeconds;
 	/**
 	 * A class constructor to create a hotel. 
 	 * @param roomConfigFilePath {String} the path to room configuration file
 	 * @throws {HotelSetupFailureException} exception when hotel failed to set up
 	 */
-	@SuppressWarnings("deprecation")
 	public Hotel(String roomConfigFilePath) throws HotelSetupFailureException {
 		this.setupRooms(this.getRoomConfig(roomConfigFilePath));
 		this.reservationSystem = new ReservationSystem();
-		this.currentDate = new Date(new Date().toLocaleString().split(",")[0]);
+		this.currentDate = new Date();
+		this.checkInTimeInMilliSeconds = 1000*60*60*14;
+		this.checkOutTimeInMilliSeconds = 1000*60*60*12;
 	}
 	
 	/**
@@ -387,7 +389,7 @@ public class Hotel {
 	 * @return {boolean} true if successful, false if failure
 	 * @throws RoomNotFoundException
 	 */
-	public boolean checkIn (Guest guest,String roomNo, String roomType) throws RoomNotFoundException {
+	public boolean checkIn (Guest guest, String roomNo, String roomType) throws RoomNotFoundException {
 		
 		Hashtable<String, Room> tempRoomList = roomTable.get(roomType);
 
@@ -421,7 +423,7 @@ public class Hotel {
 	 * @return {boolean} true if successful, false if failure
 	 * @throws RoomNotFoundException
 	 */
-	public boolean checkIn(Guest guest,String roomNo, String roomType,Reservation reservation) throws RoomNotFoundException {
+	public boolean checkIn(Guest guest, String roomNo, String roomType, Reservation reservation) throws RoomNotFoundException {
 		
 		Hashtable<String, Room> tempRoomList = roomTable.get(roomType);
 		
@@ -677,5 +679,37 @@ public class Hotel {
 			throw new RoomTypeNotFoundException();
 		}
 	}
+	
+	/**
+	 * A function to update today reservation status with current time.
+	 */
+	public void updateTodayReservationStatusWithCurrentTime() {
+		this.currentDate = new Date();
+		long checkInTimeTolerance = 1000*60*60;
+		@SuppressWarnings("deprecation")
+		long currentTime = this.currentDate.getTime() - 
+				new Date(this.currentDate.toLocaleString().split(",")[0]).getTime();
+		long checkInTime = this.checkInTimeInMilliSeconds;
+		if (currentTime > checkInTime + checkInTimeTolerance) {
+			this.reservationSystem.expireAllReservationsOnDate(currentDate);
+		}
+	}
+	
+	/**
+	 * A function to get the hotel check in date and time.
+	 * @return {Date} the check in date and time
+	 */
+	@SuppressWarnings("deprecation")
+	public Date getCheckInDate() {
+		return new Date(new Date(new Date().toLocaleString().split(",")[0]).getTime() + 
+				this.checkInTimeInMilliSeconds);
+	}
+	
+	/**
+	 * A function to get the hotel check out time
+	 * @return {int} the time in milliseconds
+	 */
+	public int getCheckOutTimeInMilliSeconds() {
+		return this.checkOutTimeInMilliSeconds;
+	}
 }
-

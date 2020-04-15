@@ -458,4 +458,15 @@ public class ReservationSystem {
 			throw new ReservationNotFoundException();
 		}
 	}
+	
+	/**
+	 * A function to expire all reservations on certain date.
+	 * @param date {Date} the date of reservations to expire
+	 */
+	public void expireAllReservationsOnDate(Date date) {
+		String formattedDate = ReservationSystem.getFormattedDate(date);
+		if (this.reservationTable.containsKey(formattedDate)) {
+			this.reservationTable.remove(formattedDate);
+		}
+	}
 }
