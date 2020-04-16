@@ -46,6 +46,7 @@ public class HotelApp {
 			Menu menu = new Menu("src/data/menu.txt");
 			while (!exitApp) {
 				hotel.updateReservationStatusByDate(HotelApp.currentTime);
+				hotel.kickOutGuestWhoPastCheckOutTime();
 				HotelApp.printHotelAppMenu();
 				System.out.print("Enter user input: ");
 				switch(HotelApp.scanner.nextLine().trim().toLowerCase()) {

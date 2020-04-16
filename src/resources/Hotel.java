@@ -756,4 +756,19 @@ public class Hotel {
 	public int getCheckOutTimeInMilliSeconds() {
 		return this.checkOutTimeInMilliSeconds;
 	}
+	
+	/**
+	 * A function to kick out guests from hotel after checkout time.
+	 */
+	public void kickOutGuestWhoPastCheckOutTime() {
+		for (String roomType: this.roomTable.keySet()) {
+			for (String roomNo: this.roomTable.get(roomType).keySet()) {
+				Room room = this.roomTable.get(roomType).get(roomNo);
+				Guest guest = room.getGuest();
+				if (guest != null && guest.getEndDateOfStay().compareTo(this.currentDate) < 0) {
+						room.removeGuest();
+				}
+			}	
+		}
+	}
 }
