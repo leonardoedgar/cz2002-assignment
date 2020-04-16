@@ -182,7 +182,9 @@ public class Guest {
 	 * @param roomCost {Double} the room cost the guest stayed at
 	 */
 	public void makePayment(String roomType, double roomCost) {
-		int numberOfDays = (int) ((this.endDateOfStay.getTime()-this.startDateOfStay.getTime())/(1000*60*60*24));
+		@SuppressWarnings("deprecation")
+		int numberOfDays = (int) ((new Date(this.endDateOfStay.toLocaleString().split(",")[0]).getTime() 
+				- new Date(this.startDateOfStay.toLocaleString().split(",")[0]).getTime())/(1000*60*60*24));
 		Payment payment = new Payment(this.paymentType, roomType, roomCost*numberOfDays, 
 				this.roomServiceList);
 		payment.printReceipt();

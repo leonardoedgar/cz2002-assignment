@@ -26,15 +26,26 @@ import exception.FoodNotOnMenuException;
 import exception.InvalidGuestDetailException;
 
 public class HotelApp {
-	static int orderId=0;
+	static int orderId = 0;
 	public static Scanner scanner = new Scanner(System.in);
+	static Date currentTime = new Date();
+	static double setupTimeDelayInSeconds = 1;
+	
+	/**
+	 * A function to fast forward the hotel app by a number of days.
+	 * @param {numOfDays} the number of days to move forward to
+	 */
+	public static void fastForwardByNumberOfDays(int numOfDays) {
+		HotelApp.currentTime = new Date(HotelApp.currentTime.getTime() + numOfDays*24*60*60*1000);
+	}
+	
 	public static void main(String[] args) {
 		boolean exitApp = false;
 		try {
-			Hotel hotel = new Hotel("src/data/roomConfig.txt");
+			Hotel hotel = new Hotel("src/data/roomConfig.txt", HotelApp.setupTimeDelayInSeconds);
 			Menu menu = new Menu("src/data/menu.txt");
 			while (!exitApp) {
-				hotel.updateTodayReservationStatusWithCurrentTime();
+				hotel.updateReservationStatusByDate(HotelApp.currentTime);
 				HotelApp.printHotelAppMenu();
 				System.out.print("Enter user input: ");
 				switch(HotelApp.scanner.nextLine().trim().toLowerCase()) {
