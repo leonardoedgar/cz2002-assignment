@@ -51,10 +51,12 @@ public class ReservationSystem {
 	 */
 	public void updateAllReservationStatus(String reservationId, String updatedStatus, String roomType) {
 		for(String date: this.reservationTable.keySet()) {
+			if(!(this.reservationTable.get(date).get(roomType)==null)) {
 			for(Reservation reservation: this.reservationTable.get(date).get(roomType)) {
 				if(reservation.getReservationId().equals(reservationId)) {
 					reservation.updateStatus(updatedStatus);
 				}
+			}
 			}
 		}
 	}
@@ -121,15 +123,18 @@ public class ReservationSystem {
 		int num_room = numRoom + delta;
 		for(String date: this.reservationTable.keySet()) {
 			int counter = 1;
-			for (Reservation reserve: this.reservationTable.get(date).get(roomtype)) {
-//				only set to waitlist if the person is between the current number of room and the prev number of room 
-				if (counter > num_room && counter <=num_room-delta && delta == -1) {
-					reserve.updateStatus("waitlist");
-				}
+      if(!(this.reservationTable.get(date).get(roomtype)==null)) {
+        for (Reservation reserve: this.reservationTable.get(date).get(roomtype)) {
+  //				only set to waitlist if the person is between the current number of room and the prev number of room 
+          if (counter > num_room && counter <=num_room-delta && delta == -1) {
+            reserve.updateStatus("waitlist");
+          }
+      }
 				else if (counter <= num_room && counter > num_room-delta && delta == 1) {
 					reserve.updateStatus("confirmed");
+					}
+					counter ++;
 				}
-				counter ++;
 			}
 		}
 	}
