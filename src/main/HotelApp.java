@@ -26,6 +26,7 @@ import exception.FoodNotOnMenuException;
 import exception.InvalidGuestDetailException;
 
 public class HotelApp {
+	static int orderId=0;
 	public static Scanner scanner = new Scanner(System.in);
 	public static void main(String[] args) {
 		boolean exitApp = false;
@@ -390,7 +391,7 @@ public class HotelApp {
 	 * @throws RoomNotFoundException 
 	 * @throws FoodNotOnMenuException 
 	 */
-	static int orderId=0;
+	
 	public static void showMenuD(Hotel hotel, Menu menu) {
 			String roomNo;
 			Guest guest;

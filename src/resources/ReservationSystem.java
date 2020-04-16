@@ -117,9 +117,10 @@ public class ReservationSystem {
 	 * @param roomtype 
 	 * @param delta delta is the number of rooms to be changed to "vacant" or "under maintainance"
 	 */
-	public void shiftReservation(int num_room,String roomtype, int delta) {
-		int counter = 1;
+	public void shiftReservation(int numRoom,String roomtype, int delta) {
+		int num_room = numRoom + delta;
 		for(String date: this.reservationTable.keySet()) {
+			int counter = 1;
 			for (Reservation reserve: this.reservationTable.get(date).get(roomtype)) {
 //				only set to waitlist if the person is between the current number of room and the prev number of room 
 				if (counter > num_room && counter <=num_room-delta && delta == -1) {
@@ -231,10 +232,14 @@ public class ReservationSystem {
 				
 			}
 			catch (ReservationNotFoundException e1) {
+				Reservation clonedReservation = Reservation.copy(reservation);
 				try {
+					if(numberOfRooms==0) {
+						clonedReservation.updateStatus("waitlist");
+					}
 					this.getReservationOnSameDate(reserveDate).put(
 							reservation.getRoomType(), 
-							new ArrayList<Reservation>() {{add(reservation);}});
+							new ArrayList<Reservation>() {{add(clonedReservation);}});
 				}
 				catch (ReservationNotFoundException e2) {
 					this.reservationTable.put(
@@ -242,7 +247,7 @@ public class ReservationSystem {
 							new ConcurrentHashMap<String, ArrayList<Reservation>>() {{
 								put(
 										reservation.getRoomType(), 
-										new ArrayList<Reservation>() {{add(reservation);}}
+										new ArrayList<Reservation>() {{add(clonedReservation);}}
 								);}}
 					);
 				}
