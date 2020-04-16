@@ -129,7 +129,6 @@ public class ReservationSystem {
           if (counter > num_room && counter <=num_room-delta && delta == -1) {
             reserve.updateStatus("waitlist");
           }
-      }
 				else if (counter <= num_room && counter > num_room-delta && delta == 1) {
 					reserve.updateStatus("confirmed");
 					}
@@ -477,4 +476,56 @@ public class ReservationSystem {
 			this.reservationTable.remove(formattedDate);
 		}
 	}
+	
+	public ArrayList<ArrayList<String>> getReservation(Date date,Hotel hotel){
+		ArrayList<ArrayList<String>> result = new ArrayList<ArrayList<String>>();;
+		ArrayList<String> single = new ArrayList<String>();
+		ArrayList<String> doublee = new ArrayList<String>();
+		ArrayList<String> deluxe = new ArrayList<String>();
+		ArrayList<String> vip = new ArrayList<String>();
+		for (String i: hotel.getRoomTypeToVacantRoomNoListTable(true).keySet()) {
+			int ctr = 0;
+			if (this.reservationTable.containsKey(date)){
+			switch(i){
+				case "single":{
+					for (Reservation j :this.reservationTable.get(date).get(i)) {
+						if (j != null) {
+						single.add(hotel.getRoomTypeToVacantRoomNoListTable(true).get(i).get(ctr));
+						ctr++;
+						}
+					}
+				}
+				case "double":{
+					for (Reservation j :this.reservationTable.get(date).get(i)) {
+						doublee.add(hotel.getRoomTypeToVacantRoomNoListTable(true).get(i).get(ctr));
+						ctr++;
+						}
+					}
+				case "deluxe":{
+					for (Reservation j :this.reservationTable.get(date).get(i)) {
+						if (j != null) {
+						deluxe.add(hotel.getRoomTypeToVacantRoomNoListTable(true).get(i).get(ctr));
+						ctr++;
+						}
+						}
+				}
+				case "vip":{
+					for (Reservation j :this.reservationTable.get(date).get(i)) {
+						if (j != null) {
+						vip.add(hotel.getRoomTypeToVacantRoomNoListTable(true).get(i).get(ctr));
+						ctr++;
+						}
+					}
+				}
+				}
+			}
+		}
+		result.add(single);
+		result.add(doublee);
+		result.add(deluxe);
+		result.add(vip);
+		
+		return result;
+}
+	
 }
