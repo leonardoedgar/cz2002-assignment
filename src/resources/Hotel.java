@@ -537,10 +537,13 @@ public class Hotel {
 				guestToCheckOut.makePayment(roomType, guestRoom.getRoomCost());
 				int numberOfRooms = this.getNumberOfRoomsByRoomType(roomType);
 				guestRoom.removeGuest();
-				if (guestToCheckOut.getEndDateOfStay().compareTo(this.currentDate) > 0) {
+				int oneDayInMilliSeconds = 24*60*60*1000;
+				if (guestToCheckOut.getEndDateOfStay().getTime() - 
+						this.currentDate.getTime() > oneDayInMilliSeconds - (
+								this.checkInTimeInMilliSeconds - this.checkOutTimeInMilliSeconds)) {
 					try {
-						this.getReservationSystem().removeReservationByGuestAndRoomType(guestToCheckOut, roomType,
-								numberOfRooms);
+						this.getReservationSystem().removeReservationByGuestAndRoomType(
+								guestToCheckOut, roomType, numberOfRooms);
 					} catch (ReservationNotFoundException e) {
 						System.out.println(e.getMessage());
 					}
