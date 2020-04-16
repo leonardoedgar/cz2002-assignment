@@ -155,6 +155,8 @@ public class HotelApp {
 					hotel.getReservationSystem().addReservation(reservation, 
 							hotel.getNumberOfRoomsByRoomType(reservation.getRoomType()));
 					System.out.println("Reservation added successfully!\n");
+					System.out.println("Reservation details are as follows:");
+					reservation.printDetails();
 					
 				} catch (InvalidGuestDetailException | InvalidReservationDetailException | 
 						DuplicateReservationFoundException | RoomTypeNotFoundException | IdGenerationFailedException e) {
@@ -171,6 +173,8 @@ public class HotelApp {
 					hotel.getReservationSystem().updateReservation(
 						reservation, hotel.getNumberOfRoomsByRoomType(reservation.getRoomType()) );
 					System.out.println("Reservation updated successfully!\n");
+					System.out.println("Reservation details are as follows:");
+					reservation.printDetails();
 				} catch ( InvalidGuestDetailException | InvalidReservationDetailException | 
 						ReservationNotFoundException | RoomTypeNotFoundException | IdGenerationFailedException e) {
 					System.out.println(e.getMessage()+ "\n");
@@ -295,80 +299,84 @@ public class HotelApp {
 	 * @throws RoomNotFoundException
 	 */
 	public static void showMenuC(Hotel hotel) throws RoomNotFoundException {
-		System.out.println("Enter your room number: ");
+		System.out.print("Enter your room number: ");
 		String roomNum = HotelApp.scanner.nextLine();
 		try {
 			boolean isUserInputValid = false;
 			Room room = hotel.getRoomByNo(roomNum);
-			room.printRoom();
-			System.out.print(""
-					+ "Details to be created/updated: \n"
-					+ "|===============================|\n"
-					+ "|(A) Room status                |\n"
-					+ "|(B) Room price                 |\n"
-					+ "|(C) Bed type                   |\n"
-					+ "|(D) Wifi Availability          |\n"
-					+ "|(E) View of the Room           |\n"
-					+ "|(F) Smoking Allowance (yes/no) |\n"
-					+ "|===============================|\n"
-					+ "\nEnter user input: ");
-			String userInput = HotelApp.scanner.nextLine().toLowerCase();
-			String detailToUpdate="";
-			while (!isUserInputValid) {
-				isUserInputValid = true;
-				switch(userInput) {
-					case "a": detailToUpdate = "status"; break;
-					case "b": detailToUpdate = "price"; break;
-					case "c": detailToUpdate = "bed type"; break;
-					case "d": detailToUpdate = "wifi"; break;
-					case "e": detailToUpdate = "view"; break;
-					case "f": detailToUpdate = "smoking"; break;
-					default: {
-						System.out.println("Invalid choice! Please try again.");
-						System.out.println("Enter user input: ");
-						userInput = HotelApp.scanner.nextLine().toLowerCase();
-						isUserInputValid=false;
-					}
-				}
-			}
-			if (detailToUpdate.equals("status")) {
+			if (room.getGuest() == null) {
+				room.printRoom();
 				System.out.print(""
-						+ "New room status: \n"
-						+ "|======================|\n"
-						+ "|(A) Vacant            |\n"
-						+ "|(B) Under Maintainance|\n"
-						+ "|======================|\n"
+						+ "Details to be created/updated: \n"
+						+ "|===============================|\n"
+						+ "|(A) Room status                |\n"
+						+ "|(B) Room price                 |\n"
+						+ "|(C) Bed type                   |\n"
+						+ "|(D) Wifi Availability          |\n"
+						+ "|(E) View of the Room           |\n"
+						+ "|(F) Smoking Allowance (yes/no) |\n"
+						+ "|===============================|\n"
 						+ "\nEnter user input: ");
-				userInput = HotelApp.scanner.nextLine().trim().toLowerCase();
-				isUserInputValid = false;
+				String userInput = HotelApp.scanner.nextLine().toLowerCase();
+				String detailToUpdate="";
 				while (!isUserInputValid) {
+					isUserInputValid = true;
 					switch(userInput) {
-						case "a": {
-							hotel.updateRoomDetails(roomNum, detailToUpdate, "vacant");
-							System.out.println("Room Information Updated!");
-							isUserInputValid = true;
-							break;
-						}
-						case "b": {
-							hotel.updateRoomDetails(roomNum, detailToUpdate, "under maintainance");
-							System.out.println("Room Information Updated!");
-							isUserInputValid = true;
-							break;
-						}
+						case "a": detailToUpdate = "status"; break;
+						case "b": detailToUpdate = "price"; break;
+						case "c": detailToUpdate = "bed type"; break;
+						case "d": detailToUpdate = "wifi"; break;
+						case "e": detailToUpdate = "view"; break;
+						case "f": detailToUpdate = "smoking"; break;
 						default: {
-							System.out.println("Invalid choice, please try again");
-							System.out.println("Enter user input: ");
+							System.out.println("Invalid choice! Please try again.");
+							System.out.print("Enter user input: ");
 							userInput = HotelApp.scanner.nextLine().toLowerCase();
+							isUserInputValid=false;
 						}
 					}
 				}
-				
+				if (detailToUpdate.equals("status")) {
+					System.out.print(""
+							+ "New room status: \n"
+							+ "|======================|\n"
+							+ "|(A) Vacant            |\n"
+							+ "|(B) Under Maintainance|\n"
+							+ "|======================|\n"
+							+ "\nEnter user input: ");
+					userInput = HotelApp.scanner.nextLine().trim().toLowerCase();
+					isUserInputValid = false;
+					while (!isUserInputValid) {
+						switch(userInput) {
+							case "a": {
+								hotel.updateRoomDetails(roomNum, detailToUpdate, "vacant");
+								System.out.println("Room Information Updated!");
+								isUserInputValid = true;
+								break;
+							}
+							case "b": {
+								hotel.updateRoomDetails(roomNum, detailToUpdate, "under maintainance");
+								System.out.println("Room Information Updated!");
+								isUserInputValid = true;
+								break;
+							}
+							default: {
+								System.out.println("Invalid choice, please try again");
+								System.out.print("Enter user input: ");
+								userInput = HotelApp.scanner.nextLine().toLowerCase();
+							}
+						}
+					}
+				}
+				else{
+					System.out.print("Enter the updated information: ");
+					String newDetail = HotelApp.scanner.nextLine().trim();
+					hotel.updateRoomDetails(roomNum, detailToUpdate, newDetail);
+					System.out.println("Room Information Updated!");
+				}
 			}
-			else{
-				System.out.println("Enter the updated information: ");
-				String newDetail = HotelApp.scanner.nextLine().trim();
-				hotel.updateRoomDetails(roomNum, detailToUpdate, newDetail);
-				System.out.println("Room Information Updated!");
+			else {
+				System.out.println("Unable to update room with guest inside.");
 			}
 		}
 		catch (RoomNotFoundException | RoomTypeNotFoundException e) {
@@ -414,24 +422,21 @@ public class HotelApp {
 						+ "\nEnter user input: ");
 				HotelApp.scanner.nextLine();
 				status = HotelApp.scanner.nextLine().trim();
-				switch(status) {
-				case "a":
-				case "A": status = "confirmed";break;
-				case "b":
-				case "B": status = "preparing";break;
-				case "c":
-				case "C": status = "delivered";break;
-				default: System.out.println("Invalid choice! Please retry.");
+				switch(status.toLowerCase()) {
+					case "a": status = "confirmed";break;
+					case "b": status = "preparing";break;
+					case "c": status = "delivered";break;
+					default: System.out.println("Invalid choice! Please retry.");
 				}
 				try {
 					guest = hotel.getRoomByNo(roomNo).getGuest();
 					roomService = guest.getRoomServiceByOrderId(orderId);
 					roomService.setStatus(status);
+					System.out.println("Room service update successful!");
 				} catch (RoomNotFoundException | OrderIdNotFoundException e) {
 					System.out.println(e.getMessage());
 				}
 				break;
-				
 			}
 			case "b":
 			case "B":{
@@ -465,9 +470,9 @@ public class HotelApp {
 				if (orderSuccess) {
 					try {
 						hotel.makeRoomServiceOrder(roomNo, menu, orderMap, orderId);
-						orderId=orderId+1;
+						orderId = orderId + 1;
 						orderId = (orderId % 2000000000);
-						System.out.println("Order successful!");
+						System.out.println("Order successful! Your order id is: " + (orderId - 1));
 					} catch (FoodNotOnMenuException | RoomNotFoundException | GuestNotFoundException e ) {
 						System.out.println(e.getMessage());
 					} 
@@ -487,10 +492,8 @@ public class HotelApp {
 					System.out.println("No Guest Assigned to The Room");
 				}
 				break;
-				
 			}
 			}
-			
 	}
 	public static void showMenuE(Menu menu) {
 		String foodname;
