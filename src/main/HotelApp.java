@@ -402,10 +402,11 @@ public class HotelApp {
 			switch(scanner.nextLine().trim()) {
 			case "a":
 			case "A":{
+				try {
 				System.out.print("Enter room number: ");
 				roomNo = HotelApp.scanner.nextLine().trim();
 				System.out.print("Enter the order ID: ");
-				orderId = HotelApp.scanner.nextInt();
+				orderId = Integer.parseInt(HotelApp.scanner.nextLine().trim());
 				System.out.print("Enter new status: \n"
 						+ "|=================|\n"
 						+ "|(A) Confirmed    |\n"
@@ -413,7 +414,7 @@ public class HotelApp {
 						+ "|(C) Delivered    |\n"
 						+ "|=================|\n"
 						+ "\nEnter user input: ");
-				HotelApp.scanner.nextLine();
+//				HotelApp.scanner.nextLine();
 				status = HotelApp.scanner.nextLine().trim();
 				switch(status) {
 				case "a":
@@ -424,12 +425,13 @@ public class HotelApp {
 				case "C": status = "delivered";break;
 				default: System.out.println("Invalid choice! Please retry.");
 				}
-				try {
 					guest = hotel.getRoomByNo(roomNo).getGuest();
 					roomService = guest.getRoomServiceByOrderId(orderId);
 					roomService.setStatus(status);
 				} catch (RoomNotFoundException | OrderIdNotFoundException e) {
 					System.out.println(e.getMessage());
+				} catch (NumberFormatException e) {
+					System.out.println("Order ID must be an integer. Please retry!");
 				}
 				break;
 				
