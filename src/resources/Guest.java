@@ -1,11 +1,8 @@
 package resources;
 import java.util.Date;
-import java.util.Set;
 import java.lang.reflect.Field;
-import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.ArrayList;
-
 import exception.FoodNotOnMenuException;
 import exception.GuestDetailUpdateFailureException;
 import exception.GuestNotFoundException;
@@ -97,39 +94,49 @@ public class Guest {
 	 * @throws {GuestDetailUpdateFailureException} exception when updating unknown details
 	 */
 	public void updateDetails(String detailToUpdate, String newData) throws GuestDetailUpdateFailureException {
-		Set<String> attrNames = this.getAttributeNames();
-		if (attrNames.contains(detailToUpdate)) {
+		Hashtable<String, String> attrNames = this.getAttributeNames();
+		detailToUpdate = detailToUpdate.toLowerCase().replaceAll(" ", "");
+		if (attrNames.containsKey(detailToUpdate)) {
 			Field field;
 			try {
-				field = this.getClass().getDeclaredField(detailToUpdate);
+				field = this.getClass().getDeclaredField(attrNames.get(detailToUpdate));
 				field.setAccessible(true);
 				try {
-					field.set(this, newData);
+					if (field.getType() == int.class) {
+						field.set(this, Integer.parseInt(newData));
+					}
+					else {
+						field.set(this, newData);
+					}
 				} catch (IllegalArgumentException e) {
-					e.printStackTrace();
 					throw new GuestDetailUpdateFailureException();
 				} catch (IllegalAccessException e) {
-					e.printStackTrace();
 					throw new GuestDetailUpdateFailureException();
 				}
 			} catch (NoSuchFieldException e) {
-				e.printStackTrace();
 				throw new GuestDetailUpdateFailureException();
 			} catch (SecurityException e) {
-				e.printStackTrace();
 				throw new GuestDetailUpdateFailureException();
 			}
+		}
+		else {
+			throw new GuestDetailUpdateFailureException("Detail to update is not found.");
 		}
 	}
 	
 	/**
 	 * A function to get attribute names of the guest class.
-	 * @return {Set<String>} the attribute of the class
+	 * @return {Hashtable<String, String>} the attribute of the class hashtable
 	 */
-	private Set<String> getAttributeNames() {
-		Set<String> fields = new HashSet<String>();
+	private Hashtable<String, String> getAttributeNames() {
+		Hashtable<String, String> fields= new Hashtable<String, String>();
         for (Field field : this.getClass().getDeclaredFields()) {
-            fields.add(field.getName().toLowerCase());
+        	if (field.getName().equals("contact")) {
+        		fields.put("contactnumber", field.getName());
+        	}
+        	else {
+        		fields.put(field.getName().toLowerCase(), field.getName());
+        	}
         }
         return fields;
 	}
