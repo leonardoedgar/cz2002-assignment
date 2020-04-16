@@ -485,39 +485,54 @@ public class ReservationSystem {
 		ArrayList<String> vip = new ArrayList<String>();
 		for (String i: hotel.getRoomTypeToVacantRoomNoListTable(true).keySet()) {
 			int ctr = 0;
-			if (this.reservationTable.containsKey(date)){
-			switch(i){
-				case "single":{
-					for (Reservation j :this.reservationTable.get(date).get(i)) {
-						if (j != null) {
-						single.add(hotel.getRoomTypeToVacantRoomNoListTable(true).get(i).get(ctr));
-						ctr++;
+			String formattedDate = ReservationSystem.getFormattedDate(date);
+			System.out.println("ct11r: "+ ctr);
+			System.out.println(this.reservationTable);
+			System.out.println(this.reservationTable.containsKey(formattedDate));
+			System.out.println(date.toString());
+			if (this.reservationTable.containsKey(formattedDate)){
+				System.out.println("ctr: "+ ctr);
+				switch(i){
+					case "single":{
+						if (this.reservationTable.get(formattedDate).get(i) != null) {
+						for (Reservation j :this.reservationTable.get(formattedDate).get(i)) {
+							single.add(hotel.getRoomTypeToVacantRoomNoListTable(true).get(i).get(ctr));
+							ctr++;
+							System.out.println("single");
+						}
+						break;
+					}}
+					case "double":{
+						if (this.reservationTable.get(formattedDate).get(i) != null) {
+						for (Reservation j :this.reservationTable.get(formattedDate).get(i)) {
+							doublee.add(hotel.getRoomTypeToVacantRoomNoListTable(true).get(i).get(ctr));
+							ctr++;
+							System.out.println("double");
+							}
+						break;
 						}
 					}
-				}
-				case "double":{
-					for (Reservation j :this.reservationTable.get(date).get(i)) {
-						doublee.add(hotel.getRoomTypeToVacantRoomNoListTable(true).get(i).get(ctr));
-						ctr++;
+					case "deluxe":{
+						if (this.reservationTable.get(formattedDate).get(i) != null) {
+						for (Reservation j :this.reservationTable.get(formattedDate).get(i)) {
+							deluxe.add(hotel.getRoomTypeToVacantRoomNoListTable(true).get(i).get(ctr));
+							ctr++;
+							System.out.println("deluxe");
+							}
+						break;
 						}
 					}
-				case "deluxe":{
-					for (Reservation j :this.reservationTable.get(date).get(i)) {
-						if (j != null) {
-						deluxe.add(hotel.getRoomTypeToVacantRoomNoListTable(true).get(i).get(ctr));
-						ctr++;
+					case "vip":{
+						if (this.reservationTable.get(formattedDate).get(i) != null) {
+						for (Reservation j :this.reservationTable.get(formattedDate).get(i)) {
+							vip.add(hotel.getRoomTypeToVacantRoomNoListTable(true).get(i).get(ctr));
+							ctr++;
+							System.out.println("vip");
 						}
-						}
-				}
-				case "vip":{
-					for (Reservation j :this.reservationTable.get(date).get(i)) {
-						if (j != null) {
-						vip.add(hotel.getRoomTypeToVacantRoomNoListTable(true).get(i).get(ctr));
-						ctr++;
+						break;
 						}
 					}
-				}
-				}
+					}
 			}
 		}
 		result.add(single);
