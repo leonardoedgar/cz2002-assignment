@@ -704,7 +704,7 @@ public class Hotel {
 				}
 			}
 		}
-		if (numberOfRooms > 0) {
+		if (numberOfRooms >= 0) {
 			return numberOfRooms;
 		} else {
 			throw new RoomTypeNotFoundException();
