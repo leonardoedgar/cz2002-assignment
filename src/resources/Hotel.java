@@ -11,6 +11,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import exception.HotelSetupFailureException;
+import exception.InvalidHotelTimeException;
 import exception.ReservationNotFoundException;
 import exception.RoomNotFoundException;
 import exception.FoodNotOnMenuException;
@@ -28,16 +29,19 @@ public class Hotel {
 	private Date currentDate;
 	private int checkInTimeInMilliSeconds; 
 	private int checkOutTimeInMilliSeconds;
+
 	/**
 	 * A class constructor to create a hotel.
 	 * 
 	 * @param roomConfigFilePath {String} the path to room configuration file
+	 * @param setupTimeDelay {int} the hotel app setup time delay
 	 * @throws {HotelSetupFailureException} exception when hotel failed to set up
 	 */
-	public Hotel(String roomConfigFilePath) throws HotelSetupFailureException {
+	public Hotel(String roomConfigFilePath, double setupTimeDelay) 
+			throws HotelSetupFailureException {
 		this.setupRooms(this.getRoomConfig(roomConfigFilePath));
 		this.reservationSystem = new ReservationSystem();
-		this.currentDate = new Date();
+		this.currentDate = new Date(new Date().getTime() - (int) setupTimeDelay*1000);
 		this.checkInTimeInMilliSeconds = 1000*60*60*14;
 		this.checkOutTimeInMilliSeconds = 1000*60*60*12;
 	}
@@ -713,16 +717,22 @@ public class Hotel {
 
 	/**
 	 * A function to update today reservation status with current time.
+	 * @throws InvalidHotelTimeException when hotel time is to be transited to the past.
 	 */
-	public void updateTodayReservationStatusWithCurrentTime() {
-		this.currentDate = new Date();
-		long checkInTimeTolerance = 1000*60*60;
-		@SuppressWarnings("deprecation")
-		long currentTime = this.currentDate.getTime() - 
-				new Date(this.currentDate.toLocaleString().split(",")[0]).getTime();
-		long checkInTime = this.checkInTimeInMilliSeconds;
-		if (currentTime > checkInTime + checkInTimeTolerance) {
-			this.reservationSystem.expireAllReservationsOnDate(currentDate);
+	public void updateReservationStatusByDate(Date date) throws InvalidHotelTimeException {
+		if (this.currentDate.compareTo(date) > 0) {
+			throw new InvalidHotelTimeException();
+		}
+		else {
+			this.currentDate = date;
+			long checkInTimeTolerance = 1000*60*60;
+			@SuppressWarnings("deprecation")
+			long currentTime = this.currentDate.getTime() - 
+					new Date(this.currentDate.toLocaleString().split(",")[0]).getTime();
+			long checkInTime = this.checkInTimeInMilliSeconds;
+			if (currentTime > checkInTime + checkInTimeTolerance) {
+				this.reservationSystem.expireAllReservationsUpToDate(currentDate);
+			}
 		}
 	}
 	
