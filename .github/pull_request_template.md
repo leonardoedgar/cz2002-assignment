@@ -5,6 +5,8 @@ Make sure that the base branch of the PR is **develop**
 - [ ] Feature has been tested
 - [ ] Provide docstring (description, param, return_value) in classes and methods
 - [ ] Get at least 1 approval
+- [ ] Update UML Class Diagram
+- [ ] Regenerate Javadoc
 
 #### Description
 Write a brief description of the feature you have worked on!! :astonished:
