@@ -232,10 +232,14 @@ public class ReservationSystem {
 				
 			}
 			catch (ReservationNotFoundException e1) {
+				Reservation clonedReservation = Reservation.copy(reservation);
 				try {
+					if(numberOfRooms==0) {
+						clonedReservation.updateStatus("waitlist");
+					}
 					this.getReservationOnSameDate(reserveDate).put(
 							reservation.getRoomType(), 
-							new ArrayList<Reservation>() {{add(reservation);}});
+							new ArrayList<Reservation>() {{add(clonedReservation);}});
 				}
 				catch (ReservationNotFoundException e2) {
 					this.reservationTable.put(
@@ -243,7 +247,7 @@ public class ReservationSystem {
 							new ConcurrentHashMap<String, ArrayList<Reservation>>() {{
 								put(
 										reservation.getRoomType(), 
-										new ArrayList<Reservation>() {{add(reservation);}}
+										new ArrayList<Reservation>() {{add(clonedReservation);}}
 								);}}
 					);
 				}
