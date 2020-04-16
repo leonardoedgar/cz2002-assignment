@@ -1,5 +1,6 @@
 package resources;
 import java.util.Date;
+import java.util.Hashtable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -477,69 +478,104 @@ public class ReservationSystem {
 		}
 	}
 	
-	public ArrayList<ArrayList<String>> getReservation(Date date,Hotel hotel){
-		ArrayList<ArrayList<String>> result = new ArrayList<ArrayList<String>>();;
-		ArrayList<String> single = new ArrayList<String>();
-		ArrayList<String> doublee = new ArrayList<String>();
-		ArrayList<String> deluxe = new ArrayList<String>();
-		ArrayList<String> vip = new ArrayList<String>();
+//	public ArrayList<ArrayList<String>> getReservation(Date date,Hotel hotel){
+//		ArrayList<ArrayList<String>> result = new ArrayList<ArrayList<String>>();;
+//		ArrayList<String> single = new ArrayList<String>();
+//		ArrayList<String> doublee = new ArrayList<String>();
+//		ArrayList<String> deluxe = new ArrayList<String>();
+//		ArrayList<String> vip = new ArrayList<String>();
+//		for (String i: hotel.getRoomTypeToVacantRoomNoListTable(true).keySet()) {
+//			int ctr = 0;
+//			String formattedDate = ReservationSystem.getFormattedDate(date);
+//			System.out.println("ct11r: "+ ctr);
+//			System.out.println(this.reservationTable);
+//			System.out.println(this.reservationTable.containsKey(formattedDate));
+//			System.out.println(date.toString());
+//			if (this.reservationTable.containsKey(formattedDate)){
+//				System.out.println("ctr: "+ ctr);
+//				switch(i){
+//					case "single":{
+//						if (this.reservationTable.get(formattedDate).get(i) != null) {
+//						for (Reservation j :this.reservationTable.get(formattedDate).get(i)) {
+//							single.add(hotel.getRoomTypeToVacantRoomNoListTable(true).get(i).get(ctr));
+//							ctr++;
+//							System.out.println("single");
+//						}
+//						break;
+//					}}
+//					case "double":{
+//						if (this.reservationTable.get(formattedDate).get(i) != null) {
+//						for (Reservation j :this.reservationTable.get(formattedDate).get(i)) {
+//							doublee.add(hotel.getRoomTypeToVacantRoomNoListTable(true).get(i).get(ctr));
+//							ctr++;
+//							System.out.println("double");
+//							}
+//						break;
+//						}
+//					}
+//					case "deluxe":{
+//						if (this.reservationTable.get(formattedDate).get(i) != null) {
+//						for (Reservation j :this.reservationTable.get(formattedDate).get(i)) {
+//							deluxe.add(hotel.getRoomTypeToVacantRoomNoListTable(true).get(i).get(ctr));
+//							ctr++;
+//							System.out.println("deluxe");
+//							}
+//						break;
+//						}
+//					}
+//					case "vip":{
+//						if (this.reservationTable.get(formattedDate).get(i) != null) {
+//						for (Reservation j :this.reservationTable.get(formattedDate).get(i)) {
+//							vip.add(hotel.getRoomTypeToVacantRoomNoListTable(true).get(i).get(ctr));
+//							ctr++;
+//							System.out.println("vip");
+//						}
+//						break;
+//						}
+//					}
+//					}
+//			}
+//		}
+//		result.add(single);
+//		result.add(doublee);
+//		result.add(deluxe);
+//		result.add(vip);
+//		
+//		return result;
+//}
+	
+	public Hashtable<String,ArrayList<String>> getReservation(Date date,Hotel hotel){
+		Hashtable<String,ArrayList<String>> result = new Hashtable<String, ArrayList<String>>();
+		ArrayList<String> reservedRooms = new ArrayList<String>();
 		for (String i: hotel.getRoomTypeToVacantRoomNoListTable(true).keySet()) {
 			int ctr = 0;
 			String formattedDate = ReservationSystem.getFormattedDate(date);
-			System.out.println("ct11r: "+ ctr);
-			System.out.println(this.reservationTable);
-			System.out.println(this.reservationTable.containsKey(formattedDate));
-			System.out.println(date.toString());
 			if (this.reservationTable.containsKey(formattedDate)){
-				System.out.println("ctr: "+ ctr);
-				switch(i){
-					case "single":{
-						if (this.reservationTable.get(formattedDate).get(i) != null) {
+				if (result.containsKey(i)==false) {
+					if (this.reservationTable.get(formattedDate).get(i) != null) {
 						for (Reservation j :this.reservationTable.get(formattedDate).get(i)) {
-							single.add(hotel.getRoomTypeToVacantRoomNoListTable(true).get(i).get(ctr));
-							ctr++;
-							System.out.println("single");
-						}
-						break;
-					}}
-					case "double":{
-						if (this.reservationTable.get(formattedDate).get(i) != null) {
-						for (Reservation j :this.reservationTable.get(formattedDate).get(i)) {
-							doublee.add(hotel.getRoomTypeToVacantRoomNoListTable(true).get(i).get(ctr));
-							ctr++;
-							System.out.println("double");
+							if (!(j.getStatus().equals("waitlist"))) {
+								reservedRooms.add(hotel.getRoomTypeToVacantRoomNoListTable(true).get(i).get(ctr));
+								result.put(i, reservedRooms);
+								ctr++;
 							}
-						break;
 						}
 					}
-					case "deluxe":{
-						if (this.reservationTable.get(formattedDate).get(i) != null) {
+					reservedRooms = new ArrayList<String>();
+				}
+				else {
+					if (this.reservationTable.get(formattedDate).get(i) != null) {
+						reservedRooms = result.get(i);
 						for (Reservation j :this.reservationTable.get(formattedDate).get(i)) {
-							deluxe.add(hotel.getRoomTypeToVacantRoomNoListTable(true).get(i).get(ctr));
-							ctr++;
-							System.out.println("deluxe");
+							if (!(j.getStatus().equals("waitlist"))) {
+								result.get(i).add(hotel.getRoomTypeToVacantRoomNoListTable(true).get(i).get(ctr));
+								ctr++;
 							}
-						break;
 						}
-					}
-					case "vip":{
-						if (this.reservationTable.get(formattedDate).get(i) != null) {
-						for (Reservation j :this.reservationTable.get(formattedDate).get(i)) {
-							vip.add(hotel.getRoomTypeToVacantRoomNoListTable(true).get(i).get(ctr));
-							ctr++;
-							System.out.println("vip");
-						}
-						break;
-						}
-					}
-					}
+				}
+				}
 			}
 		}
-		result.add(single);
-		result.add(doublee);
-		result.add(deluxe);
-		result.add(vip);
-		
 		return result;
 }
 	

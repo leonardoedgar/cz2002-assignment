@@ -777,15 +777,29 @@ public class HotelApp {
 					}
 					break;
 				}
+//				case "c":{
+//					System.out.println("Select the date: ");
+//					Date date = new Date(HotelApp.scanner.nextLine().trim());
+//					ArrayList<ArrayList<String>> reservedRooms = hotel.getReservationSystem().getReservation(date,hotel);
+//					System.out.println("The Reserved Rooms on "+ date+ " are as the following.");
+//					System.out.println("Single: "+ reservedRooms.get(0));
+//					System.out.println("Double: " + reservedRooms.get(1));
+//					System.out.println("Deluxe: " + reservedRooms.get(2));
+//					System.out.println("VIP: "+ reservedRooms.get(3));
+//					break;
+//				}
 				case "c":{
 					System.out.println("Select the date: ");
 					Date date = new Date(HotelApp.scanner.nextLine().trim());
-					ArrayList<ArrayList<String>> reservedRooms = hotel.getReservationSystem().getReservation(date,hotel);
-					System.out.println("The Reserved Rooms on "+ date+ " are as the following.");
-					System.out.println("Single: "+ reservedRooms.get(0));
-					System.out.println("Double: " + reservedRooms.get(1));
-					System.out.println("Deluxe: " + reservedRooms.get(2));
-					System.out.println("VIP: "+ reservedRooms.get(3));
+					Hashtable<String, ArrayList<String>> reservedRooms = hotel.getReservationSystem().getReservation(date,hotel);
+					if (reservedRooms.isEmpty()) {
+						System.out.println("Currently No Reservation on This Date");
+					}
+					else {
+						for(String i: reservedRooms.keySet()) {
+							System.out.println(i+": "+reservedRooms.get(i));
+						}
+					}
 					break;
 				}
 				default: System.out.println("Invalid input.");
