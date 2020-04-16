@@ -633,23 +633,28 @@ public class HotelApp {
 				if(tempreservation != null) {
 					String roomType = tempreservation.getRoomType();
 					Guest tempGuest = tempreservation.getGuest();
-					boolean success = false;
-					String vacantRoomListString = 
-							hotel.getRoomTypeToVacantRoomNoListTable(true).get(roomType).toString();
-					System.out.println("Available rooms: " + vacantRoomListString.substring(1,
-							vacantRoomListString.length()-1));
-					System.out.print("Enter the room number guest will be assigned to: ");
-					String roomNo = HotelApp.scanner.nextLine().trim();
-					try{
-						success = hotel.checkIn(tempGuest, roomNo, roomType,tempreservation);
-						if(success) {
-							System.out.println("Check-in successful!");
+					if (tempGuest.getStartDateOfStay().compareTo(hotel.getCurrentDate()) > 0) {
+						System.out.println("It is not the time yet to check in.");
+					}
+					else {
+						boolean success = false;
+						String vacantRoomListString = 
+								hotel.getRoomTypeToVacantRoomNoListTable(true).get(roomType).toString();
+						System.out.println("Available rooms: " + vacantRoomListString.substring(1,
+								vacantRoomListString.length()-1));
+						System.out.print("Enter the room number guest will be assigned to: ");
+						String roomNo = HotelApp.scanner.nextLine().trim();
+						try{
+							success = hotel.checkIn(tempGuest, roomNo, roomType,tempreservation);
+							if(success) {
+								System.out.println("Check-in successful!");
+							}
+							else {
+								System.out.println("Room is currently unavailable. Choose another room.");
+							}
+						} catch(RoomNotFoundException e) {
+							System.out.println(e.getMessage());
 						}
-						else {
-							System.out.println("Room is currently unavailable. Choose another room.");
-						}
-					} catch(RoomNotFoundException e) {
-						System.out.println(e.getMessage());
 					}
 				}
 				else {
