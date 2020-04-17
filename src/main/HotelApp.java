@@ -27,15 +27,27 @@ import exception.FoodNotOnMenuException;
 import exception.InvalidGuestDetailException;
 
 public class HotelApp {
-	static int orderId=0;
+	static int orderId = 0;
 	public static Scanner scanner = new Scanner(System.in);
+	static Date currentTime = new Date();
+	static double setupTimeDelayInSeconds = 1;
+	
+	/**
+	 * A function to fast forward the hotel app by a number of days.
+	 * @param {numOfDays} the number of days to move forward to
+	 */
+	public static void fastForwardByNumberOfDays(int numOfDays) {
+		HotelApp.currentTime = new Date(HotelApp.currentTime.getTime() + numOfDays*24*60*60*1000);
+	}
+	
 	public static void main(String[] args) {
 		boolean exitApp = false;
 		try {
-			Hotel hotel = new Hotel("src/data/roomConfig.txt");
+			Hotel hotel = new Hotel("src/data/roomConfig.txt", HotelApp.setupTimeDelayInSeconds);
 			Menu menu = new Menu("src/data/menu.txt");
 			while (!exitApp) {
-				hotel.updateTodayReservationStatusWithCurrentTime();
+				hotel.updateReservationStatusByDate(HotelApp.currentTime);
+				hotel.kickOutGuestWhoPastCheckOutTime();
 				HotelApp.printHotelAppMenu();
 				System.out.print("Enter user input: ");
 				switch(HotelApp.scanner.nextLine().trim().toLowerCase()) {
@@ -623,23 +635,28 @@ public class HotelApp {
 				if(tempreservation != null) {
 					String roomType = tempreservation.getRoomType();
 					Guest tempGuest = tempreservation.getGuest();
-					boolean success = false;
-					String vacantRoomListString = 
-							hotel.getRoomTypeToVacantRoomNoListTable(true).get(roomType).toString();
-					System.out.println("Available rooms: " + vacantRoomListString.substring(1,
-							vacantRoomListString.length()-1));
-					System.out.print("Enter the room number guest will be assigned to: ");
-					String roomNo = HotelApp.scanner.nextLine().trim();
-					try{
-						success = hotel.checkIn(tempGuest, roomNo, roomType,tempreservation);
-						if(success) {
-							System.out.println("Check-in successful!");
+					if (tempGuest.getStartDateOfStay().compareTo(hotel.getCurrentDate()) > 0) {
+						System.out.println("It is not the time yet to check in.");
+					}
+					else {
+						boolean success = false;
+						String vacantRoomListString = 
+								hotel.getRoomTypeToVacantRoomNoListTable(true).get(roomType).toString();
+						System.out.println("Available rooms: " + vacantRoomListString.substring(1,
+								vacantRoomListString.length()-1));
+						System.out.print("Enter the room number guest will be assigned to: ");
+						String roomNo = HotelApp.scanner.nextLine().trim();
+						try{
+							success = hotel.checkIn(tempGuest, roomNo, roomType,tempreservation);
+							if(success) {
+								System.out.println("Check-in successful!");
+							}
+							else {
+								System.out.println("Room is currently unavailable. Choose another room.");
+							}
+						} catch(RoomNotFoundException e) {
+							System.out.println(e.getMessage());
 						}
-						else {
-							System.out.println("Room is currently unavailable. Choose another room.");
-						}
-					} catch(RoomNotFoundException e) {
-						System.out.println(e.getMessage());
 					}
 				}
 				else {

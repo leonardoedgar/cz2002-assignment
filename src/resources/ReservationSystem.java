@@ -127,14 +127,14 @@ public class ReservationSystem {
 		int num_room = numRoom + delta;
 		for(String date: this.reservationTable.keySet()) {
 			int counter = 1;
-      if(!(this.reservationTable.get(date).get(roomtype)==null)) {
-        for (Reservation reserve: this.reservationTable.get(date).get(roomtype)) {
+			if(!(this.reservationTable.get(date).get(roomtype)==null)) {
+				for (Reservation reserve: this.reservationTable.get(date).get(roomtype)) {
   //				only set to waitlist if the person is between the current number of room and the prev number of room 
-          if (counter > num_room && counter <=num_room-delta && delta == -1) {
+          if (counter > num_room && counter <= num_room-delta && delta == -1) {
             reserve.updateStatus("waitlist");
           }
-				else if (counter <= num_room && counter > num_room-delta && delta == 1) {
-					reserve.updateStatus("confirmed");
+				  else if (counter <= num_room && counter > num_room-delta && delta == 1) {
+					  reserve.updateStatus("confirmed");
 					}
 					counter ++;
 				}
@@ -471,13 +471,16 @@ public class ReservationSystem {
 	}
 	
 	/**
-	 * A function to expire all reservations on certain date.
-	 * @param date {Date} the date of reservations to expire
+	 * A function to expire all reservations up to certain date.
+	 * @param date {Date} the up to date of reservations to expire
 	 */
-	public void expireAllReservationsOnDate(Date date) {
+	@SuppressWarnings("deprecation")
+	public void expireAllReservationsUpToDate(Date date) {
 		String formattedDate = ReservationSystem.getFormattedDate(date);
-		if (this.reservationTable.containsKey(formattedDate)) {
-			this.reservationTable.remove(formattedDate);
+		for (String registeredFormattedDate: this.reservationTable.keySet()) {
+			if (new Date(registeredFormattedDate).compareTo(new Date(formattedDate)) <= 0) {
+				this.reservationTable.remove(registeredFormattedDate);
+			}
 		}
 	}
 	
@@ -496,43 +499,4 @@ public class ReservationSystem {
 			return null;
 		}
 	}
-
-//	public Hashtable<String,ArrayList<String>> getReservationsByDate(Date date, 
-//			Hashtable <String, ArrayList<String>> roomTypeToVacantRoomNoListTable){
-//		Hashtable<String,ArrayList<String>> result = new Hashtable<String, ArrayList<String>>();
-//		ArrayList<String> reservedRooms = new ArrayList<String>();
-//		for (String roomType: roomTypeToVacantRoomNoListTable.keySet()) {
-//			int ctr = 0;
-//			String formattedDate = ReservationSystem.getFormattedDate(date);
-//			if (this.reservationTable.containsKey(formattedDate)){
-//				if (!result.containsKey(roomType)) {
-//					if (this.reservationTable.get(formattedDate).get(formattedDate) != null) {
-//						for (Reservation reservation :
-//							this.reservationTable.get(formattedDate).get(roomType)) {
-//							if (!(reservation.getStatus().equals("waitlist"))) {
-//								reservedRooms.add(roomTypeToVacantRoomNoListTable.get(roomType).get(ctr));
-//								result.put(roomType, reservedRooms);
-//								ctr++;
-//							}
-//						}
-//					}
-//					reservedRooms = new ArrayList<String>();
-//				}
-//				else {
-//					if (this.reservationTable.get(formattedDate).get(roomType) != null) {
-//						reservedRooms = result.get(roomType);
-//						for (Reservation reservation :
-//							this.reservationTable.get(formattedDate).get(roomType)) {
-//							if (!(reservation.getStatus().equals("waitlist"))) {
-//								result.get(roomType).add(
-//										roomTypeToVacantRoomNoListTable.get(roomType).get(ctr));
-//								ctr++;
-//							}
-//						}
-//				}
-//				}
-//			}
-//		}
-//		return result;
-//	}
 }
