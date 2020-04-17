@@ -1,6 +1,5 @@
 package resources;
 import java.util.Date;
-import java.util.Hashtable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,13 +26,13 @@ public class ReservationSystem {
 	 */
 	public String generateNewId() throws IdGenerationFailedException {
 		String validIdCharacters="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-		int idLength=10;
-		int maxtry=10;
-		int noOfTry=0;
+		int idLength = 10;
+		int maxtry = 10;
+		int noOfTry = 0;
 		StringBuilder newReservationId = new StringBuilder(idLength);
 		
 		do {
-		for(int i=0;i<idLength;i++) {
+		for(int i=0; i<idLength; i++) {
 			if(noOfTry>=maxtry) {
 				throw new IdGenerationFailedException();
 			}
@@ -45,19 +44,23 @@ public class ReservationSystem {
 		
 		return newReservationId.toString();
 	}
+
 	/**
-	 * A function to update the reservation status of all reservation objects with the corresponding reservationId
+	 * A function to update the reservation status for checked in guests.
 	 * @param reservationId {String} the reservationId
-	 * @param updatedStatus {String} the new status of the reservation
+	 * @param roomType {String} the reserved room type
 	 */
-	public void updateAllReservationStatus(String reservationId, String updatedStatus, String roomType) {
+	public void updateCheckedInReservationStatusnByIdAndRoomType(String reservationId, String roomType) {
 		for(String date: this.reservationTable.keySet()) {
-			if(!(this.reservationTable.get(date).get(roomType)==null)) {
-			for(Reservation reservation: this.reservationTable.get(date).get(roomType)) {
-				if(reservation.getReservationId().equals(reservationId)) {
-					reservation.updateStatus(updatedStatus);
+			if(this.reservationTable.get(date).get(roomType) != null) {
+				ArrayList <Reservation> reservationList = this.reservationTable.get(date).get(roomType);
+				for(Reservation reservation: reservationList) {
+					if(reservation.getReservationId().equals(reservationId)) {
+						reservationList.remove(reservation);
+						reservation.updateStatus("checked-in");
+						reservationList.add(0, reservation);
+					}
 				}
-			}
 			}
 		}
 	}
@@ -478,105 +481,58 @@ public class ReservationSystem {
 		}
 	}
 	
-//	public ArrayList<ArrayList<String>> getReservation(Date date,Hotel hotel){
-//		ArrayList<ArrayList<String>> result = new ArrayList<ArrayList<String>>();;
-//		ArrayList<String> single = new ArrayList<String>();
-//		ArrayList<String> doublee = new ArrayList<String>();
-//		ArrayList<String> deluxe = new ArrayList<String>();
-//		ArrayList<String> vip = new ArrayList<String>();
-//		for (String i: hotel.getRoomTypeToVacantRoomNoListTable(true).keySet()) {
+	/**
+	 * A function to get all reservations on a specified date.
+	 * @param date {Date} the date of the reservation
+	 * @param {roomTypeToVacantRoomNoListTable}
+	 * @return {ConcurrentHashMap<String, ArrayList<Reservation>>} the map of reservations by room type
+	 */
+	public ConcurrentHashMap<String, ArrayList<Reservation>> getReservationsByDate(Date date) {
+		String formattedDate = ReservationSystem.getFormattedDate(date);
+		if (this.reservationTable.containsKey(formattedDate)) {
+			return this.reservationTable.get(formattedDate);
+		}
+		else {
+			return null;
+		}
+	}
+
+//	public Hashtable<String,ArrayList<String>> getReservationsByDate(Date date, 
+//			Hashtable <String, ArrayList<String>> roomTypeToVacantRoomNoListTable){
+//		Hashtable<String,ArrayList<String>> result = new Hashtable<String, ArrayList<String>>();
+//		ArrayList<String> reservedRooms = new ArrayList<String>();
+//		for (String roomType: roomTypeToVacantRoomNoListTable.keySet()) {
 //			int ctr = 0;
 //			String formattedDate = ReservationSystem.getFormattedDate(date);
-//			System.out.println("ct11r: "+ ctr);
-//			System.out.println(this.reservationTable);
-//			System.out.println(this.reservationTable.containsKey(formattedDate));
-//			System.out.println(date.toString());
 //			if (this.reservationTable.containsKey(formattedDate)){
-//				System.out.println("ctr: "+ ctr);
-//				switch(i){
-//					case "single":{
-//						if (this.reservationTable.get(formattedDate).get(i) != null) {
-//						for (Reservation j :this.reservationTable.get(formattedDate).get(i)) {
-//							single.add(hotel.getRoomTypeToVacantRoomNoListTable(true).get(i).get(ctr));
-//							ctr++;
-//							System.out.println("single");
-//						}
-//						break;
-//					}}
-//					case "double":{
-//						if (this.reservationTable.get(formattedDate).get(i) != null) {
-//						for (Reservation j :this.reservationTable.get(formattedDate).get(i)) {
-//							doublee.add(hotel.getRoomTypeToVacantRoomNoListTable(true).get(i).get(ctr));
-//							ctr++;
-//							System.out.println("double");
+//				if (!result.containsKey(roomType)) {
+//					if (this.reservationTable.get(formattedDate).get(formattedDate) != null) {
+//						for (Reservation reservation :
+//							this.reservationTable.get(formattedDate).get(roomType)) {
+//							if (!(reservation.getStatus().equals("waitlist"))) {
+//								reservedRooms.add(roomTypeToVacantRoomNoListTable.get(roomType).get(ctr));
+//								result.put(roomType, reservedRooms);
+//								ctr++;
 //							}
-//						break;
 //						}
 //					}
-//					case "deluxe":{
-//						if (this.reservationTable.get(formattedDate).get(i) != null) {
-//						for (Reservation j :this.reservationTable.get(formattedDate).get(i)) {
-//							deluxe.add(hotel.getRoomTypeToVacantRoomNoListTable(true).get(i).get(ctr));
-//							ctr++;
-//							System.out.println("deluxe");
+//					reservedRooms = new ArrayList<String>();
+//				}
+//				else {
+//					if (this.reservationTable.get(formattedDate).get(roomType) != null) {
+//						reservedRooms = result.get(roomType);
+//						for (Reservation reservation :
+//							this.reservationTable.get(formattedDate).get(roomType)) {
+//							if (!(reservation.getStatus().equals("waitlist"))) {
+//								result.get(roomType).add(
+//										roomTypeToVacantRoomNoListTable.get(roomType).get(ctr));
+//								ctr++;
 //							}
-//						break;
 //						}
-//					}
-//					case "vip":{
-//						if (this.reservationTable.get(formattedDate).get(i) != null) {
-//						for (Reservation j :this.reservationTable.get(formattedDate).get(i)) {
-//							vip.add(hotel.getRoomTypeToVacantRoomNoListTable(true).get(i).get(ctr));
-//							ctr++;
-//							System.out.println("vip");
-//						}
-//						break;
-//						}
-//					}
-//					}
+//				}
+//				}
 //			}
 //		}
-//		result.add(single);
-//		result.add(doublee);
-//		result.add(deluxe);
-//		result.add(vip);
-//		
 //		return result;
-//}
-	
-	public Hashtable<String,ArrayList<String>> getReservation(Date date,Hotel hotel){
-		Hashtable<String,ArrayList<String>> result = new Hashtable<String, ArrayList<String>>();
-		ArrayList<String> reservedRooms = new ArrayList<String>();
-		for (String i: hotel.getRoomTypeToVacantRoomNoListTable(true).keySet()) {
-			int ctr = 0;
-			String formattedDate = ReservationSystem.getFormattedDate(date);
-			if (this.reservationTable.containsKey(formattedDate)){
-				if (result.containsKey(i)==false) {
-					if (this.reservationTable.get(formattedDate).get(i) != null) {
-						for (Reservation j :this.reservationTable.get(formattedDate).get(i)) {
-							if (!(j.getStatus().equals("waitlist"))) {
-								reservedRooms.add(hotel.getRoomTypeToVacantRoomNoListTable(true).get(i).get(ctr));
-								result.put(i, reservedRooms);
-								ctr++;
-							}
-						}
-					}
-					reservedRooms = new ArrayList<String>();
-				}
-				else {
-					if (this.reservationTable.get(formattedDate).get(i) != null) {
-						reservedRooms = result.get(i);
-						for (Reservation j :this.reservationTable.get(formattedDate).get(i)) {
-							if (!(j.getStatus().equals("waitlist"))) {
-								result.get(i).add(hotel.getRoomTypeToVacantRoomNoListTable(true).get(i).get(ctr));
-								ctr++;
-							}
-						}
-				}
-				}
-			}
-		}
-		return result;
-}
-	
+//	}
 }

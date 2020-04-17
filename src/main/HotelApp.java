@@ -2,6 +2,7 @@ package main;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Scanner;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Hashtable;
@@ -686,8 +687,8 @@ public class HotelApp {
 								if(reservation != null) {
 									hotel.getReservationSystem().addReservation(reservation, 
 											hotel.getNumberOfRoomsByRoomType(reservation.getRoomType()));
-									hotel.getReservationSystem().updateAllReservationStatus(reservation.getReservationId(), 
-											"checked-in", reservation.getRoomType());
+									hotel.getReservationSystem().updateCheckedInReservationStatusnByIdAndRoomType(
+											reservation.getReservationId(), roomType);
 								}
 								System.out.println("Check-in successful!");
 							}
@@ -777,28 +778,54 @@ public class HotelApp {
 					}
 					break;
 				}
-//				case "c":{
-//					System.out.println("Select the date: ");
-//					Date date = new Date(HotelApp.scanner.nextLine().trim());
-//					ArrayList<ArrayList<String>> reservedRooms = hotel.getReservationSystem().getReservation(date,hotel);
-//					System.out.println("The Reserved Rooms on "+ date+ " are as the following.");
-//					System.out.println("Single: "+ reservedRooms.get(0));
-//					System.out.println("Double: " + reservedRooms.get(1));
-//					System.out.println("Deluxe: " + reservedRooms.get(2));
-//					System.out.println("VIP: "+ reservedRooms.get(3));
-//					break;
-//				}
 				case "c":{
-					System.out.println("Select the date: ");
-					Date date = new Date(HotelApp.scanner.nextLine().trim());
-					Hashtable<String, ArrayList<String>> reservedRooms = hotel.getReservationSystem().getReservation(date,hotel);
-					if (reservedRooms.isEmpty()) {
-						System.out.println("Currently No Reservation on This Date");
-					}
-					else {
-						for(String i: reservedRooms.keySet()) {
-							System.out.println(i+": "+reservedRooms.get(i));
+					System.out.print("Select the date (MM/DD/YYYY): ");
+					try {
+						@SuppressWarnings("deprecation")
+						Date date = new Date(HotelApp.scanner.nextLine().trim());
+						ConcurrentHashMap<String, ArrayList<Reservation>> reservationsMap = 
+								hotel.getReservationSystem().getReservationsByDate(date);
+						if (reservationsMap != null) {
+							for (String roomType: reservationsMap.keySet()) {
+								ArrayList<String> reservedRoomNoList = new ArrayList<String>();
+								String startingRoomNo = "01";
+								String roomLevel = hotel.getRoomLevelByRoomType(roomType);
+								for (Reservation reservation: reservationsMap.get(roomType)) {
+									if (reservation.getStatus().equals("checked-in")) {
+										try {
+											String roomNoOfCheckedInGuest = 
+													hotel.getRoomNoOfCheckedInGuestFromReservation(
+															reservation.getGuest(), roomType);
+											reservedRoomNoList.add(roomNoOfCheckedInGuest);
+										} catch (GuestNotFoundException e) {
+											System.out.println(e.getMessage());
+										}
+									}
+									else if (reservation.getStatus().equals("confirmed")){
+										while(reservedRoomNoList.contains(startingRoomNo)) {
+											int roomNo = Integer.parseInt(startingRoomNo);
+											if (roomNo < 10) {
+												startingRoomNo = "0" + Integer.toString(roomNo+1);
+											}
+											else {
+												startingRoomNo = Integer.toString(roomNo+1);
+											}
+										}
+										reservedRoomNoList.add(roomLevel + "-" + startingRoomNo);
+									}
+								}
+								String sortedRoomNoList = 
+										Hotel.getSortedRoomNoList(reservedRoomNoList).toString(); 
+								System.out.println(roomType + ": " + 
+										sortedRoomNoList.substring(1, sortedRoomNoList.length()-1));
+							}
 						}
+						else {
+							System.out.println("There is no reservation on this date.");
+						}
+					}
+					catch(IllegalArgumentException e) {
+						System.out.println("Invalid date and time format.");
 					}
 					break;
 				}
