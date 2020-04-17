@@ -3,6 +3,7 @@ package resources;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Hashtable;
+
 import resources.ReservationSystem;
 import resources.Room;
 import resources.Guest;
@@ -10,6 +11,7 @@ import java.io.FileReader;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+
 import exception.HotelSetupFailureException;
 import exception.InvalidHotelTimeException;
 import exception.ReservationNotFoundException;
@@ -463,12 +465,10 @@ public class Hotel {
 			throw new RoomNotFoundException("Check in failed. The reservation is in waitlist");
 		}
 		if (tempRoom.getStatus().equals("vacant")) {
-
 			tempRoom.assignGuestToRoom(guest);
 			tempRoom.updateStatus("occupied");
-
-			this.reservationSystem.updateAllReservationStatus(reservation.getReservationId(), "checked-in", roomType);
-
+			this.reservationSystem.updateCheckedInReservationStatusnByIdAndRoomType(
+					reservation.getReservationId(), roomType);
 			return true;
 		} else {
 			return false;
@@ -661,21 +661,6 @@ public class Hotel {
 	}
 
 	/**
-	 * A function to update the number of available room in a certain room type
-	 * 
-	 * @param room_type {String} the room type
-	 * @param num_room  {int} this is the number of available room of the
-	 *                  corresponding room type
-	 * @param delta     {int} the number of rooms that the status should be change
-	 *                  (1 if you are changing waitlist to confirmed, -1 otherwise)
-	 * @return {void}
-	 * @throws RoomTypeNotFoundException
-	 */
-	public void updateReservation(String roomType, int delta) throws RoomTypeNotFoundException {
-		this.getReservationSystem().shiftReservation(this.getNumberOfRoomsByRoomType(roomType), roomType, delta);
-	}
-
-	/**
 	 * A function to check if roomType exists in the hotel
 	 * 
 	 * @param roomType {String} the roomType you want to check
@@ -757,6 +742,40 @@ public class Hotel {
 		return this.checkOutTimeInMilliSeconds;
 	}
 	
+	/**
+	 * A function to get hotel room level by room type.
+	 * @return {String} the room level
+	 * @throws {RoomTypeNotFoundException} when room type is not in the hotel system
+	 */
+	public String getRoomLevelByRoomType(String roomType) throws RoomTypeNotFoundException {
+		if (this.getAvailableRoomTypes().contains(roomType)) {
+			ArrayList <String> roomNoList = new ArrayList<String>();
+			roomNoList.addAll(this.roomTable.get(roomType).keySet());
+			return roomNoList.get(0).split("-")[0];
+		}
+		else {
+			throw new RoomTypeNotFoundException();
+		}
+	}
+	
+	/**
+	 * A function to get the room number of checked in guest.
+	 * @param guest {Guest} the guest whose room number is to find
+	 * @param roomType {roomType} the room type
+	 * @return {String} the roomNo 
+	 * @throws {GuestNotFoundException} when guest is not in the hotel. 
+	 */
+	public String getRoomNoOfCheckedInGuestFromReservation(Guest guest, String roomType) 
+			throws GuestNotFoundException {
+		for (String roomNo: this.roomTable.get(roomType).keySet()) {
+			Guest hotelCurrentGuest = this.roomTable.get(roomType).get(roomNo).getGuest();
+			if (hotelCurrentGuest != null && Guest.isIdentical(hotelCurrentGuest, guest)) {
+				return roomNo;
+			}
+		}
+		throw new GuestNotFoundException();
+	}
+
 	/**
 	 * A function to kick out guests from hotel after checkout time.
 	 */

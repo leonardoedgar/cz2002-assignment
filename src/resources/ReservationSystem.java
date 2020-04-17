@@ -26,13 +26,13 @@ public class ReservationSystem {
 	 */
 	public String generateNewId() throws IdGenerationFailedException {
 		String validIdCharacters="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-		int idLength=10;
-		int maxtry=10;
-		int noOfTry=0;
+		int idLength = 10;
+		int maxtry = 10;
+		int noOfTry = 0;
 		StringBuilder newReservationId = new StringBuilder(idLength);
 		
 		do {
-		for(int i=0;i<idLength;i++) {
+		for(int i=0; i<idLength; i++) {
 			if(noOfTry>=maxtry) {
 				throw new IdGenerationFailedException();
 			}
@@ -44,19 +44,23 @@ public class ReservationSystem {
 		
 		return newReservationId.toString();
 	}
+
 	/**
-	 * A function to update the reservation status of all reservation objects with the corresponding reservationId
+	 * A function to update the reservation status for checked in guests.
 	 * @param reservationId {String} the reservationId
-	 * @param updatedStatus {String} the new status of the reservation
+	 * @param roomType {String} the reserved room type
 	 */
-	public void updateAllReservationStatus(String reservationId, String updatedStatus, String roomType) {
+	public void updateCheckedInReservationStatusnByIdAndRoomType(String reservationId, String roomType) {
 		for(String date: this.reservationTable.keySet()) {
-			if(!(this.reservationTable.get(date).get(roomType)==null)) {
-			for(Reservation reservation: this.reservationTable.get(date).get(roomType)) {
-				if(reservation.getReservationId().equals(reservationId)) {
-					reservation.updateStatus(updatedStatus);
+			if(this.reservationTable.get(date).get(roomType) != null) {
+				ArrayList <Reservation> reservationList = this.reservationTable.get(date).get(roomType);
+				for(Reservation reservation: reservationList) {
+					if(reservation.getReservationId().equals(reservationId)) {
+						reservationList.remove(reservation);
+						reservation.updateStatus("checked-in");
+						reservationList.add(0, reservation);
+					}
 				}
-			}
 			}
 		}
 	}
@@ -126,11 +130,11 @@ public class ReservationSystem {
 			if(!(this.reservationTable.get(date).get(roomtype)==null)) {
 				for (Reservation reserve: this.reservationTable.get(date).get(roomtype)) {
   //				only set to waitlist if the person is between the current number of room and the prev number of room 
-					if (counter > num_room && counter <=num_room-delta && delta == -1) {
-						reserve.updateStatus("waitlist");
-					}
-					else if (counter <= num_room && counter > num_room-delta && delta == 1) {
-						reserve.updateStatus("confirmed");
+          if (counter > num_room && counter <= num_room-delta && delta == -1) {
+            reserve.updateStatus("waitlist");
+          }
+				  else if (counter <= num_room && counter > num_room-delta && delta == 1) {
+					  reserve.updateStatus("confirmed");
 					}
 					counter ++;
 				}
@@ -477,6 +481,22 @@ public class ReservationSystem {
 			if (new Date(registeredFormattedDate).compareTo(new Date(formattedDate)) <= 0) {
 				this.reservationTable.remove(registeredFormattedDate);
 			}
+		}
+	}
+	
+	/**
+	 * A function to get all reservations on a specified date.
+	 * @param date {Date} the date of the reservation
+	 * @param {roomTypeToVacantRoomNoListTable}
+	 * @return {ConcurrentHashMap<String, ArrayList<Reservation>>} the map of reservations by room type
+	 */
+	public ConcurrentHashMap<String, ArrayList<Reservation>> getReservationsByDate(Date date) {
+		String formattedDate = ReservationSystem.getFormattedDate(date);
+		if (this.reservationTable.containsKey(formattedDate)) {
+			return this.reservationTable.get(formattedDate);
+		}
+		else {
+			return null;
 		}
 	}
 }
