@@ -112,9 +112,37 @@ public class HotelApp {
 			case "a": {
 				System.out.print("Enter guest name      : ");
 				String guestName = HotelApp.scanner.nextLine().trim();
-				System.out.print("Enter detail to update: ");
-				String detailToUpdate = HotelApp.scanner.nextLine().trim();
-				System.out.print("Enter new detail      : ");
+				String detailToUpdate = "";
+				boolean correct = false;
+				while(!correct) {
+					System.out.println(	""
+							+ "|====================================|\n"
+							+ "|(A) Update guest's name             |\n"
+							+ "|(B) Update guest's card details     |\n"
+							+ "|(C) Update guest's address          |\n"
+							+ "|(D) Update guest's country          |\n"
+							+ "|(E) Update guest's nationality      |\n"
+							+ "|(F) Update guest's gender           |\n"
+							+ "|(G) Update guest's contact number   |\n"
+							+ "|(H) Update guest's identity         |\n"
+							+ "|(I) Update guest's payment type     |\n"
+							+ "|====================================|\n"
+							+"Enter detail to update: ");
+					detailToUpdate = HotelApp.scanner.nextLine().trim();
+					switch(detailToUpdate) {
+					case "a": detailToUpdate = "name"; correct=true; break;
+					case "b": detailToUpdate = "card details"; correct=true; break;
+					case "c": detailToUpdate = "address"; correct=true; break;
+					case "d": detailToUpdate = "country"; correct=true; break;
+					case "e": detailToUpdate = "nationality"; correct=true; break;
+					case "f": detailToUpdate = "gender"; correct=true; break;
+					case "g": detailToUpdate = "contact number"; correct=true; break;
+					case "h": detailToUpdate = "identity"; correct=true; break;
+					case "i": detailToUpdate = "payment type"; correct=true; break;
+					default: System.out.println("Invalid entry, try again");
+					}
+				}
+				System.out.print("Enter new "+ detailToUpdate +"      : ");
 				String newDetail = HotelApp.scanner.nextLine().trim();
 				try {
 					hotel.updateGuestDetailsByName(guestName, detailToUpdate, newDetail);
@@ -223,8 +251,18 @@ public class HotelApp {
 		Date checkOutDate = guest.getEndDateOfStay();
 		System.out.print("Enter room type                                     : ");
 		String roomType = HotelApp.scanner.nextLine().trim();
-		System.out.print("Enter number of people                              : ");
-		int numOfPeople = Integer.parseInt(HotelApp.scanner.nextLine().trim());
+		boolean correct=false;
+		int numOfPeople=1;
+		while(!correct) {
+			System.out.print("Enter number of people                              : ");
+			numOfPeople = Integer.parseInt(HotelApp.scanner.nextLine().trim());
+			if(numOfPeople <= 0) {
+				System.out.println("Number of people must be greater than 0!");
+			}
+			else {
+				correct=true;
+			}
+		}
 		String paymentType = guest.getPaymentType();
 		if (checkInDate.compareTo(checkOutDate) >=0 || !roomTypes.contains(roomType)) {
 			throw new InvalidReservationDetailException();
@@ -453,40 +491,45 @@ public class HotelApp {
 				menu.printItems();
 				System.out.print("Enter room number: ");
 				roomNo = HotelApp.scanner.nextLine().trim();
+				try {
+					hotel.getRoomByNo(roomNo); //using this to check if roomNo exists
 				while (orderMore) {
 					System.out.print("Enter food name: ");
 					String foodName = HotelApp.scanner.nextLine().trim();
 					System.out.print("Enter quantity to order: ");
 					try {
-						String quantity = Integer.toString(HotelApp.scanner.nextInt());
-						HotelApp.scanner.nextLine();
+						orderSuccess = true;
+						int quantity = Integer.parseInt(HotelApp.scanner.nextLine());
 						if (orderMap.containsKey(foodName)) {
 							String newQuantity = Integer.toString(
-									Integer.parseInt(orderMap.get(foodName)) + Integer.parseInt(quantity));
+									Integer.parseInt(orderMap.get(foodName)) + quantity);
 							orderMap.replace(foodName, newQuantity);
 						}
 						else {
-							orderMap.put(foodName, quantity);
+							orderMap.put(foodName, Integer.toString(quantity));
 						}
 						System.out.println("current order: " + orderMap.toString());
 						System.out.print("Order more (yes/no): ");
 						orderMore = HotelApp.scanner.nextLine().trim().equalsIgnoreCase("yes");
 					}
-					catch(InputMismatchException e) {
+					catch(InputMismatchException | NumberFormatException e) {
 						System.out.println("Invalid input. Re-entry the last order to reorder.");
 						orderSuccess = false;
 					}
 				}
 				if (orderSuccess) {
-					try {
+					
 						hotel.makeRoomServiceOrder(roomNo, menu, orderMap, orderId);
 						orderId = orderId + 1;
 						orderId = (orderId % 2000000000);
 						System.out.println("Order successful! Your order id is: " + (orderId - 1));
-					} catch (FoodNotOnMenuException | RoomNotFoundException | GuestNotFoundException e ) {
-						System.out.println(e.getMessage());
-					} 
+						} 
+				else {
+					System.out.println("Order failed! Invalid input.");
 				}
+				}catch (FoodNotOnMenuException | RoomNotFoundException | GuestNotFoundException e ) {
+					System.out.println(e.getMessage());
+				} 
 				break;
 			}
 			case "c":
@@ -503,6 +546,7 @@ public class HotelApp {
 				}
 				break;
 			}
+			default:System.out.println("Invalid input.");
 			}
 	}
 	public static void showMenuE(Menu menu) {
@@ -658,14 +702,23 @@ public class HotelApp {
 				}
 			}
 			else {
-				//create new guest object and assign to room
 				try {
 					Guest newGuest = HotelApp.createNewGuest(false, hotel.getCheckInDate(), 
 							hotel.getCheckOutTimeInMilliSeconds());				
 					System.out.print("Enter guest's preferred room type                   : ");
 					String roomType = HotelApp.scanner.nextLine().trim();
-					System.out.print("Enter number of people                              : ");
-					int numOfPeople = Integer.parseInt(HotelApp.scanner.nextLine().trim());
+					boolean correct=false;
+					int numOfPeople=1;
+					while(!correct) {
+						System.out.print("Enter number of people                              : ");
+						numOfPeople = Integer.parseInt(HotelApp.scanner.nextLine().trim());
+						if(numOfPeople <= 0) {
+							System.out.println("Number of people must be greater than 0!");
+						}
+						else {
+							correct=true;
+						}
+					}
 					String paymentType = newGuest.getPaymentType();
 					boolean roomTypeExists = false;
 					while(!roomTypeExists) {
