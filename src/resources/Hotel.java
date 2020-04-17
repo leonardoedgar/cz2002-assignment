@@ -774,8 +774,9 @@ public class Hotel {
 			}
 		}
 		throw new GuestNotFoundException();
-   
-  /**
+	}
+
+	/**
 	 * A function to kick out guests from hotel after checkout time.
 	 */
 	public void kickOutGuestWhoPastCheckOutTime() {

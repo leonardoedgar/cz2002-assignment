@@ -819,7 +819,7 @@ public class HotelApp {
 										}
 									}
 									else if (reservation.getStatus().equals("confirmed")){
-										while(reservedRoomNoList.contains(startingRoomNo)) {
+										while(reservedRoomNoList.contains(roomLevel + "-" + startingRoomNo)) {
 											int roomNo = Integer.parseInt(startingRoomNo);
 											if (roomNo < 10) {
 												startingRoomNo = "0" + Integer.toString(roomNo+1);
