@@ -25,20 +25,13 @@ import exception.AppFailureException;
 import exception.DuplicateReservationFoundException;
 import exception.FoodNotOnMenuException;
 import exception.InvalidGuestDetailException;
+import exception.InvalidHotelTimeException;
 
 public class HotelApp {
 	static int orderId = 0;
 	public static Scanner scanner = new Scanner(System.in);
 	static Date currentTime = new Date();
 	static double setupTimeDelayInSeconds = 1;
-	
-	/**
-	 * A function to fast forward the hotel app by a number of days.
-	 * @param {numOfDays} the number of days to move forward to
-	 */
-	public static void fastForwardByNumberOfDays(int numOfDays) {
-		HotelApp.currentTime = new Date(HotelApp.currentTime.getTime() + numOfDays*24*60*60*1000);
-	}
 	
 	public static void main(String[] args) {
 		boolean exitApp = false;
@@ -60,6 +53,7 @@ public class HotelApp {
 					case "g": HotelApp.showMenuG(hotel);break;
 					case "h": HotelApp.showMenuH(hotel);break;
 					case "i": HotelApp.showMenuI(hotel); break;
+					case "j": HotelApp.showMenuJ(); break;
 					case "q": exitApp = true; break;
 					default: System.out.println("Invalid input. Retry\n");
 				}
@@ -99,6 +93,7 @@ public class HotelApp {
 				+ "|    order items and its total, tax and total     |\n"
 				+ "|    amount)                                      |\n"
 				+ "|(I) Print room status statistic report           |\n"
+				+ "|(J) Fast forward hotel time                      |\n"
 				+ "|(Q) Quit the app                                 |\n"
 				+ "|=================================================|\n");
 	}
@@ -435,7 +430,6 @@ public class HotelApp {
 						+ "|(C) Delivered    |\n"
 						+ "|=================|\n"
 						+ "\nEnter user input: ");
-//				HotelApp.scanner.nextLine();
 				status = HotelApp.scanner.nextLine().trim();
 				switch(status.toLowerCase()) {
 					case "a": status = "confirmed";break;
@@ -851,5 +845,41 @@ public class HotelApp {
 		} catch(RoomTypeNotFoundException e){
 			System.out.println(e.getMessage());
 		}
+	}
+	
+	/**
+	 * A function to fast forward the hotel app by a number of days.
+	 * @param {numOfDays} the number of days to move forward to
+	 * @throws {InvalidHotelTimeException} when the time to shift to is not valid 
+	 */
+	public static void fastForwardByNumberOfDays(int numOfDays) throws 
+		InvalidHotelTimeException {
+		if (numOfDays >= 0) {
+			HotelApp.currentTime = new Date(HotelApp.currentTime.getTime() + numOfDays*24*60*60*1000);
+		}
+		else {
+			throw new InvalidHotelTimeException("System is not able to revert time back.");
+		}
+	}
+	
+	/**
+	 * A function to show hotel app menu to change hotel time.
+	 */
+	public static void showMenuJ() {
+		System.out.println("The current date and time is: " + HotelApp.currentTime.toString());
+		System.out.print("Enter the number of days to fast forward to: ");
+		try {
+			int numOfDays = HotelApp.scanner.nextInt();
+			HotelApp.fastForwardByNumberOfDays(numOfDays);
+			System.out.println("Update successful. \nThe updated date and time is : " + 
+					HotelApp.currentTime.toString());
+		}
+		catch (InputMismatchException e) {
+			System.out.println("Invalid input. ");
+		}
+		catch (InvalidHotelTimeException e) {
+			System.out.println(e.getMessage());
+		}
+		HotelApp.scanner.nextLine();
 	}
 }
