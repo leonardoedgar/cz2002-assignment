@@ -492,13 +492,18 @@ public class ReservationSystem {
 						try {
 							for (Reservation reservation: 
 								this.reservationTable.get(registeredFormattedDate).get(roomType)) {
-								try {
-									this.removeReservation(reservation.getReservationId(), 
-											roomTypeToNumOfAvailRoomsTable.get(roomType));
-								} catch (ReservationNotFoundException e) {
-									System.out.println(e.getMessage());
-								} catch (ConcurrentModificationException e) {
-									break;
+								if (!reservation.getStatus().equals("checked-in")) {
+									try {
+										this.removeReservation(reservation.getReservationId(), 
+												roomTypeToNumOfAvailRoomsTable.get(roomType));
+									} catch (ReservationNotFoundException e) {
+										System.out.println(e.getMessage());
+									} catch (ConcurrentModificationException e) {
+										break;
+									}
+								}
+								else {
+									this.reservationTable.remove(registeredFormattedDate);
 								}
 							}
 						}
