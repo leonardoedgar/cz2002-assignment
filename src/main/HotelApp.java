@@ -300,21 +300,21 @@ public class HotelApp {
 		  String contact = HotelApp.scanner.nextLine().trim();
 		  System.out.print("Enter identity (driving license or passport number) : ");
 		  String identity = HotelApp.scanner.nextLine().trim();
-		  Date startDate = new Date();
-		  Date endDate = new Date();
 		  System.out.print("Enter payment type                                  : ");
-			String paymentType = HotelApp.scanner.nextLine().trim();
+		  String paymentType = HotelApp.scanner.nextLine().trim();
+		  Date startDate;
 			if (isForReservation) {
 				System.out.print("Enter date of check-in (MM/DD/YYYY)                 : ");
 				startDate = new Date(HotelApp.scanner.nextLine().trim());
 				if (startDate.compareTo(new Date(checkInDate.toLocaleString().split(",")[0])) == 0) {
-					if (new Date().getTime() > checkInDate.getTime()) {
+					if (HotelApp.currentTime.getTime() > checkInDate.getTime()) {
 						throw new InvalidReservationDetailException("Reservation start date and time "
 								+ "cannot be after hotel check in time");
 					}
 					startDate = checkInDate;
 				}
-				else if (startDate.compareTo(new Date (new Date().toLocaleString().split(",")[0])) < 0) {
+				else if (startDate.compareTo(new Date (
+						HotelApp.currentTime.toLocaleString().split(",")[0])) < 0) {
 					throw new InvalidReservationDetailException("Cannot reserve from days in the past.");
 				}
 				else {
@@ -326,7 +326,7 @@ public class HotelApp {
 				startDate = checkInDate;
 			}
 			System.out.print("Enter date of check-out (MM/DD/YYYY)                : ");
-			endDate = new Date(new Date(HotelApp.scanner.nextLine().trim()).getTime() + checkOutTime);	
+			Date endDate = new Date(new Date(HotelApp.scanner.nextLine().trim()).getTime() + checkOutTime);	
 			if (startDate.compareTo(endDate) >= 0) {
 				throw new InvalidReservationDetailException("Check out date "
 						+ "cannot be before the check in date.");
@@ -585,9 +585,9 @@ public class HotelApp {
 	 */
 	@SuppressWarnings("deprecation")
 	public static void showMenuF(Hotel hotel) {
-		Date startDate = new Date();
-		Date endDate = new Date();
 		boolean isUserInputValid = false;
+		Date startDate = HotelApp.currentTime;
+		Date endDate = HotelApp.currentTime;
 		try {
 			while (!isUserInputValid) {
 				System.out.print("Enter start date in the following format (MM/DD/YYYY): ");
@@ -632,7 +632,7 @@ public class HotelApp {
 	 */
 	@SuppressWarnings("deprecation")
 	public static void showMenuG(Hotel hotel){
-		if (new Date().getTime() < hotel.getCheckInDate().getTime()) {
+		if (HotelApp.currentTime.getTime() < hotel.getCheckInDate().getTime()) {
 			System.out.println("Check-in is only available from 2PM");
 		}
 		else {

@@ -1,9 +1,12 @@
 package resources;
 import java.util.Date;
+import java.util.Hashtable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.ConcurrentModificationException;
+
 import resources.Reservation;
 import exception.ReservationNotFoundException;
 import exception.DuplicateReservationFoundException;
@@ -95,8 +98,9 @@ public class ReservationSystem {
 	}
 	
 	/**
-	 * A function to remove a reservation
+	 * A function to remove a reservation.
 	 * @param reservationId {String} the reservation id to remove
+	 * @param the number of rooms that is available in the hotel for the reserved room type
 	 * @throws {ReservationNotFoundException} exception when reservation to remove is not found
 	 */
 	public void removeReservation(String reservationId, int numberOfRooms) throws ReservationNotFoundException {
@@ -473,13 +477,41 @@ public class ReservationSystem {
 	/**
 	 * A function to expire all reservations up to certain date.
 	 * @param date {Date} the up to date of reservations to expire
+	 * @param roomTypeToNumOfAvailRoomsTable {Hashtable<String, Integer>} 
+	 * 		  the room type to number of available rooms hash table
 	 */
 	@SuppressWarnings("deprecation")
-	public void expireAllReservationsUpToDate(Date date) {
+	public void expireAllReservationsUpToDate(Date date, 
+			Hashtable<String, Integer> roomTypeToNumOfAvailRoomsTable) {
 		String formattedDate = ReservationSystem.getFormattedDate(date);
 		for (String registeredFormattedDate: this.reservationTable.keySet()) {
 			if (new Date(registeredFormattedDate).compareTo(new Date(formattedDate)) <= 0) {
-				this.reservationTable.remove(registeredFormattedDate);
+				if (this.reservationTable.get(registeredFormattedDate) != null) {
+					for (String roomType: 
+						this.reservationTable.get(registeredFormattedDate).keySet()) {
+						try {
+							for (Reservation reservation: 
+								this.reservationTable.get(registeredFormattedDate).get(roomType)) {
+								if (!reservation.getStatus().equals("checked-in")) {
+									try {
+										this.removeReservation(reservation.getReservationId(), 
+												roomTypeToNumOfAvailRoomsTable.get(roomType));
+									} catch (ReservationNotFoundException e) {
+										System.out.println(e.getMessage());
+									} catch (ConcurrentModificationException e) {
+										break;
+									}
+								}
+								else {
+									this.reservationTable.remove(registeredFormattedDate);
+								}
+							}
+						}
+						catch (ConcurrentModificationException e) {
+							break;
+						}
+					}
+				}
 			}
 		}
 	}

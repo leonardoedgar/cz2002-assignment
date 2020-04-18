@@ -718,8 +718,24 @@ public class Hotel {
 			long currentTime = this.currentDate.getTime() - 
 					new Date(this.currentDate.toLocaleString().split(",")[0]).getTime();
 			long checkInTime = this.checkInTimeInMilliSeconds;
+			Hashtable<String, Integer> roomTypeToNumOfAvailRoomsTable = 
+					new Hashtable<String, Integer>();
+			for (String roomType: this.getAvailableRoomTypes()) {
+				try {
+					roomTypeToNumOfAvailRoomsTable.put(roomType, 
+							this.getNumberOfRoomsByRoomType(roomType));
+				} catch (RoomTypeNotFoundException e) {
+					System.out.println(e.getMessage());
+				}
+			}
 			if (currentTime > checkInTime + checkInTimeTolerance) {
-				this.reservationSystem.expireAllReservationsUpToDate(currentDate);
+				this.reservationSystem.expireAllReservationsUpToDate(this.currentDate, 
+						roomTypeToNumOfAvailRoomsTable);
+			}
+			else {
+				this.reservationSystem.expireAllReservationsUpToDate(
+						new Date(this.currentDate.getTime()-24*60*60*1000), 
+						roomTypeToNumOfAvailRoomsTable);
 			}
 		}
 	}
@@ -730,7 +746,7 @@ public class Hotel {
 	 */
 	@SuppressWarnings("deprecation")
 	public Date getCheckInDate() {
-		return new Date(new Date(new Date().toLocaleString().split(",")[0]).getTime() + 
+		return new Date(new Date(this.currentDate.toLocaleString().split(",")[0]).getTime() + 
 				this.checkInTimeInMilliSeconds);
 	}
 	
