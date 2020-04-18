@@ -84,7 +84,8 @@ public class Guest {
 				+ "\nGender        : " + this.gender
 				+ "\nNationality   : " + this.nationality
 				+ "\nContact Number: " + Integer.toString(this.contact)
-				+ "\nIdentity      : " + this.identity);
+				+ "\nIdentity      : " + this.identity
+				+ "\nPayment Type  : " + this.paymentType);
 	}
 	
 	/**
