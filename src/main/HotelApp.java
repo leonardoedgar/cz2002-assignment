@@ -586,8 +586,8 @@ public class HotelApp {
 	@SuppressWarnings("deprecation")
 	public static void showMenuF(Hotel hotel) {
 		boolean isUserInputValid = false;
-		Date startDate;
-		Date endDate;
+		Date startDate = HotelApp.currentTime;
+		Date endDate = HotelApp.currentTime;
 		try {
 			while (!isUserInputValid) {
 				System.out.print("Enter start date in the following format (MM/DD/YYYY): ");
