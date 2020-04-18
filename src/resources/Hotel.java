@@ -730,7 +730,7 @@ public class Hotel {
 	 */
 	@SuppressWarnings("deprecation")
 	public Date getCheckInDate() {
-		return new Date(new Date(new Date().toLocaleString().split(",")[0]).getTime() + 
+		return new Date(new Date(this.currentDate.toLocaleString().split(",")[0]).getTime() + 
 				this.checkInTimeInMilliSeconds);
 	}
 	
