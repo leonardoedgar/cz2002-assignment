@@ -487,7 +487,7 @@ public class Hotel {
 	 * @throws {FoodNotOnMenuException} when food ordered is not on the menu
 	 * @throws {RoomNotFoundException}  when room number is not found in the hotel
 	 */
-	public void makeRoomServiceOrder(String roomNo, Menu menu, Hashtable<String, String> orderMap, int orderId)
+	public void makeRoomServiceOrder(String roomNo, Menu menu, Hashtable<String, String> orderMap, String orderId)
 			throws FoodNotOnMenuException, RoomNotFoundException, GuestNotFoundException {
 		try {
 			this.getRoomByNo(roomNo).getGuest().makeOrder(menu, orderMap, orderId);

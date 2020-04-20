@@ -28,7 +28,6 @@ import exception.InvalidGuestDetailException;
 import exception.InvalidHotelTimeException;
 
 public class HotelApp {
-	static int orderId = 0;
 	public static Scanner scanner = new Scanner(System.in);
 	static Date currentTime = new Date();
 	static double setupTimeDelayInSeconds = 1;
@@ -39,6 +38,7 @@ public class HotelApp {
 			Hotel hotel = new Hotel("src/data/roomConfig.txt", HotelApp.setupTimeDelayInSeconds);
 			Menu menu = new Menu("src/data/menu.txt");
 			while (!exitApp) {
+				HotelApp.currentTime = new Date();
 				hotel.updateReservationStatusByDate(HotelApp.currentTime);
 				hotel.kickOutGuestWhoPastCheckOutTime();
 				HotelApp.printHotelAppMenu();
@@ -429,6 +429,7 @@ public class HotelApp {
 			System.out.println(e.getMessage());
 		}
 	}
+	
 	/**
 	 * A function show hotel app menu D.
 	 * @param hotel {Hotel} the hotel object
@@ -436,7 +437,6 @@ public class HotelApp {
 	 * @throws RoomNotFoundException 
 	 * @throws FoodNotOnMenuException 
 	 */
-	
 	public static void showMenuD(Hotel hotel, Menu menu) {
 			String roomNo;
 			Guest guest;
@@ -458,7 +458,7 @@ public class HotelApp {
 						System.out.print("Enter room number: ");
 						roomNo = HotelApp.scanner.nextLine().trim();
 						System.out.print("Enter the order ID: ");
-						orderId = Integer.parseInt(HotelApp.scanner.nextLine().trim());
+						String orderId = HotelApp.scanner.nextLine().trim();
 						System.out.print("Enter new status: \n"
 								+ "|=================|\n"
 								+ "|(A) Confirmed    |\n"
@@ -479,9 +479,7 @@ public class HotelApp {
 						System.out.println("Room service update successful!");
 				} catch (RoomNotFoundException | OrderIdNotFoundException e) {
 					System.out.println(e.getMessage());
-				} catch (NumberFormatException e) {
-					System.out.println("Order ID must be an integer. Please retry!");
-				}
+				} 
 				break;
 			}
 			case "b": {
@@ -508,10 +506,10 @@ public class HotelApp {
 						System.out.print("Order more (yes/no): ");
 						orderMore = HotelApp.scanner.nextLine().trim().equalsIgnoreCase("yes");
 					}
-					hotel.makeRoomServiceOrder(roomNo, menu, orderMap, HotelApp.orderId);
-					HotelApp.orderId = HotelApp.orderId + 1;
-					HotelApp.orderId = (HotelApp.orderId % 2000000000);
-					System.out.println("Order successful! Your order id is: " + (HotelApp.orderId - 1));
+					String orderId = HotelApp.currentTime.toString();
+					String formattedOrderId = orderId.substring(4, 19);
+					hotel.makeRoomServiceOrder(roomNo, menu, orderMap, formattedOrderId);
+					System.out.println("Order successful! Your order id is: " + formattedOrderId);
 				} catch (FoodNotOnMenuException | RoomNotFoundException | GuestNotFoundException |
 						InputMismatchException| NumberFormatException e ) {
 					System.out.println(e.getMessage());
@@ -534,6 +532,11 @@ public class HotelApp {
 			default: System.out.println("Invalid input.");
 		}
 	}
+	
+	/**
+	 * Functional requirement E. To edit the menu.
+	 * @param menu
+	 */
 	public static void showMenuE(Menu menu) {
 		String foodname;
 		double price;
@@ -627,7 +630,7 @@ public class HotelApp {
 	}
 
 	/**
-	 * A function to show the functional requirements of G
+	 * A function to show the functional requirements of G. to check in the guest
 	 * @param hotel
 	 */
 	@SuppressWarnings("deprecation")
@@ -765,6 +768,10 @@ public class HotelApp {
 		
 	}
 
+	/**
+	 * Functinoal requirement H, to check out the guest.
+	 * @param hotel
+	 */
 	public static void showMenuH(Hotel hotel) {
 		System.out.print("Enter room number to check out: ");
 		String roomNo = HotelApp.scanner.nextLine().trim();
