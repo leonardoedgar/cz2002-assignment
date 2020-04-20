@@ -1,10 +1,13 @@
 package main;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.ArrayList;
@@ -41,9 +44,9 @@ public class HotelApp {
 	public static void main(String[] args) {
 		boolean exitApp = false;
 		try {
-			Hotel hotel=loadStateHotel();
-			Menu menu=loadStateMenu();
-			if(hotel==null||menu==null) {
+			Hotel hotel = HotelApp.loadStateHotel();
+			Menu menu = HotelApp.loadStateMenu();
+			if(hotel == null|| menu == null) {
 				 hotel = new Hotel("src/data/roomConfig.txt", HotelApp.setupTimeDelayInSeconds);
 				 menu = new Menu("src/data/menu.txt");
 			}
@@ -70,7 +73,7 @@ public class HotelApp {
 					default: System.out.println("Invalid input. Retry\n");
 				}
 			}
-			saveState(hotel,menu);
+			HotelApp.saveState(hotel, menu);
 			System.out.println("\nThank you for using the app. Have a good day!");
 		}
 		catch(AppFailureException e) {
@@ -951,19 +954,23 @@ public class HotelApp {
 	 */
 	public static void saveState(Hotel hotel, Menu menu) {
 		if(HotelApp.isSaveState) {
-			try{  
-				  FileOutputStream hotelFile=new FileOutputStream("src/state_data/hotel.txt");  
-				  ObjectOutputStream out=new ObjectOutputStream(hotelFile);  
-				  out.writeObject(hotel);  
-				  out.flush();  
-				  FileOutputStream menuFile=new FileOutputStream("src/state_data/menu.txt");  
-				  out=new ObjectOutputStream(menuFile);  
-				  out.writeObject(menu);  
-				  out.flush();
-				  out.close(); 
-				 }catch(IOException e){
-				  System.out.println(e.getMessage());
-				 }  
+			try {
+				String dirToSave = "src/state_data";
+				if(!Files.isDirectory(Paths.get(dirToSave))) {
+					(new File(dirToSave)).mkdirs();
+				}
+				FileOutputStream hotelFile=new FileOutputStream(dirToSave + "/hotel_state.txt");  
+				ObjectOutputStream out=new ObjectOutputStream(hotelFile);  
+				out.writeObject(hotel);  
+				out.flush();  
+				FileOutputStream menuFile=new FileOutputStream(dirToSave + "/menu_state.txt");  
+				out=new ObjectOutputStream(menuFile);  
+				out.writeObject(menu);  
+				out.flush();
+				out.close(); 
+			}catch(IOException e){
+				System.out.println(e.getMessage());
+			}  
 		}
 	}
 
@@ -972,15 +979,15 @@ public class HotelApp {
 	 * @return {Hotel} the hotel object from the previous state
 	 */
 	public static Hotel loadStateHotel() {
-		Hotel hotel=null;
+		Hotel hotel = null;
 		try{   
-			 ObjectInputStream hotelIn=new ObjectInputStream(
-					 new FileInputStream("src/state_data/hotel.txt"));  
-			 hotel=(Hotel)hotelIn.readObject();  
-			 hotelIn.close(); 
-			 }catch(IOException | ClassNotFoundException e){
-			  System.out.println(e.getMessage());
-			 }
+			ObjectInputStream hotelIn=new ObjectInputStream(
+					new FileInputStream("src/state_data/hotel_state.txt"));  
+			hotel=(Hotel)hotelIn.readObject();  
+			hotelIn.close(); 
+		}catch(IOException | ClassNotFoundException e){
+			System.out.println(e.getMessage());
+		}
 		return hotel;  
 	}
 	
@@ -991,14 +998,13 @@ public class HotelApp {
 	public static Menu loadStateMenu() {
 		Menu menu = null;
 		try {
-			 ObjectInputStream menuIn=new ObjectInputStream(
-					 new FileInputStream("src/state_data/menu.txt"));  
-			 menu=(Menu)menuIn.readObject();  
-			 menuIn.close();
-			}catch(IOException | ClassNotFoundException e){
-				System.out.println(e.getMessage());
-			}
-			return menu;
+			ObjectInputStream menuIn=new ObjectInputStream(
+					new FileInputStream("src/state_data/menu_state.txt"));  
+			menu=(Menu)menuIn.readObject();  
+			menuIn.close();
+		}catch(IOException | ClassNotFoundException e){
+			System.out.println(e.getMessage());
+		}
+		return menu;
 	}
-	
 }
