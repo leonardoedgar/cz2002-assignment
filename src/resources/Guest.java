@@ -13,7 +13,8 @@ import resources.Payment;
 /**
  * A class to represent a guest in a hotel.
  */
-public class Guest implements Serializable{
+@SuppressWarnings("serial")
+public class Guest implements Serializable {
 	private String name;
 	private String cardDetails;
 	private String address;
