@@ -288,7 +288,8 @@ public class HotelApp {
 	/**
 	 * A function to create a new Guest.
 	 * @param isForReservation {boolean} whether the guest created wants to make a reservation
-	 * @param currentDate {Date} the current date in the hotel system
+	 * @param checkInDate {Date} the hotel check in date and time
+	 * @param checkOutTime {int} the hotel check out time in milliseconds
 	 * @return {Guest} the guest object
 	 * @throws InvalidReservationDetailException  exception when check in date is later than check out date
 	 * @throws {InvalidGuestDetailException} exception when guest detail input is not valid 
@@ -951,11 +952,11 @@ public class HotelApp {
 	public static void saveState(Hotel hotel, Menu menu) {
 		if(HotelApp.isSaveState) {
 			try{  
-				  FileOutputStream hotelFile=new FileOutputStream("src/statedata/hotel.txt");  
+				  FileOutputStream hotelFile=new FileOutputStream("src/state_data/hotel.txt");  
 				  ObjectOutputStream out=new ObjectOutputStream(hotelFile);  
 				  out.writeObject(hotel);  
 				  out.flush();  
-				  FileOutputStream menuFile=new FileOutputStream("src/statedata/menu.txt");  
+				  FileOutputStream menuFile=new FileOutputStream("src/state_data/menu.txt");  
 				  out=new ObjectOutputStream(menuFile);  
 				  out.writeObject(menu);  
 				  out.flush();
@@ -973,7 +974,8 @@ public class HotelApp {
 	public static Hotel loadStateHotel() {
 		Hotel hotel=null;
 		try{   
-			 ObjectInputStream hotelIn=new ObjectInputStream(new FileInputStream("src/statedata/hotel.txt"));  
+			 ObjectInputStream hotelIn=new ObjectInputStream(
+					 new FileInputStream("src/state_data/hotel.txt"));  
 			 hotel=(Hotel)hotelIn.readObject();  
 			 hotelIn.close(); 
 			 }catch(IOException | ClassNotFoundException e){
@@ -989,7 +991,8 @@ public class HotelApp {
 	public static Menu loadStateMenu() {
 		Menu menu = null;
 		try {
-			 ObjectInputStream menuIn=new ObjectInputStream(new FileInputStream("src/statedata/menu.txt"));  
+			 ObjectInputStream menuIn=new ObjectInputStream(
+					 new FileInputStream("src/state_data/menu.txt"));  
 			 menu=(Menu)menuIn.readObject();  
 			 menuIn.close();
 			}catch(IOException | ClassNotFoundException e){

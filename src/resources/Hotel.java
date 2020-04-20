@@ -25,8 +25,8 @@ import exception.GuestNotFoundException;
 /**
  * A class to represent a hotel.
  */
+@SuppressWarnings("serial")
 public class Hotel implements Serializable {
-	// {"roomType": {"roomNo": Room()}}
 	private Hashtable<String, Hashtable<String, Room>> roomTable = new Hashtable<String, Hashtable<String, Room>>();
 	private ReservationSystem reservationSystem;
 	private Date currentDate;
@@ -96,7 +96,6 @@ public class Hotel implements Serializable {
 	 * @throws {HotelSetupException} failure in setting up the hotel (configuration
 	 *                               file not found)
 	 */
-	@SuppressWarnings("serial")
 	private Hashtable<String, Hashtable<String, String>> getRoomConfig(String roomConfigFilePath)
 			throws HotelSetupFailureException {
 		try {
@@ -565,7 +564,6 @@ public class Hotel implements Serializable {
 	 * @return {<Hashtable<String, ArrayList<Room>>>} the room status to room number
 	 *         list table
 	 */
-	@SuppressWarnings("serial")
 	public Hashtable<String, ArrayList<String>> getRoomStatusToRoomNoListTable(boolean sort) {
 		Hashtable<String, ArrayList<String>> roomStatusToRoomNoListTable = new Hashtable<String, ArrayList<String>>();
 		for (String roomType : this.roomTable.keySet()) {
@@ -599,7 +597,6 @@ public class Hotel implements Serializable {
 	 * @return {Hashtable<String, ArrayList<String>>} the room type to vacant room
 	 *         number list table
 	 */
-	@SuppressWarnings("serial")
 	public Hashtable<String, ArrayList<String>> getRoomTypeToVacantRoomNoListTable(boolean sort) {
 		Hashtable<String, ArrayList<String>> roomTypeToVacantRoomNoListTable = new Hashtable<String, ArrayList<String>>();
 		for (String roomType : this.roomTable.keySet()) {
@@ -679,8 +676,7 @@ public class Hotel implements Serializable {
 
 	/**
 	 * A function to get the number of available rooms by its type.
-	 * 
-	 * @param roomType {String} the room type
+	 * @param aRoomType {String} the room type
 	 * @return {int} the number of rooms
 	 * @throws {RoomTypeNotFoundException} when the room type is not in the hotel
 	 *                                     system

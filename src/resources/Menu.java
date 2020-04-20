@@ -8,17 +8,22 @@ import java.io.Serializable;
 import java.util.Hashtable;
 import exception.FoodNotOnMenuException;
 
+
+/**
+ * A class to represent a menu in a hotel system
+ */
+@SuppressWarnings("serial")
 public class Menu implements Serializable{
 	private Hashtable<String,Double> foodTable;
 	public Menu(String filepath) throws FileNotFoundException, IOException {
 		this.foodTable = getMenu(filepath);
 	}
 	
-/**
- * add the items in the list (will also check if the food is already in the menu)
- * @param foodname
- * @param price
- */
+	/**
+	 * Add the items in the list (will also check if the food is already in the menu)
+	 * @param foodname {String} the food name
+	 * @param price {double} the price
+	 */
 	public void addItems(String foodname, double price) {
 		// Append new food and price to the .txt file
 		boolean isFoodOnMenu = false;
@@ -35,11 +40,11 @@ public class Menu implements Serializable{
 		isFoodOnMenu= false;
 	}
 	
-/**
- * update the menu, will not update if the food is not yet in the menu.
- * @param foodname
- * @param price
- */
+	/**
+ 	* update the menu, will not update if the food is not yet in the menu.
+ 	* @param foodname {String} the food name
+ 	* @param price {double} te price
+ 	*/
 	public void updateItems(String foodname, double price) {
 		// Check if foodName is inside the .txt file, if so modify the price
 		// If not, raise error
@@ -59,10 +64,10 @@ public class Menu implements Serializable{
 		isFoodOnMenu = false;	
 	}
 	
-/**
- * remove items from the menu. Will also check if the food is on the menu.	
- * @param foodname
- */
+	/**
+	 * Remove items from the menu. Will also check if the food is on the menu.	
+	 * @param foodname {String} the food name
+	 */
 	public void removeItems(String foodname) {
 		// Check if foodName is inside the .txt file, if so remove the food name
 		// If not, raise error
@@ -80,9 +85,9 @@ public class Menu implements Serializable{
 		isFoodOnMenu= false;
 	}
 	
-/**
- * print the current menu.
- */
+	/**
+ 	* Print the current menu.
+ 	*/
 	public void printItems() {
 		System.out.println("Food \t\t\t\tPrice");
 		for (String food: this.foodTable.keySet()) {
@@ -90,6 +95,13 @@ public class Menu implements Serializable{
 		}	
 	}
 	
+	/**
+	 * A function to get a menu
+	 * @param MenuFilePath {String} the path to config file
+	 * @return {Menu} the menu
+	 * @throws {FileNotFoundException} when the config file is not found
+	 * @throws {IOException} when the config file cannot be opened
+	 */
 	private Hashtable<String,Double> getMenu(String MenuFilePath) throws FileNotFoundException,IOException {
 		// Here we will read the txt file in the format of csv. with the format of "food,price". Then next we will create a hashtable for the menu.
 		String row;
@@ -119,5 +131,4 @@ public class Menu implements Serializable{
 			throw new FoodNotOnMenuException();
 		}
 	}
-	
 }

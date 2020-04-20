@@ -5,6 +5,7 @@ import java.io.Serializable;
 /**
  * A class to represent a room in a hotel.
  */
+@SuppressWarnings("serial")
 public class Room implements Serializable{
 	private Guest guest;
 	private String roomNo;

@@ -8,6 +8,7 @@ import resources.Menu;
 /**
  * A class to represent a room service in a hotel.
  */
+@SuppressWarnings("serial")
 public class RoomService implements Serializable{
 	private Menu menu;
 	private double totalCost;

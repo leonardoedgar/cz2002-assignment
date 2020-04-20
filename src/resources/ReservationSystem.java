@@ -16,11 +16,11 @@ import exception.IdGenerationFailedException;
 /**
  * A class to represent a reservation system.
  */
+@SuppressWarnings("serial")
 public class ReservationSystem implements Serializable{
-	//{"DD MM YYYY": {"roomType": Reservation}}
 	private ConcurrentHashMap<String, ConcurrentHashMap<String, ArrayList<Reservation>>> reservationTable;
 	
-	ReservationSystem() {
+	public ReservationSystem() {
 		this.reservationTable = 
 				new ConcurrentHashMap<String, ConcurrentHashMap<String, ArrayList<Reservation>>>();
 	}
@@ -101,7 +101,7 @@ public class ReservationSystem implements Serializable{
 	/**
 	 * A function to remove a reservation.
 	 * @param reservationId {String} the reservation id to remove
-	 * @param the number of rooms that is available in the hotel for the reserved room type
+	 * @param numberOfRooms {int} the number of rooms that is available in the hotel for the reserved room type
 	 * @throws {ReservationNotFoundException} exception when reservation to remove is not found
 	 */
 	public void removeReservation(String reservationId, int numberOfRooms) throws ReservationNotFoundException {
@@ -124,11 +124,11 @@ public class ReservationSystem implements Serializable{
 	
 	/**
 	 * this method will shift the reservation list to have add more "waitlist" (delta =-1) or add more "confirmed" (delta = 1) depending on delta
-	 * @param num_room number of available rooms in certain roomtype (updated information)
-	 * @param roomtype 
-	 * @param delta delta is the number of rooms to be changed to "vacant" or "under maintainance"
+	 * @param numRoom {int} number of available rooms in certain roomtype (updated information)
+	 * @param roomtype {String} the room type
+	 * @param delta {int} is the number of rooms to be changed to "vacant" or "under maintainance"
 	 */
-	public void shiftReservation(int numRoom,String roomtype, int delta) {
+	public void shiftReservation(int numRoom, String roomtype, int delta) {
 		int num_room = numRoom + delta;
 		for(String date: this.reservationTable.keySet()) {
 			int counter = 1;
@@ -218,7 +218,6 @@ public class ReservationSystem implements Serializable{
 	 * A function to add a new reservation.
 	 * @param reservation {Reservation} the new reservation to add
 	 */
-	@SuppressWarnings("serial")
 	private void addNewReservation(Reservation reservation, int numberOfRooms) {
 		reservation.updateStatus("confirmed");
 		for(

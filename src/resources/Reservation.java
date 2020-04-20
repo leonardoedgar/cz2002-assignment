@@ -5,6 +5,7 @@ import java.util.Date;
 /**
  * A class to represent a reservation in a hotel.
  */
+@SuppressWarnings("serial")
 public class Reservation implements Serializable{
 	private String reservationId;
 	private Guest guestDetails;
