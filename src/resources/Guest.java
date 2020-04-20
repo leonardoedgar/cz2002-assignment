@@ -171,8 +171,8 @@ public class Guest {
 	 * @param orderMap {Hashtable<String, String>} the order and quantity from the guest 
 	 * @throws {FoodNotOnMenuException} when food ordered not on menu
 	 */
-	public void makeOrder(Menu menu, Hashtable<String, String> orderMap, int orderId) throws FoodNotOnMenuException {
-		RoomService roomService = new RoomService(menu);
+	public void makeOrder(Menu menu, Hashtable<String, String> orderMap, String orderId) throws FoodNotOnMenuException {
+		RoomService roomService = new RoomService(menu, orderId);
 		roomService.makeOrder(orderMap);
 		this.roomServiceList.add(roomService);
 	}
@@ -245,9 +245,9 @@ public class Guest {
 	 * @return
 	 * @throws OrderIdNotFoundException
 	 */
-	public RoomService getRoomServiceByOrderId(int orderId) throws OrderIdNotFoundException {
+	public RoomService getRoomServiceByOrderId(String orderId) throws OrderIdNotFoundException {
 		for(RoomService rs: this.roomServiceList) {
-			if (rs.getOrderId() == orderId) {
+			if (rs.getOrderId().equals(orderId)) {
 				return rs;
 			}
 		}
