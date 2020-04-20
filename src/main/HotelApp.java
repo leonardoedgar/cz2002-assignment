@@ -28,7 +28,6 @@ import exception.InvalidGuestDetailException;
 import exception.InvalidHotelTimeException;
 
 public class HotelApp {
-	static int orderId = 0;
 	public static Scanner scanner = new Scanner(System.in);
 	static Date currentTime = new Date();
 	static double setupTimeDelayInSeconds = 1;
@@ -438,6 +437,7 @@ public class HotelApp {
 	 */
 	
 	public static void showMenuD(Hotel hotel, Menu menu) {
+			int orderId;
 			String roomNo;
 			Guest guest;
 			String status;
@@ -508,10 +508,10 @@ public class HotelApp {
 						System.out.print("Order more (yes/no): ");
 						orderMore = HotelApp.scanner.nextLine().trim().equalsIgnoreCase("yes");
 					}
-					hotel.makeRoomServiceOrder(roomNo, menu, orderMap, HotelApp.orderId);
-					HotelApp.orderId = HotelApp.orderId + 1;
-					HotelApp.orderId = (HotelApp.orderId % 2000000000);
-					System.out.println("Order successful! Your order id is: " + (HotelApp.orderId - 1));
+					hotel.makeRoomServiceOrder(roomNo, menu, orderMap, RoomService.orderId1);
+					RoomService.orderId1 = RoomService.orderId1 + 1;
+					RoomService.orderId1= (RoomService.orderId1 % 2000000000);
+					System.out.println("Order successful! Your order id is: " + (RoomService.orderId1 - 1));
 				} catch (FoodNotOnMenuException | RoomNotFoundException | GuestNotFoundException |
 						InputMismatchException| NumberFormatException e ) {
 					System.out.println(e.getMessage());

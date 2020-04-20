@@ -24,6 +24,8 @@ public class RoomService {
 		this.orderId = orderId;
 	}
 	
+	public static int orderId1 = 0;
+	
 	/**
 	 * A function to make an order.
 	 * @param orderMap {Hashtable<String, String>} the order and quantity map
