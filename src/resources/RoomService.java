@@ -1,5 +1,6 @@
 package resources;
 import java.util.Hashtable;
+import java.io.Serializable;
 import java.util.Date;
 import exception.FoodNotOnMenuException;
 import resources.Menu;
@@ -7,7 +8,7 @@ import resources.Menu;
 /**
  * A class to represent a room service in a hotel.
  */
-public class RoomService {
+public class RoomService implements Serializable{
 	private Menu menu;
 	private double totalCost;
 	private Hashtable<String, String> orderMap;

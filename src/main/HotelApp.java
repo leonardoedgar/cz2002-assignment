@@ -1,6 +1,10 @@
 package main;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.ArrayList;
@@ -29,16 +33,24 @@ import exception.InvalidHotelTimeException;
 
 public class HotelApp {
 	public static Scanner scanner = new Scanner(System.in);
-	static Date currentTime = new Date();
-	static double setupTimeDelayInSeconds = 1;
+	public static Date currentTime = new Date();
+	public static double setupTimeDelayInSeconds = 1;
+	public static Date prevTime = new Date();
+	public static boolean isSaveState = true;
 	
 	public static void main(String[] args) {
 		boolean exitApp = false;
 		try {
-			Hotel hotel = new Hotel("src/data/roomConfig.txt", HotelApp.setupTimeDelayInSeconds);
-			Menu menu = new Menu("src/data/menu.txt");
+			Hotel hotel=loadStateHotel();
+			Menu menu=loadStateMenu();
+			if(hotel==null||menu==null) {
+				 hotel = new Hotel("src/data/roomConfig.txt", HotelApp.setupTimeDelayInSeconds);
+				 menu = new Menu("src/data/menu.txt");
+			}
 			while (!exitApp) {
-				HotelApp.currentTime = new Date();
+				HotelApp.currentTime = new Date(HotelApp.currentTime.getTime()+
+						new Date().getTime()- HotelApp.prevTime.getTime());
+				HotelApp.prevTime = new Date();
 				hotel.updateReservationStatusByDate(HotelApp.currentTime);
 				hotel.kickOutGuestWhoPastCheckOutTime();
 				HotelApp.printHotelAppMenu();
@@ -58,6 +70,7 @@ public class HotelApp {
 					default: System.out.println("Invalid input. Retry\n");
 				}
 			}
+			saveState(hotel,menu);
 			System.out.println("\nThank you for using the app. Have a good day!");
 		}
 		catch(AppFailureException e) {
@@ -919,6 +932,7 @@ public class HotelApp {
 			HotelApp.fastForwardByNumberOfDays(numOfDays);
 			System.out.println("Update successful. \nThe updated date and time is : " + 
 					HotelApp.currentTime.toString());
+			HotelApp.isSaveState = false;
 		}
 		catch (InputMismatchException e) {
 			System.out.println("Invalid input. ");
@@ -928,4 +942,60 @@ public class HotelApp {
 		}
 		HotelApp.scanner.nextLine();
 	}
+	
+	/**
+	 * A function to save the current state of hotel and menu
+	 * @param hotel {Hotel} the Hotel of HotelApp
+	 * @param menu {Menu} the Menu of HotelApp
+	 */
+	public static void saveState(Hotel hotel, Menu menu) {
+		if(HotelApp.isSaveState) {
+			try{  
+				  FileOutputStream hotelFile=new FileOutputStream("src/statedata/hotel.txt");  
+				  ObjectOutputStream out=new ObjectOutputStream(hotelFile);  
+				  out.writeObject(hotel);  
+				  out.flush();  
+				  FileOutputStream menuFile=new FileOutputStream("src/statedata/menu.txt");  
+				  out=new ObjectOutputStream(menuFile);  
+				  out.writeObject(menu);  
+				  out.flush();
+				  out.close(); 
+				 }catch(IOException e){
+				  System.out.println(e.getMessage());
+				 }  
+		}
+	}
+
+	/**
+	 * A function to load the previous state of hotel
+	 * @return {Hotel} the hotel object from the previous state
+	 */
+	public static Hotel loadStateHotel() {
+		Hotel hotel=null;
+		try{   
+			 ObjectInputStream hotelIn=new ObjectInputStream(new FileInputStream("src/statedata/hotel.txt"));  
+			 hotel=(Hotel)hotelIn.readObject();  
+			 hotelIn.close(); 
+			 }catch(IOException | ClassNotFoundException e){
+			  System.out.println(e.getMessage());
+			 }
+		return hotel;  
+	}
+	
+	/**
+	 * A function to load the previous state of menu
+	 * @return {Menu} the menu object from the previous state
+	 */
+	public static Menu loadStateMenu() {
+		Menu menu = null;
+		try {
+			 ObjectInputStream menuIn=new ObjectInputStream(new FileInputStream("src/statedata/menu.txt"));  
+			 menu=(Menu)menuIn.readObject();  
+			 menuIn.close();
+			}catch(IOException | ClassNotFoundException e){
+				System.out.println(e.getMessage());
+			}
+			return menu;
+	}
+	
 }

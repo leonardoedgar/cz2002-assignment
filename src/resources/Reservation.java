@@ -1,10 +1,11 @@
 package resources;
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * A class to represent a reservation in a hotel.
  */
-public class Reservation {
+public class Reservation implements Serializable{
 	private String reservationId;
 	private Guest guestDetails;
 	private Date dateOfCheckIn;

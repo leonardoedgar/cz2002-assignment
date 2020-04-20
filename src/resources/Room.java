@@ -1,9 +1,11 @@
 package resources;
 
+import java.io.Serializable;
+
 /**
  * A class to represent a room in a hotel.
  */
-public class Room {
+public class Room implements Serializable{
 	private Guest guest;
 	private String roomNo;
 	private String status;

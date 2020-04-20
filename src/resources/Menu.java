@@ -4,10 +4,11 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Hashtable;
 import exception.FoodNotOnMenuException;
 
-public class Menu {
+public class Menu implements Serializable{
 	private Hashtable<String,Double> foodTable;
 	public Menu(String filepath) throws FileNotFoundException, IOException {
 		this.foodTable = getMenu(filepath);
