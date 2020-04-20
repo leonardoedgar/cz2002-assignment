@@ -437,7 +437,6 @@ public class HotelApp {
 	 */
 	
 	public static void showMenuD(Hotel hotel, Menu menu) {
-			int orderId;
 			String roomNo;
 			Guest guest;
 			String status;
@@ -458,7 +457,7 @@ public class HotelApp {
 						System.out.print("Enter room number: ");
 						roomNo = HotelApp.scanner.nextLine().trim();
 						System.out.print("Enter the order ID: ");
-						orderId = Integer.parseInt(HotelApp.scanner.nextLine().trim());
+						int orderId = Integer.parseInt(HotelApp.scanner.nextLine().trim());
 						System.out.print("Enter new status: \n"
 								+ "|=================|\n"
 								+ "|(A) Confirmed    |\n"
@@ -508,10 +507,8 @@ public class HotelApp {
 						System.out.print("Order more (yes/no): ");
 						orderMore = HotelApp.scanner.nextLine().trim().equalsIgnoreCase("yes");
 					}
-					hotel.makeRoomServiceOrder(roomNo, menu, orderMap, RoomService.orderId1);
-					RoomService.orderId1 = RoomService.orderId1 + 1;
-					RoomService.orderId1= (RoomService.orderId1 % 2000000000);
-					System.out.println("Order successful! Your order id is: " + (RoomService.orderId1 - 1));
+					hotel.makeRoomServiceOrder(roomNo, menu, orderMap, RoomService.orderId);
+					System.out.println("Order successful! Your order id is: " + (RoomService.orderId - 1));
 				} catch (FoodNotOnMenuException | RoomNotFoundException | GuestNotFoundException |
 						InputMismatchException| NumberFormatException e ) {
 					System.out.println(e.getMessage());

@@ -13,18 +13,20 @@ public class RoomService {
 	private Hashtable<String, String> orderMap;
 	private Date dateOfTransaction;
 	private String status;
-	private int orderId;
+	private int orderIdLocal;
 	/**
 	 * A class constructor to construct a room service.
 	 * @param menu {Menu} the room service menu in a hotel
 	 */
-	public RoomService(Menu menu,int orderId) {
+	public RoomService(Menu menu) {
 		this.menu = menu;
 		this.status = "confirmed";
-		this.orderId = orderId;
+		this.orderIdLocal = RoomService.orderId;
+		RoomService.orderId = RoomService.orderId + 1;
+		RoomService.orderId= (RoomService.orderId % 2000000000);
 	}
 	
-	public static int orderId1 = 0;
+	public static int orderId = 1;
 	
 	/**
 	 * A function to make an order.
@@ -121,7 +123,7 @@ public class RoomService {
 	 * @return
 	 */
 	public int getOrderId() {
-		return this.orderId;
+		return this.orderIdLocal;
 	}
 	
 }

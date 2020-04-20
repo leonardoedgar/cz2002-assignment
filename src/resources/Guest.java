@@ -172,7 +172,7 @@ public class Guest {
 	 * @throws {FoodNotOnMenuException} when food ordered not on menu
 	 */
 	public void makeOrder(Menu menu, Hashtable<String, String> orderMap, int orderId) throws FoodNotOnMenuException {
-		RoomService roomService = new RoomService(menu, orderId);
+		RoomService roomService = new RoomService(menu);
 		roomService.makeOrder(orderMap);
 		this.roomServiceList.add(roomService);
 	}
