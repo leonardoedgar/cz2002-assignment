@@ -11,6 +11,7 @@ import java.io.FileReader;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.Serializable;
 
 import exception.HotelSetupFailureException;
 import exception.InvalidHotelTimeException;
@@ -24,9 +25,9 @@ import exception.GuestNotFoundException;
 /**
  * A class to represent a hotel.
  */
-public class Hotel {
+public class Hotel implements Serializable {
 	// {"roomType": {"roomNo": Room()}}
-	Hashtable<String, Hashtable<String, Room>> roomTable;
+	private Hashtable<String, Hashtable<String, Room>> roomTable = new Hashtable<String, Hashtable<String, Room>>();
 	private ReservationSystem reservationSystem;
 	private Date currentDate;
 	private int checkInTimeInMilliSeconds; 
@@ -690,7 +691,7 @@ public class Hotel {
 			if (roomType.equals(aRoomType)) {
 				for (String roomNo : this.roomTable.get(roomType).keySet()) {
 					Room room = this.roomTable.get(roomType).get(roomNo);
-					if (room.getStatus() == "vacant" || room.getStatus() == "occupied") {
+					if (room.getStatus().equals("vacant")  || room.getStatus().equals("occupied") ) {
 						numberOfRooms += 1;
 					}
 				}

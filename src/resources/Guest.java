@@ -1,5 +1,6 @@
 package resources;
 import java.util.Date;
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.Hashtable;
 import java.util.ArrayList;
@@ -12,7 +13,7 @@ import resources.Payment;
 /**
  * A class to represent a guest in a hotel.
  */
-public class Guest {
+public class Guest implements Serializable{
 	private String name;
 	private String cardDetails;
 	private String address;

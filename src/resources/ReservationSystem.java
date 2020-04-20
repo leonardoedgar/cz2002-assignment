@@ -2,6 +2,7 @@ package resources;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.concurrent.ConcurrentHashMap;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -15,7 +16,7 @@ import exception.IdGenerationFailedException;
 /**
  * A class to represent a reservation system.
  */
-public class ReservationSystem {
+public class ReservationSystem implements Serializable{
 	//{"DD MM YYYY": {"roomType": Reservation}}
 	private ConcurrentHashMap<String, ConcurrentHashMap<String, ArrayList<Reservation>>> reservationTable;
 	
